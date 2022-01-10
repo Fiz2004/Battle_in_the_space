@@ -4,8 +4,12 @@
     <string name="options_main_button">Options</string>
     <string name="exit_main_button">Exit</string>
 
+    <string name="one_players_options_radiobutton">1 Player </string>
+    <string name="two_players_options_radiobutton">2 Players</string>
+    <string name="three_players_options_radiobutton">3 Players</string>
+    <string name="four_players_options_radiobutton">4 Players</string>
     <string name="name_options_textview">Name:</string>
-    <string name="name_options_editview">Enter name</string>
+    <string name="name_options_edittext">Enter name</string>
     <string name="exit_options_button">Exit</string>
 
     <string name="new_game_game_button">New game</string>

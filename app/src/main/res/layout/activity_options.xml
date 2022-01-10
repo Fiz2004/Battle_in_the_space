@@ -1,37 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="10dp"
     tools:context=".OptionsActivity">
+
+
+    <RadioGroup
+        android:id="@+id/radios"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/one_players_options_radiobutton"
+                style="@style/RadioButtonStyle"
+                android:text="@string/one_players_options_radiobutton" />
+
+            <TextView
+                android:id="@+id/one_players_options_textview"
+                style="@style/TextViewStyle"
+                android:text="@string/name_options_textview" />
+
+            <EditText
+                android:id="@+id/one_players_options_edittext"
+                style="@style/EditTextStyle"
+                android:hint="@string/name_options_edittext" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/two_players_options_radiobutton"
+                style="@style/RadioButtonStyle"
+                android:text="@string/two_players_options_radiobutton" />
+
+            <TextView
+                android:id="@+id/two_players_options_textview"
+                style="@style/TextViewStyle"
+                android:text="@string/name_options_textview" />
+
+            <EditText
+                android:id="@+id/two_players_options_edittext"
+                style="@style/EditTextStyle"
+                android:hint="@string/name_options_edittext" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/three_players_options_radiobutton"
+                style="@style/RadioButtonStyle"
+                android:text="@string/two_players_options_radiobutton" />
+
+            <TextView
+                android:id="@+id/three_players_options_textview"
+                style="@style/TextViewStyle"
+                android:text="@string/name_options_textview" />
+
+            <EditText
+                android:id="@+id/three_players_options_edittext"
+                style="@style/EditTextStyle"
+                android:hint="@string/name_options_edittext" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/four_players_options_radiobutton"
+                style="@style/RadioButtonStyle"
+                android:text="@string/four_players_options_radiobutton" />
+
+            <TextView
+                android:id="@+id/four_players_options_textview"
+                style="@style/TextViewStyle"
+                android:text="@string/name_options_textview" />
+
+            <EditText
+                android:id="@+id/four_players_options_edittext"
+                style="@style/EditTextStyle"
+                android:hint="@string/name_options_edittext" />
+
+        </LinearLayout>
+
+
+    </RadioGroup>
 
     <Button
         android:id="@+id/exit_options_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
         android:text="@string/exit_options_button"
+        android:layout_marginStart="131dp"
+        android:layout_marginEnd="131dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/name_options_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="171dp"
-        tools:layout_editor_absoluteY="163dp" />
-
-    <EditText
-        android:id="@+id/name_options_editview"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Введите имя"
-        app:layout_constraintTop_toBottomOf="@+id/name_options_textview"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,38 +1,63 @@
-package com.fiz.tetriswithlife
+package com.fiz.android.battleinthespace
 
+import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.widget.ProgressBar
 
 private const val NUMBER_FRAMES_ELEMENTS = 4
 
 // Время без дыхания для проигрыша
 private const val TIMES_BREATH_LOSE = 60
 
-//class State(
-//  width: Int,
-//  height: Int,
-//  _settings: SharedPreferences
-//) {
+class State(
+    width: Int,
+    height: Int,
+    _settings: SharedPreferences
+) {
 //  val grid = Grid(width, height)
 //  val character = CharacterBreath(grid)
 //
 //  var scores = 0
 //  var record = _settings.getInt("Record", 0)
-//
-//  var status = "playing"
-//
-//  var nextFigure: Figure = Figure()
+
+    var Gam: ClGam = ClGam()
+
+    var status = "playing"
+
+    //  var nextFigure: Figure = Figure()
 //  var currentFigure: CurrentFigure = CurrentFigure(grid, nextFigure)
 //
 //  private val settings = _settings
-//  private var pauseTime: Long = System.currentTimeMillis()
-//
-//  private fun createCurrentFigure() {
+    private var pauseTime: Long = System.currentTimeMillis()
+
+    private fun createCurrentFigure() {
 //    currentFigure = CurrentFigure(grid, nextFigure)
 //    nextFigure = Figure()
-//  }
-//
-//  fun update(deltaTime: Float, controller: Controller): Boolean {
+    }
+
+    fun update(deltaTime: Float, controller: Array<Controller>): Boolean {
+        Gam.KadrKor()
+        Gam.KadrPul()
+        Gam.KadrMet()
+
+        for (n in 0..Gam.Players - 1) {
+            if (controller[n].Up == true)
+                Gam.Up(n);
+            if (controller[n].Right == true)
+                Gam.Right(n);
+            if (controller[n].Left == true)
+                Gam.Left(n);
+            if (controller[n].Vystr == true) {
+                if (controller[n].PauseVystr == 0) {
+                    Gam.Vystr(n)
+                    controller[n].PauseVystr = 500
+                } else {
+                    controller[n].PauseVystr -= deltaTime.toInt()
+                    if (controller[n].PauseVystr < 0)
+                        controller[n].PauseVystr = 0
+                }
+            }
+        }
+
 //    if (!actionsControl(controller)
 //      || (!character.isBreath(grid) && (checkLose() || isCrushedBeetle()))
 //      || status == "new game"
@@ -50,10 +75,10 @@ private const val TIMES_BREATH_LOSE = 60
 //      changeGridDestroyElement()
 //    }
 //
-//    return true
-//  }
-//
-//  private fun actionsControl(controller: Controller): Boolean {
+        return true
+    }
+
+    private fun actionsControl(controller: Controller): Boolean {
 //    val status = currentFigure.moves(controller)
 //    if (status == "endGame"
 //      // Фигура достигла препятствия
@@ -67,10 +92,10 @@ private const val TIMES_BREATH_LOSE = 60
 //      createCurrentFigure()
 //    }
 //
-//    return true
-//  }
-//
-//  private fun isCrushedBeetle(): Boolean {
+        return true
+    }
+
+    private fun isCrushedBeetle(): Boolean {
 //    val tile = character.posTile
 //    for (elem in currentFigure.getPositionTile())
 //      if (elem == tile
@@ -78,10 +103,10 @@ private const val TIMES_BREATH_LOSE = 60
 //      )
 //        return true
 //
-//    return false
-//  }
-//
-//  private fun fixation() {
+        return false
+    }
+
+    private fun fixation() {
 //    val tile = currentFigure.getPositionTile()
 //    for ((index, value) in tile.withIndex())
 //      grid.space[value.y][value.x].block =
@@ -110,9 +135,9 @@ private const val TIMES_BREATH_LOSE = 60
 //      prefEditor.putInt("Record", scores)
 //      prefEditor.apply()
 //    }
-//  }
-//
-//  private fun changeGridDestroyElement() {
+    }
+
+    private fun changeGridDestroyElement() {
 //    val offset = Point(character.move.x, character.move.y)
 //    if (offset.x == -1)
 //      offset.x = 0
@@ -123,10 +148,10 @@ private const val TIMES_BREATH_LOSE = 60
 //    )
 //    grid.space[tile.y][tile.x].status[character.getDirectionEat()] =
 //      getStatusDestroyElement() + 1
-//
-//  }
-//
-//  private fun getStatusDestroyElement(): Int {
+
+    }
+
+    private fun getStatusDestroyElement(): Int {
 //    if (character.angle == 0F)
 //      return floor((character.position.x % 1) * NUMBER_FRAMES_ELEMENTS.toDouble())
 //        .toInt()
@@ -134,10 +159,10 @@ private const val TIMES_BREATH_LOSE = 60
 //      return 3 - floor((character.position.x % 1) * NUMBER_FRAMES_ELEMENTS.toDouble())
 //        .toInt()
 //
-//    return 0
-//  }
-//
-//  private fun checkLose(): Boolean {
+        return 0
+    }
+
+    private fun checkLose(): Boolean {
 //    if ((this.grid.isNotFree(character.posTile) && character.eat == 0)
 //      || TIMES_BREATH_LOSE - ceil(
 //        (System.currentTimeMillis() - character.timeBreath)
@@ -146,157 +171,90 @@ private const val TIMES_BREATH_LOSE = 60
 //    )
 //      return true
 //
-//    return false
-//  }
-//
-//  fun clickPause() {
-//    if (status == "playing") {
-//      status = "pause"
-//      pauseTime = System.currentTimeMillis()
-//    } else {
-//      status = "playing"
+        return false
+    }
+
+    fun clickPause() {
+        if (status == "playing") {
+            status = "pause"
+            pauseTime = System.currentTimeMillis()
+        } else {
+            status = "playing"
 //      character.timeBreath += System.currentTimeMillis() - pauseTime
-//    }
-//  }
-//}
+        }
+    }
+}
 
-private const val cVmaxKor = 5
-private const val cVmaxPul = 1
-private const val cVmaxMet = 0.5
+const val cVmaxKor = 5
+const val cVmaxPul = 1
+const val cVmaxMet = 0.5
 
-//Запись Корабля
-private data class RecKor(
-  //Координаты
-  var CX: Double,
-  var CY: Double,
-  //Скорость
-  var VX: Double,
-  var VY: Double,
-  //Угол поворота
-  var Angle: Double,
-  var InGame: Boolean
+data class Spaceship(
+    //Координаты
+    var CX: Double,
+    var CY: Double,
+    //Скорость
+    var VX: Double,
+    var VY: Double,
+    //Угол поворота
+    var Angle: Double,
+    var InGame: Boolean
 ) {}
 
 //Запись пули
-private data class RecPul(
+data class Bullet(
 //Координаты
-  var X: Double,
-  var Y: Double,
+    var X: Double,
+    var Y: Double,
 //Скорость
-  var VX: Double,
-  var VY: Double,
+    var VX: Double,
+    var VY: Double,
 //Угол под которым летит
-  var Angle: Double,
+    var Angle: Double,
 //Пройденный путь
-  var Put: Double,
+    var Put: Double,
 //Игрок выпустивший пулю
-  var Nom: Int
+    var Nom: Int
 ) {}
 
-//Запись метеорита
-private data class recMet(
+data class Meteorite(
 //Координаты
-  var X: Double,
-  var Y: Double,
+    var X: Double,
+    var Y: Double,
 //Скорость
-  var VX: Double,
-  var VY: Double,
+    var VX: Double,
+    var VY: Double,
 //Угол
-  var Angle: Double,
-  var Razmer: Int,
+    var Angle: Double,
+    var Razmer: Int,
 //Размер: 0-Самый большой;5-самый маленький
-  var TipRazmer: Int,
+    var TipRazmer: Int,
 //Тип
-  var Tip: Int
+    var Tip: Int
 ) {}
 
 //Запись анимации взрыва пули
-private data class recAnimKonecPul(
-  //Координаты
-  var X: Double,
-  var Y: Double,
+data class AnimationBulletDestroy(
+    //Координаты
+    var X: Double,
+    var Y: Double,
 //Кадр
-  var Kadr: Int
+    var Kadr: Int
 ) {}
 
 //Запись анимации взрыва Корабля
-private data class recAnimKonecKor(
-  //Координаты
-  var X: Double,
-  var Y: Double,
+data class AnimationSpaceshipDestroy(
+    //Координаты
+    var X: Double,
+    var Y: Double,
 //Кадр
-  var Kadr: Int
+    var Kadr: Int
 ) {}
 
-//Запись кортинок
-private data class recBmp(
-  //Фон
-  var Fon: Array<Bitmap>,//[0..7]
-//Корабль
-  var Kor: Array<Bitmap>,//[0..3]
+data class RecKey(var temp: Int = 0) {}
 
-//Маска корабля
-  var KorMask: Bitmap,
-  var KonecKor: Array<Bitmap>,//[0..4]
-  var KonecKorMask: Array<Bitmap>,//[0..4]
-
-//Корабль символизирующий жизни
-  var KorGizn: Array<Bitmap>,//[0..3]
-
-//Маска Корабль символизирующий жизни
-  var KorGiznMask: Bitmap,
-
-//Пуля
-  var Pul: Bitmap,
-
-//Маска пули
-  var PulMask: Bitmap,
-
-//Взрыв пули
-  var KonecPul: Array<Bitmap>,//[0..2]
-
-//Маска взрыва пули
-  var KonecPulMask: Array<Bitmap>,//[0..2]
-
-//Метеориты
-  var Met: Array<Array<Bitmap>>,//[0..3, 0..1]
-
-//Маска метеоритов
-  var MetMask: Array<Bitmap>,//[0..3]
+data class Respawn(
+    var X: Int,
+    var Y: Int,
+    var Angle: Int
 ) {}
-
-private data class RecKey(var temp = 0) {}
-
-private data class RecRespaun(
-  var X: Int,
-  var Y: Int,
-  var Angle: Int
-) {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class TfrmOption {
-  fun rbPlayersClick() {
-    Gam.Players: = rbPlayers.ItemIndex+1
-    Gam.NewGame()
-  }
-
-  fun cmdReturnClick() {
-    Close()
-  }
-
-}

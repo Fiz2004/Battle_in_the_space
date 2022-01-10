@@ -9,28 +9,19 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/name_main_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Name: " />
-
     <Button
         android:id="@+id/new_game_main_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
         android:text="@string/new_game_main_button" />
 
     <Button
         android:id="@+id/options_main_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
         android:text="@string/options_main_button" />
 
     <Button
         android:id="@+id/exit_main_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/ButtonStyle"
         android:text="@string/exit_main_button" />
 
 

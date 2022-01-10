@@ -1,12 +1,10 @@
-package com.fiz.tetriswithlife
+package com.fiz.android.battleinthespace
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.*
 import android.view.SurfaceHolder
-import android.widget.Button
-import android.widget.TextView
 import kotlin.math.min
 
 private const val TIME_UPDATE_CONTROLLER = 80
@@ -14,28 +12,26 @@ private const val widthCanvas: Int = 13
 private const val heightCanvas: Int = 25
 
 data class Controller(
-    var Down: Boolean = false,
+    var Vystr: Boolean = false,
     var Up: Boolean = false,
     var Left: Boolean = false,
     var Right: Boolean = false,
+    var PauseVystr:Int=0
 )
 
 class DrawThread(
     private val surfaceHolder: SurfaceHolder,
-    private val nextFigureSurfaceHolder: SurfaceHolder,
+    private val informationSurfaceHolder: SurfaceHolder,
+    private val settings: SharedPreferences,
     resources: Resources,
-    scoresTextView: TextView,
-    private val settings: SharedPreferences, recordTextView: TextView,
-    infoBreathTextview: TextView, breathTextview: TextView,
-    pauseButton: Button, context:Context
+    context:Context
 ) : Thread() {
     private var prevTime = System.currentTimeMillis()
     private var deltaTime = 0
     private var ending = 1000
 
     private val display = Display(
-        resources, scoresTextView,
-        recordTextView, infoBreathTextview, breathTextview, pauseButton,
+        resources,
         context
     )
 
@@ -43,7 +39,7 @@ class DrawThread(
         widthCanvas, heightCanvas, settings
     )
 
-    val controller = Controller()
+    val controller:Array<Controller> = Array(4){Controller()}
 
     private var running = false
 
@@ -62,11 +58,11 @@ class DrawThread(
             nextFigureCanvas = null
             try {
                 canvas = surfaceHolder.lockCanvas(null)
-                nextFigureCanvas = nextFigureSurfaceHolder.lockCanvas(null)
+                nextFigureCanvas = informationSurfaceHolder.lockCanvas(null)
                 if (canvas == null) continue
                 if (nextFigureCanvas == null) continue
                 synchronized(surfaceHolder) {
-                    synchronized(nextFigureSurfaceHolder) {
+                    synchronized(informationSurfaceHolder) {
                         var status = true
                         if (state.status != "pause") {
                             if (deltaTime > TIME_UPDATE_CONTROLLER) {
@@ -93,7 +89,7 @@ class DrawThread(
             } finally {
                 if (canvas != null) {
                     surfaceHolder.unlockCanvasAndPost(canvas)
-                    nextFigureSurfaceHolder.unlockCanvasAndPost(nextFigureCanvas)
+                    informationSurfaceHolder.unlockCanvasAndPost(nextFigureCanvas)
                 }
             }
         }
