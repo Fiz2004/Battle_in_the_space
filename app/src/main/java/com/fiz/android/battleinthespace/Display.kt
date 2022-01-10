@@ -267,7 +267,7 @@ class Display(
                 state.Gam.Raz1 = 0
         }
 
-        var tempArrayAnimationSpaceshipDestroy: Array<AnimationSpaceshipDestroy> = emptyArray()
+        var tempArrayAnimationSpaceshipDestroy: MutableList<AnimationSpaceshipDestroy> = mutableListOf()
         for (n in 0..state.Gam.animationSpaceshipDestroy.size - 1)
             if (state.Gam.animationSpaceshipDestroy[n].Kadr <= 7)
                 tempArrayAnimationSpaceshipDestroy += state.Gam.animationSpaceshipDestroy[n]
@@ -329,7 +329,7 @@ class Display(
                 state.Gam.Raz = 0
         }
 
-        var tempArrayAnimationBulletDestroy: Array<AnimationBulletDestroy> = emptyArray()
+        var tempArrayAnimationBulletDestroy: MutableList<AnimationBulletDestroy> = mutableListOf()
         for (n in 0..state.Gam.animationBulletDestroy.size - 1)
             if (state.Gam.animationBulletDestroy[n].Kadr <= 4)
                 tempArrayAnimationBulletDestroy += state.Gam.animationBulletDestroy[n]
@@ -375,59 +375,59 @@ class Display(
 
     private fun drawSpaceship(state: State, canvas: Canvas) {
         for (nom in 0 until state.Gam.Players)
-            if (state.Gam.spaceship[nom].InGame == true) {
+            if (state.Gam.spaceships[nom].InGame == true) {
                 Risov(
-                    state.Gam.spaceship[nom].Angle,
-                    state.Gam.spaceship[nom].CX,
-                    state.Gam.spaceship[nom].CY,
+                    state.Gam.spaceships[nom].Angle,
+                    state.Gam.spaceships[nom].CX,
+                    state.Gam.spaceships[nom].CY,
                     nom,
                     canvas
                 );
-                if (state.Gam.spaceship[nom].CY + 50 >= canvas.height)
+                if (state.Gam.spaceships[nom].CY + 50 >= canvas.height)
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX,
-                        state.Gam.spaceship[nom].CY - canvas.height,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX,
+                        state.Gam.spaceships[nom].CY - canvas.height,
                         nom,
                         canvas
                     )
-                if (state.Gam.spaceship[nom].CX + 50 >= canvas.width)
+                if (state.Gam.spaceships[nom].CX + 50 >= canvas.width)
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX - canvas.width,
-                        state.Gam.spaceship[nom].CY,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX - canvas.width,
+                        state.Gam.spaceships[nom].CY,
                         nom,
                         canvas
                     );
-                if ((state.Gam.spaceship[nom].CX + 50 >= canvas.width) && (state.Gam.spaceship[nom].CY + 50 >= canvas.height))
+                if ((state.Gam.spaceships[nom].CX + 50 >= canvas.width) && (state.Gam.spaceships[nom].CY + 50 >= canvas.height))
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX - canvas.width,
-                        state.Gam.spaceship[nom].CY - canvas.height,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX - canvas.width,
+                        state.Gam.spaceships[nom].CY - canvas.height,
                         nom,
                         canvas
                     );
-                if (state.Gam.spaceship[nom].CX - 50 <= 0)
+                if (state.Gam.spaceships[nom].CX - 50 <= 0)
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX + canvas.width,
-                        state.Gam.spaceship[nom].CY,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX + canvas.width,
+                        state.Gam.spaceships[nom].CY,
                         nom,
                         canvas
                     );
-                if (state.Gam.spaceship[nom].CY - 50 <= 0)
+                if (state.Gam.spaceships[nom].CY - 50 <= 0)
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX,
-                        state.Gam.spaceship[nom].CY + canvas.height,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX,
+                        state.Gam.spaceships[nom].CY + canvas.height,
                         nom,
                         canvas
                     );
-                if ((state.Gam.spaceship[nom].CX - 50 <= 0) && (state.Gam.spaceship[nom].CY - 50 <= 0))
+                if ((state.Gam.spaceships[nom].CX - 50 <= 0) && (state.Gam.spaceships[nom].CY - 50 <= 0))
                     Risov(
-                        state.Gam.spaceship[nom].Angle,
-                        state.Gam.spaceship[nom].CX + canvas.width,
-                        state.Gam.spaceship[nom].CY + canvas.height,
+                        state.Gam.spaceships[nom].Angle,
+                        state.Gam.spaceships[nom].CX + canvas.width,
+                        state.Gam.spaceships[nom].CY + canvas.height,
                         nom,
                         canvas
                     );
@@ -435,8 +435,8 @@ class Display(
     }
 
     private fun drawBullet(state: State, canvas: Canvas) {
-        if (state.Gam.bullet.size > 0)
-            for (n in 0 until state.Gam.bullet.size)
+        if (state.Gam.bullets.size > 0)
+            for (n in 0 until state.Gam.bullets.size)
                 canvas.drawBitmap(
                     bmpBullet,
                     Rect(
@@ -446,10 +446,10 @@ class Display(
                         bmpBullet.height
                     ),
                     RectF(
-                        Math.floor(state.Gam.bullet[n].X).toFloat(),
-                        Math.floor(state.Gam.bullet[n].Y).toFloat(),
-                        Math.floor(state.Gam.bullet[n].X).toFloat() + 5,
-                        Math.floor(state.Gam.bullet[n].Y).toFloat() + 5
+                        Math.floor(state.Gam.bullets[n].X).toFloat(),
+                        Math.floor(state.Gam.bullets[n].Y).toFloat(),
+                        Math.floor(state.Gam.bullets[n].X).toFloat() + 5,
+                        Math.floor(state.Gam.bullets[n].Y).toFloat() + 5
                     ),
                     paint
                 )

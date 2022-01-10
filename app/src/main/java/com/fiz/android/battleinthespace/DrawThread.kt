@@ -49,18 +49,18 @@ class DrawThread(
 
     override fun run() {
         var canvas: Canvas?
-        var nextFigureCanvas: Canvas?
+        var informationCanvas: Canvas?
         while (running) {
             val now = System.currentTimeMillis()
             deltaTime += min(now - prevTime, 100).toInt()
             val tempDeltaTime = deltaTime
             canvas = null
-            nextFigureCanvas = null
+            informationCanvas = null
             try {
                 canvas = surfaceHolder.lockCanvas(null)
-                nextFigureCanvas = informationSurfaceHolder.lockCanvas(null)
+                informationCanvas = informationSurfaceHolder.lockCanvas(null)
                 if (canvas == null) continue
-                if (nextFigureCanvas == null) continue
+                if (informationCanvas == null) continue
                 synchronized(surfaceHolder) {
                     synchronized(informationSurfaceHolder) {
                         var status = true
@@ -72,7 +72,7 @@ class DrawThread(
                                 deltaTime = 0
                             }
                         }
-                        display.render(state, canvas, nextFigureCanvas)
+                        display.render(state, canvas, informationCanvas)
                         if (!status || ending != 1000) {
                             ending -= tempDeltaTime
                         }
@@ -89,7 +89,7 @@ class DrawThread(
             } finally {
                 if (canvas != null) {
                     surfaceHolder.unlockCanvasAndPost(canvas)
-                    informationSurfaceHolder.unlockCanvasAndPost(nextFigureCanvas)
+                    informationSurfaceHolder.unlockCanvasAndPost(informationCanvas)
                 }
             }
         }
