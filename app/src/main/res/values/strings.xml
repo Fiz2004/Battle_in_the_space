@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tetris with life</string>
+    <string name="app_name">Battle in the space</string>
     <string name="new_game_main_button">New game</string>
     <string name="options_main_button">Options</string>
     <string name="exit_main_button">Exit</string>

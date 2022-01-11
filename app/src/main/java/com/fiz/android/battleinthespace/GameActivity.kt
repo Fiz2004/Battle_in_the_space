@@ -4,9 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceView
-import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class GameActivity : AppCompatActivity() {
@@ -19,22 +17,30 @@ class GameActivity : AppCompatActivity() {
     private lateinit var gameSurfaceView: SurfaceView
     private lateinit var informationSurfaceView: SurfaceView
 
+    var lastX: Float = 0F
+    var lastY: Float = 0F
+    var touchDown: Boolean = false
+    val sensivity: Float = 10F
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        newGameButton=findViewById(R.id.new_game_game_button)
-        pauseButton=findViewById(R.id.pause_game_button)
-        exitButton=findViewById(R.id.exit_game_button)
+        newGameButton = findViewById(R.id.new_game_game_button)
+        pauseButton = findViewById(R.id.pause_game_button)
+        exitButton = findViewById(R.id.exit_game_button)
 
-        gameSurfaceView=findViewById(R.id.game_game_surfaceview)
-        informationSurfaceView=findViewById(R.id.information_game_surfaceview)
+        gameSurfaceView = findViewById(R.id.game_game_surfaceview)
+        informationSurfaceView = findViewById(R.id.information_game_surfaceview)
 
-        drawThread = DrawThread(gameSurfaceView.holder,
+        drawThread = DrawThread(
+            gameSurfaceView.holder,
             informationSurfaceView.holder,
             getSharedPreferences("data", Context.MODE_PRIVATE),
             resources,
-            this.applicationContext)
+            this.applicationContext,
+            pauseButton
+        )
 
         drawThread!!.setRunning(true)
         drawThread!!.start()
@@ -53,18 +59,47 @@ class GameActivity : AppCompatActivity() {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                drawThread!!.controller[0].Vystr = true
-                drawThread!!.controller[0].Up = false
-                drawThread!!.controller[0].Left = false
-                drawThread!!.controller[0].Right = false
+                drawThread?.controller?.get(0)?.fire = true
+                drawThread?.controller?.get(0)?.up = false
+                drawThread?.controller?.get(0)?.down = false
+                drawThread?.controller?.get(0)?.left = false
+                drawThread?.controller?.get(0)?.right = false
+                touchDown = true
             }
             MotionEvent.ACTION_MOVE -> {
+                if (touchDown) {
+                    drawThread?.controller?.get(0)?.up = false
+                    drawThread?.controller?.get(0)?.down = false
+                    if (event.y < lastY-sensivity) {
+                        drawThread?.controller?.get(0)?.up = true
+                        drawThread?.controller?.get(0)?.down = false
+                    }
+                    if (event.y > lastY+sensivity) {
+                        drawThread?.controller?.get(0)?.down = true
+                        drawThread?.controller?.get(0)?.up = false
+                    }
+
+                    drawThread?.controller?.get(0)?.left = false
+                    drawThread?.controller?.get(0)?.right = false
+                    if (event.x < lastX-sensivity) {
+                        drawThread?.controller?.get(0)?.left = true
+                        drawThread?.controller?.get(0)?.right = false
+                    }
+                    if (event.x > lastX+sensivity) {
+                        drawThread?.controller?.get(0)?.left = true
+                        drawThread?.controller?.get(0)?.right = false
+                    }
+                }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                drawThread!!.controller[0].Vystr = false
-                drawThread!!.controller[0].Up = false
-                drawThread!!.controller[0].Left = false
-                drawThread!!.controller[0].Right = false
+                drawThread?.controller?.get(0)?.fire = false
+                drawThread?.controller?.get(0)?.up = false
+                drawThread?.controller?.get(0)?.down = false
+                drawThread?.controller?.get(0)?.left = false
+                drawThread?.controller?.get(0)?.right = false
+                lastX = event?.x
+                lastY = event?.y
+                touchDown = false
             }
         }
         return super.onTouchEvent(event)

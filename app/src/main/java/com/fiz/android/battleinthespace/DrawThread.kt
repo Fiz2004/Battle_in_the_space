@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.*
 import android.view.SurfaceHolder
+import android.widget.Button
 import kotlin.math.min
 
 private const val TIME_UPDATE_CONTROLLER = 80
@@ -12,11 +13,12 @@ private const val widthCanvas: Int = 13
 private const val heightCanvas: Int = 25
 
 data class Controller(
-    var Vystr: Boolean = false,
-    var Up: Boolean = false,
-    var Left: Boolean = false,
-    var Right: Boolean = false,
-    var PauseVystr:Int=0
+    var fire: Boolean = false,
+    var up: Boolean = false,
+    var left: Boolean = false,
+    var right: Boolean = false,
+    var down: Boolean = false,
+    var timeLastFire:Int=0
 )
 
 class DrawThread(
@@ -24,19 +26,21 @@ class DrawThread(
     private val informationSurfaceHolder: SurfaceHolder,
     private val settings: SharedPreferences,
     resources: Resources,
-    context:Context
+    context:Context,
+    pauseButton: Button
 ) : Thread() {
     private var prevTime = System.currentTimeMillis()
     private var deltaTime = 0
     private var ending = 1000
 
-    private val display = Display(
-        resources,
-        context
+    var state = State(
+        width=30.0,height=30.0, settings
     )
 
-    var state = State(
-        widthCanvas, heightCanvas, settings
+    private val display = Display(
+        resources,
+        context,
+        pauseButton
     )
 
     val controller:Array<Controller> = Array(4){Controller()}
@@ -78,7 +82,7 @@ class DrawThread(
                         }
                         if (ending < 0 || state.status == "new game") {
                             state = State(
-                                widthCanvas, heightCanvas, settings
+                                width=30.0,height=30.0, settings
                             )
                             ending = 1000
                             deltaTime = 0
