@@ -5,9 +5,9 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val speedSpaceShipMax = 0.1
-private const val speedBulletMax = 0.02
-private const val speedMeteoriteMax = 0.01
+private const val speedSpaceShipMax= 500.0/1000
+private const val speedMeteoriteMax = 100.0/1000
+private const val speedBulletMax = 200.0/1000
 
 class State(
     val width: Double,
@@ -73,10 +73,7 @@ class State(
             spaceShips += SpaceShip(
                 centerX = respawns[n].centerX.toDouble(),
                 centerY = respawns[n].centerY.toDouble(),
-                speedX = 0.0,
-                speedY = 0.0,
                 angle = respawns[n].angle.toDouble(),
-                inGame = true
             )
         }
 
@@ -119,10 +116,7 @@ class State(
             spaceShips += SpaceShip(
                 centerX = respawns[n].centerX.toDouble(),
                 centerY = respawns[n].centerY.toDouble(),
-                speedX = 0.0,
-                speedY = 0.0,
                 angle = respawns[n].angle.toDouble(),
-                inGame = true
             )
         }
 
@@ -170,31 +164,31 @@ class State(
         }
     }
 
-    fun update(deltaTime: Float, controller: Array<Controller>): Boolean {
-        for (n in 0 until countPlayers) {
-            if (controller[n].up)
-                updateMoveUp(n)
-            if (controller[n].down)
-                updateMoveDown(n)
-            if (controller[n].right)
-                updateMoveRight(n)
-            if (controller[n].left)
-                updateMoveLeft(n)
-            if (controller[n].fire) {
-                if (controller[n].timeLastFire == 0) {
-                    updatePressFire(n)
-                    controller[n].timeLastFire = 500
+    fun update(controller: Array<Controller>,deltaTime: Int): Boolean {
+        for (player in 0 until countPlayers) {
+            if (controller[player].up)
+                updateMoveUp(player,deltaTime)
+            if (controller[player].down)
+                updateMoveDown(player,deltaTime)
+            if (controller[player].right)
+                updateMoveRight(player,deltaTime)
+            if (controller[player].left)
+                updateMoveLeft(player,deltaTime)
+            if (controller[player].fire) {
+                if (controller[player].timeLastFire == 0) {
+                    updatePressFire(player,deltaTime)
+                    controller[player].timeLastFire = 500
                 } else {
-                    controller[n].timeLastFire -= deltaTime.toInt()
-                    if (controller[n].timeLastFire < 0)
-                        controller[n].timeLastFire = 0
+                    controller[player].timeLastFire -= deltaTime.toInt()
+                    if (controller[player].timeLastFire < 0)
+                        controller[player].timeLastFire = 0
                 }
             }
         }
 
-        updateSpaceShips()
-        updateBullets()
-        updateMeteorites()
+        updateSpaceShips(deltaTime)
+        updateBullets(deltaTime)
+        updateMeteorites(deltaTime)
 
         if (lifes.none { it > 0 } || meteorites.isEmpty()) {
             newRound()
@@ -206,63 +200,27 @@ class State(
         return true
     }
 
-    private fun updateMoveUp(numberPlayer: Int) {
-        if ((spaceShips[numberPlayer].angle != 180.0) && (spaceShips[numberPlayer].angle != 0.0))
-            spaceShips[numberPlayer].speedY -= 0.05 * sin(spaceShips[numberPlayer].angle / 180 * Math.PI)
-
-        if (spaceShips[numberPlayer].speedY >= speedSpaceShipMax)
-            spaceShips[numberPlayer].speedY = speedSpaceShipMax
-
-        if (spaceShips[numberPlayer].speedY <= -speedSpaceShipMax)
-            spaceShips[numberPlayer].speedY = -speedSpaceShipMax
-
-        if ((spaceShips[numberPlayer].angle != 90.0) && (spaceShips[numberPlayer].angle != 270.0))
-            spaceShips[numberPlayer].speedX += 0.05 * cos(spaceShips[numberPlayer].angle / 180 * Math.PI)
-
-        if (spaceShips[numberPlayer].speedX >= speedSpaceShipMax)
-            spaceShips[numberPlayer].speedX = speedSpaceShipMax
-
-        if (spaceShips[numberPlayer].speedX <= -speedSpaceShipMax)
-            spaceShips[numberPlayer].speedX = -speedSpaceShipMax
+    private fun updateMoveUp(numberPlayer: Int,deltaTime: Int) {
+        spaceShips[numberPlayer].moveUp(deltaTime)
     }
 
-    private fun updateMoveDown(numberPlayer: Int) {
-        if ((spaceShips[numberPlayer].angle != 180.0) && (spaceShips[numberPlayer].angle != 0.0))
-            spaceShips[numberPlayer].speedY += 0.05 * sin(spaceShips[numberPlayer].angle / 180 * Math.PI)
-
-        if (spaceShips[numberPlayer].speedY >= speedSpaceShipMax)
-            spaceShips[numberPlayer].speedY = -speedSpaceShipMax
-
-        if (spaceShips[numberPlayer].speedY <= -speedSpaceShipMax)
-            spaceShips[numberPlayer].speedY = speedSpaceShipMax
-
-        if ((spaceShips[numberPlayer].angle != 90.0) && (spaceShips[numberPlayer].angle != 270.0))
-            spaceShips[numberPlayer].speedX -= 0.05 * cos(spaceShips[numberPlayer].angle / 180 * Math.PI)
-
-        if (spaceShips[numberPlayer].speedX >= speedSpaceShipMax)
-            spaceShips[numberPlayer].speedX = -speedSpaceShipMax
-
-        if (spaceShips[numberPlayer].speedX <= -speedSpaceShipMax)
-            spaceShips[numberPlayer].speedX = speedSpaceShipMax
+    private fun updateMoveDown(numberPlayer: Int,deltaTime: Int) {
+        spaceShips[numberPlayer].moveDown(deltaTime)
     }
 
-    private fun updateMoveRight(numberPlayer: Int) {
-        spaceShips[numberPlayer].angle -= 5
-        if (spaceShips[numberPlayer].angle + 5 > 360)
-            spaceShips[numberPlayer].angle -= 360
+    private fun updateMoveRight(numberPlayer: Int,deltaTime: Int) {
+        spaceShips[numberPlayer].moveRight(deltaTime)
     }
 
-    private fun updateMoveLeft(numberPlayer: Int) {
-        spaceShips[numberPlayer].angle += 5
-        if (spaceShips[numberPlayer].angle + 5 < 0)
-            spaceShips[numberPlayer].angle += +360
+    private fun updateMoveLeft(numberPlayer: Int,deltaTime: Int) {
+        spaceShips[numberPlayer].moveLeft(deltaTime)
     }
 
-    private fun updatePressFire(numberPlayer: Int) {
+    private fun updatePressFire(numberPlayer: Int,deltaTime: Int) {
         if (spaceShips[numberPlayer].inGame) {
             bullets += Bullet(
-                centerX = spaceShips[numberPlayer].centerX + 0.5 * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
-                centerY = spaceShips[numberPlayer].centerY - 0.5 * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                centerX = spaceShips[numberPlayer].centerX + (50*deltaTime/1000) * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                centerY = spaceShips[numberPlayer].centerY - (50*deltaTime/1000) * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
                 speedX = +speedBulletMax * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
                 speedY = -speedBulletMax * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
                 angle = 0.0,// TODO Возможно не требуется проверить
@@ -272,19 +230,10 @@ class State(
         }
     }
 
-    private fun updateSpaceShips() {
+    private fun updateSpaceShips(deltaTime: Int) {
         for (spaceShip in spaceShips)
             if (spaceShip.inGame) {
-                spaceShip.centerY += spaceShip.speedY
-                if (spaceShip.centerY > height)
-                    spaceShip.centerY = 0.0
-                if (spaceShip.centerY < 0)
-                    spaceShip.centerY = height
-                spaceShip.centerX = spaceShip.centerX + spaceShip.speedX
-                if (spaceShip.centerX > width)
-                    spaceShip.centerX = 0.0
-                if (spaceShip.centerX < 0)
-                    spaceShip.centerX = width
+                spaceShip.update(deltaTime,width,height)
             } else {
                 val numberPlayer=spaceShips.indexOf(spaceShip)
                 if (lifes[numberPlayer] >= 0)
@@ -442,21 +391,10 @@ class State(
         }
     }
 
-    private fun updateBullets() {
+    private fun updateBullets(deltaTime: Int) {
         if (bullets.isNotEmpty()) {
-            for (n in 0 until bullets.size) {
-                bullets[n].centerX += bullets[n].speedX
-                if (bullets[n].centerX > width)
-                    bullets[n].centerX = 0.0
-                if (bullets[n].centerX < 0)
-                    bullets[n].centerX = width
-                bullets[n].centerY += bullets[n].speedY
-                if (bullets[n].centerY > height)
-                    bullets[n].centerY = 0.0
-                if (bullets[n].centerY < 0)
-                    bullets[n].centerY = height
-                bullets[n].roadLength += speedBulletMax
-            }
+            for (bullet in bullets)
+                bullet.update(deltaTime,width,height)
 
             collisionBulletSpaceShips()
             collisionBulletBullet()
@@ -579,24 +517,11 @@ class State(
         }
     }
 
-    private fun updateMeteorites() {
+    private fun updateMeteorites(deltaTime: Int) {
         if (meteorites.isNotEmpty()) {
-            for (n in meteorites.indices) {
-                meteorites[n].centerX += meteorites[n].speedX
+            for (meteorite in meteorites)
+                meteorite.update(deltaTime,width,height)
 
-                if (meteorites[n].centerX > width)
-                    meteorites[n].centerX = 0.0
-
-                if (meteorites[n].centerX < 0)
-                    meteorites[n].centerX = width
-
-                meteorites[n].centerY += meteorites[n].speedY
-
-                if (meteorites[n].centerY > height)
-                    meteorites[n].centerY = 0.0
-                if (meteorites[n].centerY < 0)
-                    meteorites[n].centerY = height
-            }
             collisionMeteoriteMeteorite()
         }
     }

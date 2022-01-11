@@ -20,7 +20,8 @@ class GameActivity : AppCompatActivity() {
     var lastX: Float = 0F
     var lastY: Float = 0F
     var touchDown: Boolean = false
-    val sensivity: Float = 10F
+    private val sensivityX: Float = 300F
+    private val sensivityY: Float = 30F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,24 +71,20 @@ class GameActivity : AppCompatActivity() {
                 if (touchDown) {
                     drawThread?.controller?.get(0)?.up = false
                     drawThread?.controller?.get(0)?.down = false
-                    if (event.y < lastY-sensivity) {
+                    if (event.y < lastY-sensivityY) {
                         drawThread?.controller?.get(0)?.up = true
-                        drawThread?.controller?.get(0)?.down = false
                     }
-                    if (event.y > lastY+sensivity) {
+                    if (event.y > lastY+sensivityY) {
                         drawThread?.controller?.get(0)?.down = true
-                        drawThread?.controller?.get(0)?.up = false
                     }
 
                     drawThread?.controller?.get(0)?.left = false
                     drawThread?.controller?.get(0)?.right = false
-                    if (event.x < lastX-sensivity) {
+                    if (event.x < lastX-sensivityX) {
                         drawThread?.controller?.get(0)?.left = true
-                        drawThread?.controller?.get(0)?.right = false
                     }
-                    if (event.x > lastX+sensivity) {
-                        drawThread?.controller?.get(0)?.left = true
-                        drawThread?.controller?.get(0)?.right = false
+                    if (event.x > lastX+sensivityX) {
+                        drawThread?.controller?.get(0)?.right = true
                     }
                 }
             }

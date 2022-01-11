@@ -18,7 +18,7 @@ data class Controller(
     var left: Boolean = false,
     var right: Boolean = false,
     var down: Boolean = false,
-    var timeLastFire:Int=0
+    var timeLastFire: Int = 0
 )
 
 class DrawThread(
@@ -26,7 +26,7 @@ class DrawThread(
     private val informationSurfaceHolder: SurfaceHolder,
     private val settings: SharedPreferences,
     resources: Resources,
-    context:Context,
+    context: Context,
     pauseButton: Button
 ) : Thread() {
     private var prevTime = System.currentTimeMillis()
@@ -34,7 +34,7 @@ class DrawThread(
     private var ending = 1000
 
     var state = State(
-        width=30.0,height=30.0, settings
+        width = 16.0, height = 16.0, settings
     )
 
     private val display = Display(
@@ -43,7 +43,7 @@ class DrawThread(
         pauseButton
     )
 
-    val controller:Array<Controller> = Array(4){Controller()}
+    val controller: Array<Controller> = Array(4) { Controller() }
 
     private var running = false
 
@@ -69,12 +69,10 @@ class DrawThread(
                     synchronized(informationSurfaceHolder) {
                         var status = true
                         if (state.status != "pause") {
-                            if (deltaTime > TIME_UPDATE_CONTROLLER) {
-                                if (ending == 1000) {
-                                    status = state.update(deltaTime.toFloat(), controller)
-                                }
-                                deltaTime = 0
+                            if (ending == 1000) {
+                                status = state.update(controller,deltaTime)
                             }
+                            deltaTime = 0
                         }
                         display.render(state, canvas, informationCanvas)
                         if (!status || ending != 1000) {
@@ -82,7 +80,7 @@ class DrawThread(
                         }
                         if (ending < 0 || state.status == "new game") {
                             state = State(
-                                width=30.0,height=30.0, settings
+                                width = 16.0, height = 16.0, settings
                             )
                             ending = 1000
                             deltaTime = 0
