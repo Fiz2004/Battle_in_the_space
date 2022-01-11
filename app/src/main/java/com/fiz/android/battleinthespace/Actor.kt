@@ -1,15 +1,17 @@
 package com.fiz.android.battleinthespace
 
 open class Actor(
-    open var centerX: Double,
-    open var centerY: Double,
+    var centerX: Double,
+    var centerY: Double,
 
-    open var speedX: Double,
-    open var speedY: Double,
+    var speedX: Double,
+    var speedY: Double,
 
-    open var angle: Double
+    var angle: Double,
+
+    var size:Double
 ) {
-    fun update(deltaTime: Int, width: Double, height: Double) {
+    open fun update(deltaTime: Int, width: Double, height: Double) {
         val stepX = speedX * deltaTime / 1000
         centerX += stepX
         if (centerX > width)

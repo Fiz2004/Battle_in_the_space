@@ -4,15 +4,17 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.*
 import android.widget.Button
+import kotlin.math.ceil
 import kotlin.math.min
 
 private const val NUMBER_BITMAP_BACKGROUND = 8
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
 private const val NUMBER_BITMAP_METEORITE_OPTION = 2
 private const val NUMBER_BITMAP_SPACESHIP = 4
-private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 5
 private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
+
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
+private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 5
 
 private const val DIVISION = 8
 
@@ -239,18 +241,15 @@ class Display(
     }
 
     private fun drawAnimationBulletDestroy(state: State, canvas: Canvas) {
-        var k: Int
+
         val rectSrc = Rect(
             0, 0,
             bmpBulletDestroy[0].width, bmpBulletDestroy[0].height
         )
         val size = sizeUnit / 10
         for (n in 0 until state.animationBulletDestroys.size) {
-            k = state.animationBulletDestroys[n].numberFrame
-            if (state.animationBulletDestroys[n].numberFrame == 3)
-                k = 1
-            if (state.animationBulletDestroys[n].numberFrame == 4)
-                k = 0
+            val step=state.animationBulletDestroys[n].timeShowMax/NUMBER_BITMAP_BULLET_DESTROY.toDouble()
+            val frame=NUMBER_BITMAP_BULLET_DESTROY-ceil(state.animationBulletDestroys[n].timeShow/step).toInt()
 
             val rectDst = RectF(
                 (state.animationBulletDestroys[n].centerX * sizeUnit - size / 2).toFloat(),
@@ -259,20 +258,8 @@ class Display(
                 (state.animationBulletDestroys[n].centerY * sizeUnit - size / 2).toFloat() + size
             )
 
-            canvas.drawBitmap(bmpBulletDestroy[k], rectSrc, rectDst, paint)
-
-            if (state.skipFrames == 0)
-                state.animationBulletDestroys[n].numberFrame += 1
-            state.skipFrames += 1
-            if (state.skipFrames > 5)
-                state.skipFrames = 0
+            canvas.drawBitmap(bmpBulletDestroy[frame], rectSrc, rectDst, paint)
         }
-
-        val tempArrayAnimationBulletDestroy: MutableList<AnimationBulletDestroy> = mutableListOf()
-        for (n in 0 until state.animationBulletDestroys.size)
-            if (state.animationBulletDestroys[n].numberFrame <= 4)
-                tempArrayAnimationBulletDestroy += state.animationBulletDestroys[n]
-        state.animationBulletDestroys = tempArrayAnimationBulletDestroy
     }
 
 
@@ -289,8 +276,8 @@ class Display(
                 val rectDst = RectF(
                     meteorite.centerX.toFloat() * sizeUnit,
                     meteorite.centerY.toFloat() * sizeUnit,
-                    meteorite.centerX.toFloat() * sizeUnit + meteorite.sizePx.toFloat() * sizeUnit * 2F,
-                    meteorite.centerY.toFloat() * sizeUnit + meteorite.sizePx.toFloat() * sizeUnit * 2F
+                    meteorite.centerX.toFloat() * sizeUnit + meteorite.size.toFloat() * sizeUnit * 2F,
+                    meteorite.centerY.toFloat() * sizeUnit + meteorite.size.toFloat() * sizeUnit * 2F
                 )
 
                 canvas.drawBitmap(bmpMeteorite, rectSrc, rectDst, paint)
@@ -304,6 +291,8 @@ class Display(
             bmpSpaceshipDestroy[0].width, bmpSpaceshipDestroy[0].height
         )
         for (n in 0 until state.animationSpaceShipDestroys.size) {
+            val step=state.animationSpaceShipDestroys[n].timeShowMax/NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
+            val frame=NUMBER_BITMAP_SPACESHIP_DESTROY-ceil(state.animationSpaceShipDestroys[n].timeShow/step).toInt()
             val rectDst = RectF(
                 state.animationSpaceShipDestroys[n].centerX.toFloat() - sizeUnit/2,
                 state.animationSpaceShipDestroys[n].centerY.toFloat() - sizeUnit/2,
@@ -312,23 +301,10 @@ class Display(
             )
 
             canvas.drawBitmap(
-                bmpSpaceshipDestroy[state.animationSpaceShipDestroys[n].numberFrame], rectSrc,
+                bmpSpaceshipDestroy[frame], rectSrc,
                 rectDst, paint
             )
-            if (state.skipFrames1 == 0)
-                state.animationSpaceShipDestroys[n].numberFrame += 1
-            state.skipFrames1 += 1
-            if (state.skipFrames1 > 7)
-                state.skipFrames1 = 0
         }
-
-        val tempArrayAnimationSpaceShipDestroy: MutableList<AnimationSpaceShipDestroy> =
-            mutableListOf()
-        for (n in 0 until state.animationSpaceShipDestroys.size)
-            if (state.animationSpaceShipDestroys[n].numberFrame <= 7)
-                tempArrayAnimationSpaceShipDestroy += state.animationSpaceShipDestroys[n]
-        state.animationSpaceShipDestroys = tempArrayAnimationSpaceShipDestroy
-
     }
 
 

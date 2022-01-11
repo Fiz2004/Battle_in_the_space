@@ -1,20 +1,21 @@
 package com.fiz.android.battleinthespace
 
-data class Meteorite(
-    override var centerX: Double,
-    override var centerY: Double,
+class Meteorite(
+    centerX: Double,
+    centerY: Double,
 
-    override var speedX: Double = 0.0,
-    override var speedY: Double = 0.0,
+    speedX: Double = 0.0,
+    speedY: Double = 0.0,
 
-    override var angle: Double,
-    var sizePx: Double,
+    angle: Double,
+
+    size:Double,
 
     var viewSize: Int,
 
     var view: Int
 ) : Actor(
-    centerX, centerY, speedX, speedY, angle
+    centerX, centerY, speedX, speedY, angle,size
 ) {
 
 }

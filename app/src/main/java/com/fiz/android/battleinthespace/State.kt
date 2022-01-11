@@ -5,9 +5,9 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val speedSpaceShipMax= 500.0/1000
-private const val speedMeteoriteMax = 100.0/1000
-private const val speedBulletMax = 200.0/1000
+private const val speedSpaceShipMax = 500.0 / 1000
+private const val speedMeteoriteMax = 100.0 / 1000
+private const val speedBulletMax = 4.0
 
 class State(
     val width: Double,
@@ -27,24 +27,24 @@ class State(
     var animationSpaceShipDestroys: MutableList<AnimationSpaceShipDestroy> = mutableListOf()
     private var respawns: MutableList<Respawn> = mutableListOf(
         Respawn(
-            centerX = 1,
-            centerY = 1,
-            angle = 0
+            centerX = 2.0,
+            centerY = 2.0,
+            angle = 0.0
         ),
         Respawn(
-            centerX = 15,
-            centerY = 1,
-            angle = 180
+            centerX = 13.0,
+            centerY = 2.0,
+            angle = 180.0
         ),
         Respawn(
-            centerX = 1,
-            centerY = 15,
-            angle = 0
+            centerX = 2.0,
+            centerY = 13.0,
+            angle = 0.0
         ),
         Respawn(
-            centerX = 15,
-            centerY = 15,
-            angle = 180
+            centerX = 13.0,
+            centerY = 13.0,
+            angle = 180.0
         )
     )
 
@@ -71,9 +71,9 @@ class State(
         spaceShips.clear()
         for (n in 0 until countPlayers) {
             spaceShips += SpaceShip(
-                centerX = respawns[n].centerX.toDouble(),
-                centerY = respawns[n].centerY.toDouble(),
-                angle = respawns[n].angle.toDouble(),
+                centerX = respawns[n].centerX,
+                centerY = respawns[n].centerY,
+                angle = respawns[n].angle,
             )
         }
 
@@ -96,7 +96,7 @@ class State(
                 angle = angle.toDouble(),
                 speedX = +speedMeteoriteMax * cos(angle / 180 * Math.PI),
                 speedY = -speedMeteoriteMax * sin(angle / 180 * Math.PI),
-                sizePx = 0.5,
+                size = 1.0,
                 viewSize = 0,
                 view = 0
             )
@@ -114,9 +114,9 @@ class State(
         spaceShips.clear()
         for (n in 0 until countPlayers) {
             spaceShips += SpaceShip(
-                centerX = respawns[n].centerX.toDouble(),
-                centerY = respawns[n].centerY.toDouble(),
-                angle = respawns[n].angle.toDouble(),
+                centerX = respawns[n].centerX,
+                centerY = respawns[n].centerY,
+                angle = respawns[n].angle,
             )
         }
 
@@ -135,7 +135,7 @@ class State(
                     speedX = +speedMeteoriteMax * cos(angle / 180 * Math.PI),
                     speedY = -speedMeteoriteMax * sin(angle / 180 * Math.PI),
                     angle = angle.toDouble(),
-                    sizePx = 0.5,
+                    size = 1.0,
                     viewSize = 0,
                     view = round - 1
                 )
@@ -148,7 +148,7 @@ class State(
                     speedX = +speedMeteoriteMax * cos(angle / 180 * Math.PI),
                     speedY = -speedMeteoriteMax * sin(angle / 180 * Math.PI),
                     angle = angle.toDouble(),
-                    sizePx = 0.5,
+                    size = 1.0,
                     viewSize = 0,
                     view = round - 1
                 )
@@ -164,22 +164,22 @@ class State(
         }
     }
 
-    fun update(controller: Array<Controller>,deltaTime: Int): Boolean {
+    fun update(controller: Array<Controller>, deltaTime: Int): Boolean {
         for (player in 0 until countPlayers) {
             if (controller[player].up)
-                updateMoveUp(player,deltaTime)
+                updateMoveUp(player, deltaTime)
             if (controller[player].down)
-                updateMoveDown(player,deltaTime)
+                updateMoveDown(player, deltaTime)
             if (controller[player].right)
-                updateMoveRight(player,deltaTime)
+                updateMoveRight(player, deltaTime)
             if (controller[player].left)
-                updateMoveLeft(player,deltaTime)
+                updateMoveLeft(player, deltaTime)
             if (controller[player].fire) {
                 if (controller[player].timeLastFire == 0) {
-                    updatePressFire(player,deltaTime)
+                    updatePressFire(player, deltaTime)
                     controller[player].timeLastFire = 500
                 } else {
-                    controller[player].timeLastFire -= deltaTime.toInt()
+                    controller[player].timeLastFire -= deltaTime
                     if (controller[player].timeLastFire < 0)
                         controller[player].timeLastFire = 0
                 }
@@ -189,6 +189,21 @@ class State(
         updateSpaceShips(deltaTime)
         updateBullets(deltaTime)
         updateMeteorites(deltaTime)
+
+        animationBulletDestroys.forEach {
+            it.numberFrame+=1
+            it.timeShow-=deltaTime
+        }
+        animationBulletDestroys=animationBulletDestroys.filter {
+            it.timeShow>0
+        }.toMutableList()
+        animationSpaceShipDestroys.forEach {
+            it.numberFrame+=1
+            it.timeShow-=deltaTime
+        }
+        animationSpaceShipDestroys=animationSpaceShipDestroys.filter {
+            it.timeShow>0
+        }.toMutableList()
 
         if (lifes.none { it > 0 } || meteorites.isEmpty()) {
             newRound()
@@ -200,29 +215,29 @@ class State(
         return true
     }
 
-    private fun updateMoveUp(numberPlayer: Int,deltaTime: Int) {
+    private fun updateMoveUp(numberPlayer: Int, deltaTime: Int) {
         spaceShips[numberPlayer].moveUp(deltaTime)
     }
 
-    private fun updateMoveDown(numberPlayer: Int,deltaTime: Int) {
+    private fun updateMoveDown(numberPlayer: Int, deltaTime: Int) {
         spaceShips[numberPlayer].moveDown(deltaTime)
     }
 
-    private fun updateMoveRight(numberPlayer: Int,deltaTime: Int) {
+    private fun updateMoveRight(numberPlayer: Int, deltaTime: Int) {
         spaceShips[numberPlayer].moveRight(deltaTime)
     }
 
-    private fun updateMoveLeft(numberPlayer: Int,deltaTime: Int) {
+    private fun updateMoveLeft(numberPlayer: Int, deltaTime: Int) {
         spaceShips[numberPlayer].moveLeft(deltaTime)
     }
 
-    private fun updatePressFire(numberPlayer: Int,deltaTime: Int) {
+    private fun updatePressFire(numberPlayer: Int, deltaTime: Int) {
         if (spaceShips[numberPlayer].inGame) {
             bullets += Bullet(
-                centerX = spaceShips[numberPlayer].centerX + (50*deltaTime/1000) * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
-                centerY = spaceShips[numberPlayer].centerY - (50*deltaTime/1000) * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
-                speedX = +speedBulletMax * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
-                speedY = -speedBulletMax * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                centerX = spaceShips[numberPlayer].centerX + 1 * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                centerY = spaceShips[numberPlayer].centerY + 1 * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                speedX = speedBulletMax * cos(spaceShips[numberPlayer].angle / 180 * Math.PI),
+                speedY = speedBulletMax * sin(spaceShips[numberPlayer].angle / 180 * Math.PI),
                 angle = 0.0,// TODO Возможно не требуется проверить
                 roadLength = 0.0,
                 player = numberPlayer
@@ -233,19 +248,19 @@ class State(
     private fun updateSpaceShips(deltaTime: Int) {
         for (spaceShip in spaceShips)
             if (spaceShip.inGame) {
-                spaceShip.update(deltaTime,width,height)
+                spaceShip.update(deltaTime, width, height)
             } else {
-                val numberPlayer=spaceShips.indexOf(spaceShip)
-                if (lifes[numberPlayer] >= 0)
+                val numberPlayer = spaceShips.indexOf(spaceShip)
+                if (lifes[numberPlayer] > 0)
                     for (k in spaceShips.indices)
                         if (numberPlayer == k) {
                             for (z in 0..3) {
-                                if (isRespawnFree(z, k, numberPlayer)) {
-                                    spaceShips[k].centerX = respawns[z].centerX.toDouble()
-                                    spaceShips[k].centerY = respawns[z].centerY.toDouble()
+                                if (isRespawnFree(z, k)) {
+                                    spaceShips[k].centerX = respawns[z].centerX
+                                    spaceShips[k].centerY = respawns[z].centerY
                                     spaceShips[k].speedX = 0.0
                                     spaceShips[k].speedY = 0.0
-                                    spaceShips[k].angle = respawns[z].angle.toDouble()
+                                    spaceShips[k].angle = respawns[z].angle
                                     spaceShips[k].inGame = true
                                     break
                                 }
@@ -255,37 +270,35 @@ class State(
         collisionSpaceShips()
     }
 
-    private fun isRespawnFree(z: Int, k: Int, player: Int): Boolean {
-        for (n in 0 until countPlayers - 1)
+    fun overlap(actor1: Actor, actor2: Actor): Boolean {
+        val size1 = (actor1.size / 2)
+        val size2 = (actor2.size / 2)
+        val L1 = changeXifBorder(actor1.centerX - size1)
+        val L2 = changeXifBorder(actor2.centerX - size2)
+        val R1 = changeXifBorder(actor1.centerX + size1)
+        val R2 = changeXifBorder(actor2.centerX + size2)
+        val U1 = changeYifBorder(actor1.centerY - size1)
+        val U2 = changeYifBorder(actor2.centerY - size2)
+        val D1 = changeYifBorder(actor1.centerY + size1)
+        val D2 = changeYifBorder(actor2.centerY + size2)
+        val LUA=L1>L2&&L1<R2&&U1>U2&&U1<D2
+        val RUA=R1>L2&&R1<R2&&U1>U2&&U1<D2
+        val LDA=L1>L2&&L1<R2&&D1>U2&&D1<D2
+        val RDA=R1>L2&&R1<R2&&D1>U2&&D1<D2
+
+        return LUA||RUA||LDA||RDA
+    }
+
+    private fun isRespawnFree(z: Int, k: Int): Boolean {
+        for (n in 0 until countPlayers)
             if (n != k)
-                if ((respawns[z].centerX - 2 < spaceShips[n].centerX + 0.5) && (respawns[z].centerX + 2 > spaceShips[n].centerX + 0.5) &&
-                    ((respawns[z].centerY - 2 < spaceShips[n].centerY + 0.5) && (respawns[z].centerY + 2 > spaceShips[n].centerY + 0.5) ||
-                            (respawns[z].centerY - 2 < spaceShips[n].centerY - 0.5) && (respawns[z].centerY + 2 > spaceShips[n].centerY - 0.5)) ||
-                    (respawns[z].centerX - 2 < spaceShips[n].centerX - 0.5) && (respawns[z].centerX + 2 > spaceShips[n].centerX - 0.5) &&
-                    ((respawns[z].centerY - 2 < spaceShips[n].centerY + 0.5) && (respawns[z].centerY + 2 > spaceShips[n].centerY + 0.5) ||
-                            (respawns[z].centerY - 2 < spaceShips[n].centerY - 0.5) && (respawns[z].centerY + 2 > spaceShips[n].centerY - 0.5))
-                )
+                if (overlap(respawns[z], spaceShips[n]))
                     return false
         for (n in 0 until bullets.size)
-            if (n != player)
-                if ((respawns[z].centerX - 2 < bullets[n].centerX + 2) && (respawns[z].centerX + 2 > bullets[n].centerX + 2) &&
-                    ((respawns[z].centerY - 2 < bullets[n].centerY + 2) && (respawns[z].centerY + 2 > bullets[n].centerY + 2) ||
-                            (respawns[z].centerY - 2 < bullets[n].centerY - 2) && (respawns[z].centerY + 2 > bullets[n].centerY - 2)) ||
-                    (respawns[z].centerX - 2 < bullets[n].centerX - 2) && (respawns[z].centerX + 2 > bullets[n].centerX - 2) &&
-                    ((respawns[z].centerY - 2 < bullets[n].centerY + 2) && (respawns[z].centerY + 2 > bullets[n].centerY + 2) ||
-                            (respawns[z].centerY - 2 < bullets[n].centerY - 2) && (respawns[z].centerY + 2 > bullets[n].centerY - 2))
-                )
+                if (overlap(respawns[z], bullets[n]))
                     return false
         for (n in 0 until meteorites.size)
-            if (n != player)
-                if ((respawns[z].centerX - 2 < meteorites[n].centerX + meteorites[n].sizePx) && (respawns[z].centerX + 2 > meteorites[n].centerX + meteorites[n].sizePx) &&
-                    ((respawns[z].centerY - 2 < meteorites[n].centerY + meteorites[n].sizePx) && (respawns[z].centerY + 2 > meteorites[n].centerY + meteorites[n].sizePx) ||
-                            (respawns[z].centerY - 2 < meteorites[n].centerY - meteorites[n].sizePx) && (respawns[z].centerY + 2 > meteorites[n].centerY - meteorites[n].sizePx)) ||
-                    (respawns[z].centerX - 2 < meteorites[n].centerX - meteorites[n].sizePx) && (respawns[z].centerX + 2 > meteorites[n].centerX - meteorites[n].sizePx) &&
-                    ((respawns[z].centerY - 2 < meteorites[n].centerY + meteorites[n].sizePx) && (respawns[z].centerY + 2 > meteorites[n].centerY + meteorites[n].sizePx) ||
-                            (respawns[z].centerY - 2 < meteorites[n].centerY - meteorites[n].sizePx) && (respawns[z].centerY + 2 > meteorites[n].centerY - meteorites[n].sizePx))
-                )
-
+                if (overlap(respawns[z], meteorites[n]))
                     return false
         return true
     }
@@ -300,49 +313,7 @@ class State(
             for (n in 0 until (countPlayers - 1))
                 for (k in (n + 1) until countPlayers)
                     if (spaceShips[n].inGame && spaceShips[k].inGame)
-                        if (((changeXifBorder(spaceShips[n].centerX + 0.5) >= changeXifBorder(
-                                spaceShips[k].centerX - 0.5
-                            )) &&
-                                    (changeXifBorder(spaceShips[n].centerX + 0.5) <= changeXifBorder(
-                                        spaceShips[k].centerX + 0.5
-                                    )) &&
-
-                                    (((changeYifBorder(spaceShips[n].centerY + 0.5) >= changeYifBorder(
-                                        spaceShips[k].centerY - 0.5
-                                    )) &&
-                                            (changeYifBorder(spaceShips[n].centerY + 0.5) <= changeYifBorder(
-                                                spaceShips[k].centerY + 0.5
-                                            ))) ||
-
-                                            ((changeYifBorder(spaceShips[n].centerY - 0.5) >= changeYifBorder(
-                                                spaceShips[k].centerY - 0.5
-                                            )) &&
-                                                    (changeYifBorder(spaceShips[n].centerY - 0.5) <= changeYifBorder(
-                                                        spaceShips[k].centerY + 0.5
-                                                    ))))
-                                    ) ||
-
-                            ((changeXifBorder(spaceShips[n].centerX - 0.5) <= changeXifBorder(
-                                spaceShips[k].centerX + 0.5
-                            )) &&
-                                    (changeXifBorder(spaceShips[n].centerX - 0.5) >= changeXifBorder(
-                                        spaceShips[k].centerX - 0.5
-                                    )) &&
-
-                                    (((changeYifBorder(spaceShips[n].centerY + 0.5) >= changeYifBorder(
-                                        spaceShips[k].centerY - 0.5
-                                    )) &&
-                                            (changeYifBorder(spaceShips[n].centerY + 0.5) <= changeYifBorder(
-                                                spaceShips[k].centerY + 0.5
-                                            ))) ||
-
-                                            ((changeYifBorder(spaceShips[n].centerY - 0.5) >= changeYifBorder(
-                                                spaceShips[k].centerY - 0.5
-                                            )) &&
-                                                    (changeYifBorder(spaceShips[n].centerY - 0.5) <= changeYifBorder(
-                                                        spaceShips[k].centerY + 0.5
-                                                    )))))
-                        ) {
+                        if (overlap(spaceShips[n],spaceShips[k])) {
                             speedSpaceShipX1 = spaceShips[n].speedX
                             speedSpaceShipX2 = spaceShips[k].speedX
                             speedSpaceShipY1 = spaceShips[n].speedY
@@ -394,7 +365,7 @@ class State(
     private fun updateBullets(deltaTime: Int) {
         if (bullets.isNotEmpty()) {
             for (bullet in bullets)
-                bullet.update(deltaTime,width,height)
+                bullet.update(deltaTime, width, height)
 
             collisionBulletSpaceShips()
             collisionBulletBullet()
@@ -417,15 +388,7 @@ class State(
             for (n in 0 until countPlayers)
                 if (spaceShips[n].inGame)
                     for (k in 0 until bullets.size)
-                        if ((((bullets[k].centerX + 2 >= spaceShips[n].centerX - 0.5) && (bullets[k].centerX + 2 <= spaceShips[n].centerX + 0.5) &&
-                                    ((bullets[k].centerY + 2 >= spaceShips[n].centerY - 0.5) && (bullets[k].centerY + 2 <= spaceShips[n].centerY + 0.5) ||
-                                            (bullets[k].centerY - 2 >= spaceShips[n].centerY - 0.5) && (bullets[k].centerY - 2 <= spaceShips[n].centerY + 0.5))) ||
-                                    ((bullets[k].centerX - 2 >= spaceShips[n].centerX - 0.5) && (bullets[k].centerX - 2 <= spaceShips[n].centerX + 0.5) && (
-                                            (bullets[k].centerY + 2 >= spaceShips[n].centerY - 0.5) && (bullets[k].centerY + 2 <= spaceShips[n].centerY + 0.5) ||
-                                                    (bullets[k].centerY - 2 >= spaceShips[n].centerY - 0.5) && (bullets[k].centerY - 2 <= spaceShips[n].centerY + 0.5)))
-                                    ) &&
-                            (n != bullets[k].player)
-                        ) {
+                        if (overlap(bullets[k], spaceShips[n])&&n != bullets[k].player) {
                             speedSpaceShipX1 = spaceShips[n].speedX
                             speedBulletX2 = bullets[k].speedX
                             speedSpaceShipY1 = spaceShips[n].speedY
@@ -471,37 +434,7 @@ class State(
 
         for (n in 0 until (bullets.size - 1))
             for (k in (n + 1) until bullets.size)
-                if (((changeXifBorder(bullets[n].centerX + 2) >= changeXifBorder(bullets[k].centerX - 2)) &&
-                            (changeXifBorder(bullets[n].centerX + 2) <= changeXifBorder(bullets[k].centerX + 2)) &&
-
-                            (((changeYifBorder(bullets[n].centerY + 2) >= changeYifBorder(bullets[k].centerY - 2)) &&
-                                    (changeYifBorder(bullets[n].centerY + 2) <= changeYifBorder(
-                                        bullets[k].centerY + 2
-                                    ))) ||
-
-                                    ((changeYifBorder(bullets[n].centerY - 2) >= changeYifBorder(
-                                        bullets[k].centerY - 2
-                                    )) &&
-                                            (changeYifBorder(bullets[n].centerY - 2) <= changeYifBorder(
-                                                bullets[k].centerY + 2
-                                            ))))
-                            ) ||
-
-                    ((changeXifBorder(bullets[n].centerX - 2) <= changeXifBorder(bullets[k].centerX + 2)) &&
-                            (changeXifBorder(bullets[n].centerX - 2) >= changeXifBorder(bullets[k].centerX - 2)) &&
-
-                            (((changeYifBorder(bullets[n].centerY + 2) >= changeYifBorder(bullets[k].centerY - 2)) &&
-                                    (changeYifBorder(bullets[n].centerY + 2) <= changeYifBorder(
-                                        bullets[k].centerY + 2
-                                    ))) ||
-
-                                    ((changeYifBorder(bullets[n].centerY - 2) >= changeYifBorder(
-                                        bullets[k].centerY - 2
-                                    )) &&
-                                            (changeYifBorder(bullets[n].centerY - 2) <= changeYifBorder(
-                                                bullets[k].centerY + 2
-                                            )))))
-                ) {
+                if (overlap(bullets[n], bullets[k])){
                     animationBulletDestroys.add(
                         AnimationBulletDestroy(
                             centerX = bullets[k].centerX,
@@ -520,7 +453,7 @@ class State(
     private fun updateMeteorites(deltaTime: Int) {
         if (meteorites.isNotEmpty()) {
             for (meteorite in meteorites)
-                meteorite.update(deltaTime,width,height)
+                meteorite.update(deltaTime, width, height)
 
             collisionMeteoriteMeteorite()
         }
@@ -534,51 +467,7 @@ class State(
 
         for (n in 0 until (meteorites.size - 1))
             for (k in (n + 1) until meteorites.size)
-                if (((changeXifBorder(meteorites[n].centerX + meteorites[n].sizePx) >= changeXifBorder(
-                        meteorites[k].centerX - meteorites[k].sizePx
-                    )) &&
-                            (changeXifBorder(meteorites[n].centerX + meteorites[n].sizePx) <= changeXifBorder(
-                                meteorites[k].centerX + meteorites[k].sizePx
-                            )) &&
-
-                            (((changeYifBorder(meteorites[n].centerY + meteorites[n].sizePx) >= changeYifBorder(
-                                meteorites[k].centerY - meteorites[k].sizePx
-                            )) &&
-                                    (changeYifBorder(meteorites[n].centerY + meteorites[n].sizePx) <= changeYifBorder(
-                                        meteorites[k].centerY + meteorites[k].sizePx
-                                    ))) ||
-
-                                    ((changeYifBorder(meteorites[n].centerY - meteorites[n].sizePx) >= changeYifBorder(
-                                        meteorites[k].centerY - meteorites[k].sizePx
-                                    )) &&
-                                            (changeYifBorder(meteorites[n].centerY - meteorites[n].sizePx) <= changeYifBorder(
-                                                meteorites[k].centerY + meteorites[k].sizePx
-                                            ))))
-                            ) ||
-
-                    (
-                            (changeXifBorder(meteorites[n].centerX - meteorites[n].sizePx) <= changeXifBorder(
-                                meteorites[k].centerX + meteorites[k].sizePx
-                            )) &&
-                                    (changeXifBorder(meteorites[n].centerX - meteorites[n].sizePx) >= changeXifBorder(
-                                        meteorites[k].centerX - meteorites[k].sizePx
-                                    )) &&
-
-                                    (((changeYifBorder(meteorites[n].centerY + meteorites[n].sizePx) >= changeYifBorder(
-                                        meteorites[k].centerY - meteorites[k].sizePx
-                                    )) &&
-                                            (changeYifBorder(meteorites[n].centerY + meteorites[n].sizePx) <= changeYifBorder(
-                                                meteorites[k].centerY + meteorites[k].sizePx
-                                            ))) ||
-
-                                            ((changeYifBorder(meteorites[n].centerY - meteorites[n].sizePx) >= changeYifBorder(
-                                                meteorites[k].centerY - meteorites[k].sizePx
-                                            )) &&
-                                                    (changeYifBorder(meteorites[n].centerY - meteorites[n].sizePx) <= changeYifBorder(
-                                                        meteorites[k].centerY + meteorites[k].sizePx
-                                                    ))))
-                            )
-                ) {
+                if (overlap(meteorites[n], meteorites[k])) {
                     speedMeteoriteX1 = meteorites[n].speedX
                     speedMeteoriteX2 = meteorites[k].speedX
                     speedMeteoriteY1 = meteorites[n].speedY
@@ -631,17 +520,8 @@ class State(
             if (meteorites.size >= 0) {
                 for (n in 0 until meteorites.size)
                     for (k in 0 until bullets.size)
-                        if (((bullets[k].centerX + 2 >= meteorites[n].centerX - meteorites[n].sizePx) && (bullets[k].centerX + 2 <= meteorites[n].centerX + meteorites[n].sizePx) && (
-                                    (bullets[k].centerY + 2 >= meteorites[n].centerY - meteorites[n].sizePx) && (bullets[k].centerY + 2 <= meteorites[n].centerY + meteorites[n].sizePx) ||
-                                            (bullets[k].centerY - 2 >= meteorites[n].centerY - meteorites[n].sizePx) && (bullets[k].centerY - 2 <= meteorites[n].centerY + meteorites[n].sizePx))
-                                    ) ||
-                            (
-                                    (bullets[k].centerX - 2 >= meteorites[n].centerX - meteorites[n].sizePx) && (bullets[k].centerX - 2 <= meteorites[n].centerX + meteorites[n].sizePx) && (
-                                            (bullets[k].centerY + 2 >= meteorites[n].centerY - meteorites[n].sizePx) && (bullets[k].centerY + 2 <= meteorites[n].centerY + meteorites[n].sizePx) ||
-                                                    (bullets[k].centerY - 2 >= meteorites[n].centerY - meteorites[n].sizePx) && (bullets[k].centerY - 2 <= meteorites[n].centerY + meteorites[n].sizePx))
-                                    )
-                        ) {
-                            meteorites[n].sizePx = meteorites[n].sizePx - 5
+                        if (overlap(bullets[k], meteorites[n])) {
+                            meteorites[n].size = meteorites[n].size - 5
                             meteorites[n].viewSize = meteorites[n].viewSize + 1
                             scores[bullets[k].player] =
                                 scores[bullets[k].player] + 100 * meteorites[n].viewSize
@@ -661,12 +541,12 @@ class State(
 
                                 meteorites.add(
                                     Meteorite(
-                                        centerX = meteorites[n].centerX + (meteorites[n].sizePx + 10),
-                                        centerY = meteorites[n].centerY + (meteorites[n].sizePx + 10),
+                                        centerX = meteorites[n].centerX + (meteorites[n].size + 10),
+                                        centerY = meteorites[n].centerY + (meteorites[n].size + 10),
                                         angle = meteorites[n].angle - 120,
                                         speedX = +speedMeteoriteMax * cos(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
                                         speedY = -speedMeteoriteMax * sin(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
-                                        sizePx = meteorites[n].sizePx,
+                                        size = meteorites[n].size,
                                         viewSize = meteorites[n].viewSize,
                                         view = meteorites[n].view,
                                     )
@@ -674,12 +554,12 @@ class State(
 
                                 meteorites.add(
                                     Meteorite(
-                                        centerX = meteorites[n].centerX + (meteorites[n].sizePx + 10),
-                                        centerY = meteorites[n].centerY + (meteorites[n].sizePx + 10),
+                                        centerX = meteorites[n].centerX + (meteorites[n].size + 10),
+                                        centerY = meteorites[n].centerY + (meteorites[n].size + 10),
                                         angle = meteorites[n].angle - 240,
                                         speedX = +speedMeteoriteMax * cos(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
                                         speedY = -speedMeteoriteMax * sin(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
-                                        sizePx = meteorites[n].sizePx,
+                                        size = meteorites[n].size,
                                         viewSize = meteorites[n].viewSize,
                                         view = meteorites[n].view,
                                     )
@@ -703,50 +583,8 @@ class State(
         for (n in 0 until countPlayers)
             for (k in 0 until meteorites.size)
                 if (spaceShips[n].inGame)
-                    if (((changeXifBorder(spaceShips[n].centerX + 0.5) >= changeXifBorder(meteorites[k].centerX - meteorites[k].sizePx)) &&
-                                (changeXifBorder(spaceShips[n].centerX + 0.5) <= changeXifBorder(
-                                    meteorites[k].centerX + meteorites[k].sizePx
-                                )) &&
-
-                                (((changeYifBorder(spaceShips[n].centerY + 0.5) >= changeYifBorder(
-                                    meteorites[k].centerY - meteorites[k].sizePx
-                                )) &&
-                                        (changeYifBorder(spaceShips[n].centerY + 0.5) <= changeYifBorder(
-                                            meteorites[k].centerY + meteorites[k].sizePx
-                                        ))) ||
-
-                                        ((changeYifBorder(spaceShips[n].centerY - 0.5) >= changeYifBorder(
-                                            meteorites[k].centerY - meteorites[k].sizePx
-                                        )) &&
-                                                (changeYifBorder(spaceShips[n].centerY - 0.5) <= changeYifBorder(
-                                                    meteorites[k].centerY + meteorites[k].sizePx
-                                                ))))
-                                ) ||
-
-                        (
-                                (changeXifBorder(spaceShips[n].centerX - 0.5) <= changeXifBorder(
-                                    meteorites[k].centerX + meteorites[k].sizePx
-                                )) &&
-                                        (changeXifBorder(spaceShips[n].centerX - 0.5) >= changeXifBorder(
-                                            meteorites[k].centerX - meteorites[k].sizePx
-                                        )) &&
-
-                                        (((changeYifBorder(spaceShips[n].centerY + 0.5) >= changeYifBorder(
-                                            meteorites[k].centerY - meteorites[k].sizePx
-                                        )) &&
-                                                (changeYifBorder(spaceShips[n].centerY + 0.5) <= changeYifBorder(
-                                                    meteorites[k].centerY + meteorites[k].sizePx
-                                                ))) ||
-
-                                                ((changeYifBorder(spaceShips[n].centerY - 0.5) >= changeYifBorder(
-                                                    meteorites[k].centerY - meteorites[k].sizePx
-                                                )) &&
-                                                        (changeYifBorder(spaceShips[n].centerY - 0.5) <= changeYifBorder(
-                                                            meteorites[k].centerY + meteorites[k].sizePx
-                                                        ))))
-                                )
-                    ) {
-                        meteorites[k].sizePx = meteorites[k].sizePx - 5
+                    if (overlap(spaceShips[n], meteorites[k])) {
+                        meteorites[k].size = meteorites[k].size - 5
                         meteorites[k].viewSize = meteorites[k].viewSize + 1
                         lifes[n] = lifes[n] - 1
                         spaceShips[n].inGame = false
@@ -761,7 +599,7 @@ class State(
                                     angle = meteorites[k].angle - 90,
                                     speedX = +speedMeteoriteMax * cos(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
                                     speedY = -speedMeteoriteMax * sin(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
-                                    sizePx = meteorites[k].sizePx,
+                                    size = meteorites[k].size,
                                     viewSize = meteorites[k].viewSize,
                                     view = meteorites[k].view,
                                 )
@@ -774,7 +612,7 @@ class State(
                                     angle = meteorites[k].angle - 180,
                                     speedX = +speedMeteoriteMax * cos(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
                                     speedY = -speedMeteoriteMax * sin(meteorites[meteorites.lastIndex].angle / 180 * Math.PI),
-                                    sizePx = meteorites[k].sizePx,
+                                    size = meteorites[k].size,
                                     viewSize = meteorites[k].viewSize,
                                     view = meteorites[k].view,
                                 )
@@ -815,12 +653,9 @@ class State(
     }
 
     fun clickPause() {
-        if (status == "playing") {
+        if (status == "playing")
             status = "pause"
-            pauseTime = System.currentTimeMillis()
-        } else {
+         else
             status = "playing"
-//      character.timeBreath += System.currentTimeMillis() - pauseTime
-        }
     }
 }

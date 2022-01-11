@@ -89,7 +89,7 @@ class DrawThread(
                     }
                 }
             } finally {
-                if (canvas != null) {
+                if (canvas != null&&informationCanvas!=null) {
                     surfaceHolder.unlockCanvasAndPost(canvas)
                     informationSurfaceHolder.unlockCanvasAndPost(informationCanvas)
                 }
