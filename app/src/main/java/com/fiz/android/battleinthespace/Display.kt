@@ -16,7 +16,7 @@ private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 5
 
-private const val DIVISION = 8
+private const val DIVISION = 6
 
 class Display(
     private val resources: Resources,
@@ -109,13 +109,16 @@ class Display(
         resources.displayMetrics.heightPixels
     ) / scale / DIVISION
 
-    fun render(state: State, canvas: Canvas, canvasInfo: Canvas) {
+    fun render(state: State, canvas: Canvas) {
         drawBackground(state, canvas)
         drawSpaceships(state, canvas)
         drawBullet(state, canvas)
         drawAnimationBulletDestroy(state, canvas)
         drawMeteorite(state, canvas)
         drawAnimationSpaceshipDestroy(state, canvas)
+    }
+
+    fun renderInfo(state: State, canvasInfo: Canvas) {
         drawInfo(state, canvasInfo)
 
         if (state.status == "pause")
@@ -125,6 +128,7 @@ class Display(
     }
 
     private fun drawBackground(state: State, canvas: Canvas) {
+        canvas.drawColor(Color.BLACK)
         val rectSrc = Rect(
             0, 0,
             bmpBackground[0].width, bmpBackground[0].height
@@ -151,7 +155,7 @@ class Display(
                     player,
                     canvas
                 )
-                if (state.spaceShips[player].centerY + 50 >= canvas.height)
+                if (state.spaceShips[player].centerY + 1 >= canvas.height)
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX,
@@ -159,7 +163,7 @@ class Display(
                         player,
                         canvas
                     )
-                if (state.spaceShips[player].centerX + 50 >= canvas.width)
+                if (state.spaceShips[player].centerX + 1 >= canvas.width)
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX - canvas.width,
@@ -167,7 +171,7 @@ class Display(
                         player,
                         canvas
                     )
-                if ((state.spaceShips[player].centerX + 50 >= canvas.width) && (state.spaceShips[player].centerY + 50 >= canvas.height))
+                if ((state.spaceShips[player].centerX + 1 >= canvas.width) && (state.spaceShips[player].centerY + 1 >= canvas.height))
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX - canvas.width,
@@ -175,7 +179,7 @@ class Display(
                         player,
                         canvas
                     )
-                if (state.spaceShips[player].centerX - 50 <= 0)
+                if (state.spaceShips[player].centerX - 1 <= 0)
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX + canvas.width,
@@ -183,7 +187,7 @@ class Display(
                         player,
                         canvas
                     )
-                if (state.spaceShips[player].centerY - 50 <= 0)
+                if (state.spaceShips[player].centerY - 1 <= 0)
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX,
@@ -191,7 +195,7 @@ class Display(
                         player,
                         canvas
                     )
-                if ((state.spaceShips[player].centerX - 50 <= 0) && (state.spaceShips[player].centerY - 50 <= 0))
+                if ((state.spaceShips[player].centerX - 1 <= 0) && (state.spaceShips[player].centerY - 1 <= 0))
                     drawSpaceship(
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX + canvas.width,
@@ -232,8 +236,10 @@ class Display(
             for (n in 0 until state.bullets.size) {
                 val bullet = state.bullets[n]
                 val rectDst = RectF(
-                    bullet.centerX.toFloat() * sizeUnit, bullet.centerY.toFloat() * sizeUnit,
-                    bullet.centerX.toFloat() * sizeUnit + size, bullet.centerY.toFloat() * sizeUnit + size
+                    (bullet.centerX * sizeUnit - size / 2).toFloat(),
+                    (bullet.centerY * sizeUnit - size / 2).toFloat(),
+                    (bullet.centerX * sizeUnit + size / 2).toFloat(),
+                    (bullet.centerY * sizeUnit + size / 2).toFloat()
                 )
 
                 canvas.drawBitmap(bmpBullet, rectSrc, rectDst, paint)
@@ -248,14 +254,16 @@ class Display(
         )
         val size = sizeUnit / 10
         for (n in 0 until state.animationBulletDestroys.size) {
-            val step=state.animationBulletDestroys[n].timeShowMax/NUMBER_BITMAP_BULLET_DESTROY.toDouble()
-            val frame=NUMBER_BITMAP_BULLET_DESTROY-ceil(state.animationBulletDestroys[n].timeShow/step).toInt()
+            val step =
+                state.animationBulletDestroys[n].timeShowMax / NUMBER_BITMAP_BULLET_DESTROY.toDouble()
+            val frame =
+                NUMBER_BITMAP_BULLET_DESTROY - ceil(state.animationBulletDestroys[n].timeShow / step).toInt()
 
             val rectDst = RectF(
                 (state.animationBulletDestroys[n].centerX * sizeUnit - size / 2).toFloat(),
                 (state.animationBulletDestroys[n].centerY * sizeUnit - size / 2).toFloat(),
-                (state.animationBulletDestroys[n].centerX * sizeUnit - size / 2).toFloat() + size,
-                (state.animationBulletDestroys[n].centerY * sizeUnit - size / 2).toFloat() + size
+                (state.animationBulletDestroys[n].centerX * sizeUnit + size / 2).toFloat(),
+                (state.animationBulletDestroys[n].centerY * sizeUnit + size / 2).toFloat()
             )
 
             canvas.drawBitmap(bmpBulletDestroy[frame], rectSrc, rectDst, paint)
@@ -274,10 +282,10 @@ class Display(
                 )
 
                 val rectDst = RectF(
-                    meteorite.centerX.toFloat() * sizeUnit,
-                    meteorite.centerY.toFloat() * sizeUnit,
-                    meteorite.centerX.toFloat() * sizeUnit + meteorite.size.toFloat() * sizeUnit * 2F,
-                    meteorite.centerY.toFloat() * sizeUnit + meteorite.size.toFloat() * sizeUnit * 2F
+                    (meteorite.centerX * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.centerY * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.centerX * sizeUnit + meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.centerY * sizeUnit + meteorite.size * sizeUnit / 2).toFloat()
                 )
 
                 canvas.drawBitmap(bmpMeteorite, rectSrc, rectDst, paint)
@@ -290,91 +298,60 @@ class Display(
             0, 0,
             bmpSpaceshipDestroy[0].width, bmpSpaceshipDestroy[0].height
         )
-        for (n in 0 until state.animationSpaceShipDestroys.size) {
-            val step=state.animationSpaceShipDestroys[n].timeShowMax/NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
-            val frame=NUMBER_BITMAP_SPACESHIP_DESTROY-ceil(state.animationSpaceShipDestroys[n].timeShow/step).toInt()
+        for (animationSpaceShipDestroy in state.animationSpaceShipDestroys) {
+            val step =
+                animationSpaceShipDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
+            val frame =
+                NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationSpaceShipDestroy.timeShow / step).toInt()
+
             val rectDst = RectF(
-                state.animationSpaceShipDestroys[n].centerX.toFloat() - sizeUnit/2,
-                state.animationSpaceShipDestroys[n].centerY.toFloat() - sizeUnit/2,
-                state.animationSpaceShipDestroys[n].centerX.toFloat() - sizeUnit/2 + sizeUnit,
-                state.animationSpaceShipDestroys[n].centerY.toFloat() - sizeUnit/2 + sizeUnit
+                (animationSpaceShipDestroy.centerX * sizeUnit - sizeUnit / 2).toFloat(),
+                (animationSpaceShipDestroy.centerY * sizeUnit - sizeUnit / 2).toFloat(),
+                (animationSpaceShipDestroy.centerX * sizeUnit + sizeUnit / 2).toFloat(),
+                (animationSpaceShipDestroy.centerY * sizeUnit + sizeUnit / 2).toFloat()
             )
 
-            canvas.drawBitmap(
-                bmpSpaceshipDestroy[frame], rectSrc,
-                rectDst, paint
-            )
+            canvas.drawBitmap(bmpSpaceshipDestroy[frame], rectSrc, rectDst, paint)
         }
     }
 
 
     private fun drawInfo(state: State, canvas: Canvas) {
+        canvas.drawColor(Color.BLACK)
         val paintFont = Paint()
         val rectSrc = Rect(
             0, 0,
             bmpSpaceshipLife[0].width, bmpSpaceshipLife[0].height
         )
 
-        paintFont.textSize = 24F
-        if (state.countPlayers >= 1) {
-            paintFont.color = Color.GREEN
-            canvas.drawText("Player 1", 0F, 0F+sizeUnit/2.5F/2, paintFont)
+        paintFont.textSize = 36F
+        paintFont.color = Color.WHITE
+        canvas.drawText("Round ${state.round}", canvas.width / 2F, 25F, paintFont)
 
-            for (n in 0 until state.lifes[0])
+        for (n in 1..state.countPlayers) {
+            paintFont.color = when (n) {
+                1 -> Color.GREEN
+                2 -> Color.CYAN
+                // Color = pink
+                3 -> Color.rgb(255, 192, 203)
+                4 -> Color.YELLOW
+                else -> Color.WHITE
+            }
+            canvas.drawText("Player $n:", 0F, 70F + 70F * (n - 1) + sizeUnit / 2.5F / 2, paintFont)
+
+            for (k in 0 until state.lifes[n - 1])
                 canvas.drawBitmap(
-                    bmpSpaceshipLife[0],rectSrc,
+                    bmpSpaceshipLife[n - 1], rectSrc,
                     RectF(
-                        200F + sizeUnit/2.5F* n, 0F,
-                        200F + sizeUnit/2.5F *n + sizeUnit/2.5F, 0F + sizeUnit/2.5F
+                        200F + sizeUnit / 2.5F * k,
+                        55F + 70F * (n - 1),
+                        200F + sizeUnit / 2.5F * k + sizeUnit / 2.5F,
+                        55F + 70F * (n - 1) + sizeUnit / 2.5F
                     ),
                     paint
                 )
         }
 
-        if (state.countPlayers >= 2) {
-            paintFont.color = Color.CYAN
-            canvas.drawText("Player 2", 0F, 70F+sizeUnit/2.5F/2, paintFont)
-
-            for (n in 0 until state.lifes[1])
-                canvas.drawBitmap(
-                    bmpSpaceshipLife[1],rectSrc,
-                    RectF(
-                        200F + sizeUnit/2.5F* n, 70F,
-                        200F + sizeUnit/2.5F *n + sizeUnit/2.5F, 70F + sizeUnit/2.5F
-                    ),
-                    paint
-                )
-        }
-
-        if (state.countPlayers >= 3) {
-            paintFont.color = Color.YELLOW
-            canvas.drawText("Player 3", 0F, 140F+sizeUnit/2.5F/2, paintFont)
-
-            for (n in 0 until state.lifes[2])
-                canvas.drawBitmap(
-                    bmpSpaceshipLife[2],rectSrc,
-                    RectF(
-                        200F + sizeUnit/2.5F* n, 140F,
-                        200F + sizeUnit/2.5F *n + sizeUnit/2.5F, 140F + sizeUnit/2.5F
-                    ),
-                    paint
-                )
-        }
-
-        if (state.countPlayers >= 4) {
-            paintFont.color = Color.YELLOW
-            canvas.drawText("Player 4", 0F, 210F+sizeUnit/2.5F/2, paintFont)
-
-            for (n in 0 until state.lifes[3])
-                canvas.drawBitmap(
-                    bmpSpaceshipLife[3],rectSrc,
-                    RectF(
-                        200F + sizeUnit/2.5F* n, 210F,
-                        200F + sizeUnit/2.5F *n + sizeUnit/2.5F, 210F + sizeUnit/2.5F
-                    ),
-                    paint
-                )
-        }
     }
 
 }

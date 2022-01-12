@@ -4,13 +4,42 @@ open class Actor(
     var centerX: Double,
     var centerY: Double,
 
-    var speedX: Double,
-    var speedY: Double,
+    _speedX: Double,
+    _speedY: Double,
 
-    var angle: Double,
+    _angle: Double,
 
-    var size:Double
+    var size:Double,
+
+    var speedMax:Double
 ) {
+    var speedX:Double=_speedX
+    set(value){
+        field=value
+        if (value>speedMax)
+            field=speedMax
+        if (value<-speedMax)
+            field=-speedMax
+    }
+
+    var speedY:Double=_speedY
+        set(value){
+            field=value
+            if (value>speedMax)
+                field=speedMax
+            if (value<-speedMax)
+                field=-speedMax
+        }
+
+    var angle: Double=_angle
+    set(value){
+        field=value
+        if (value>360)
+            field=value-360
+        if (value<0)
+            field=value+360
+    }
+
     open fun update(deltaTime: Int, width: Double, height: Double) {
         val stepX = speedX * deltaTime / 1000
         centerX += stepX

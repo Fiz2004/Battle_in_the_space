@@ -1,14 +1,16 @@
 package com.fiz.android.battleinthespace
 
-import android.content.Context
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceView
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.abs
+import kotlin.math.sqrt
 
-class GameActivity : AppCompatActivity() {
-    private var drawThread: DrawThread? = null
+class GameActivity : Activity() {
+    private var gameThread: GameThread? = null
 
     private lateinit var newGameButton: Button
     private lateinit var pauseButton: Button
@@ -20,8 +22,8 @@ class GameActivity : AppCompatActivity() {
     var lastX: Float = 0F
     var lastY: Float = 0F
     var touchDown: Boolean = false
-    private val sensivityX: Float = 300F
-    private val sensivityY: Float = 30F
+    private val sensivityX: Float = 0F
+    private val sensivityY: Float = 0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,23 +36,22 @@ class GameActivity : AppCompatActivity() {
         gameSurfaceView = findViewById(R.id.game_game_surfaceview)
         informationSurfaceView = findViewById(R.id.information_game_surfaceview)
 
-        drawThread = DrawThread(
+        gameThread = GameThread(
             gameSurfaceView.holder,
             informationSurfaceView.holder,
-            getSharedPreferences("data", Context.MODE_PRIVATE),
             resources,
             this.applicationContext,
             pauseButton
         )
 
-        drawThread!!.setRunning(true)
-        drawThread!!.start()
+        gameThread!!.setRunning(true)
+        gameThread!!.start()
 
         newGameButton.setOnClickListener {
-            drawThread!!.state.status = "new game"
+            gameThread!!.state.status = "new game"
         }
         pauseButton.setOnClickListener {
-            drawThread!!.state.clickPause()
+            gameThread!!.state.clickPause()
         }
         exitButton.setOnClickListener {
             finish()
@@ -58,45 +59,77 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val x = event?.x ?: 0F
+        val y = event?.y ?: 0F
+        val widthJoystick = 50F * resources.displayMetrics.scaledDensity
+
+        val type: String
+        if (x < resources.displayMetrics.widthPixels / 2)
+            type = "left"
+        else
+            type = "right"
+
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                drawThread?.controller?.get(0)?.fire = true
-                drawThread?.controller?.get(0)?.up = false
-                drawThread?.controller?.get(0)?.down = false
-                drawThread?.controller?.get(0)?.left = false
-                drawThread?.controller?.get(0)?.right = false
-                touchDown = true
+                if (type == "right")
+                    gameThread?.controller?.get(0)?.fire = true
+                gameThread?.controller?.get(0)?.up = false
+                gameThread?.controller?.get(0)?.down = false
+                gameThread?.controller?.get(0)?.left = false
+                gameThread?.controller?.get(0)?.right = false
+                if (type == "left") {
+                    lastX = x
+                    lastY = y
+                    touchDown = true
+                }
             }
             MotionEvent.ACTION_MOVE -> {
                 if (touchDown) {
-                    drawThread?.controller?.get(0)?.up = false
-                    drawThread?.controller?.get(0)?.down = false
-                    if (event.y < lastY-sensivityY) {
-                        drawThread?.controller?.get(0)?.up = true
+                    gameThread?.controller?.get(0)?.left = false
+                    gameThread?.controller?.get(0)?.right = false
+                    if (x - lastX < -sensivityX) {
+                        gameThread?.controller?.get(0)?.left = true
                     }
-                    if (event.y > lastY+sensivityY) {
-                        drawThread?.controller?.get(0)?.down = true
+                    if (x - lastX > +sensivityX) {
+                        gameThread?.controller?.get(0)?.right = true
                     }
+                    val deltaX = if (abs(x - lastX) < sensivityX) 0F else x - lastX
+                    gameThread?.controller?.get(0)?.deltaX = deltaX
+                    Log.d ("onTouchEvent","dx=${deltaX}")
 
-                    drawThread?.controller?.get(0)?.left = false
-                    drawThread?.controller?.get(0)?.right = false
-                    if (event.x < lastX-sensivityX) {
-                        drawThread?.controller?.get(0)?.left = true
+                    gameThread?.controller?.get(0)?.up = false
+                    gameThread?.controller?.get(0)?.down = false
+                    if (y - lastY < -sensivityY) {
+                        gameThread?.controller?.get(0)?.up = true
                     }
-                    if (event.x > lastX+sensivityX) {
-                        drawThread?.controller?.get(0)?.right = true
+                    if (y - lastY > +sensivityY) {
+                        gameThread?.controller?.get(0)?.down = true
                     }
+                    val deltaY = if (abs(y - lastY) < sensivityY) 0F else y - lastY
+                    gameThread?.controller?.get(0)?.deltaY = deltaY
+                    Log.d ("onTouchEvent","dy=${deltaY}")
+
+                    var power = sqrt(deltaX * deltaX + deltaY * deltaY)/widthJoystick
+                    power =if (power>1) 1F else power
+                    gameThread?.controller?.get(0)?.power = power
+                    Log.d ("onTouchEvent","power=${power}")
+
+                    val angle=Math.atan2(deltaY.toDouble(),deltaX.toDouble())*180/Math.PI
+                    gameThread?.controller?.get(0)?.angle = angle.toFloat()
+                    Log.d ("onTouchEvent","angle=${gameThread?.controller?.get(0)?.angle}")
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                drawThread?.controller?.get(0)?.fire = false
-                drawThread?.controller?.get(0)?.up = false
-                drawThread?.controller?.get(0)?.down = false
-                drawThread?.controller?.get(0)?.left = false
-                drawThread?.controller?.get(0)?.right = false
-                lastX = event?.x
-                lastY = event?.y
-                touchDown = false
+                if (type == "right")
+                    gameThread?.controller?.get(0)?.fire = false
+                gameThread?.controller?.get(0)?.up = false
+                gameThread?.controller?.get(0)?.down = false
+                gameThread?.controller?.get(0)?.left = false
+                gameThread?.controller?.get(0)?.right = false
+                if (type == "left") {
+                    touchDown = false
+                    gameThread?.controller?.get(0)?.power=0F
+                }
             }
         }
         return super.onTouchEvent(event)
@@ -105,10 +138,10 @@ class GameActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         var retry = true
-        drawThread!!.setRunning(false)
+        gameThread!!.setRunning(false)
         while (retry) {
             try {
-                drawThread!!.join()
+                gameThread!!.join()
                 retry = false
             } catch (e: InterruptedException) {
             }
