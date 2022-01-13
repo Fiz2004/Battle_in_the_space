@@ -8,6 +8,10 @@ import android.view.SurfaceView
 import android.widget.Button
 import kotlin.math.abs
 import kotlin.math.sqrt
+import android.widget.TextView
+
+import android.view.View.OnTouchListener
+import java.lang.StringBuilder
 
 class GameActivity : Activity() {
     private var gameThread: GameThread? = null
@@ -69,21 +73,27 @@ class GameActivity : Activity() {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         // событие
         val actionMask: Int = event?.actionMasked ?: 0
+        // индекс касания
+        val pointerIndex = event?.actionIndex?: 0
+        // ID касания
+        val pointerId = event?.getPointerId(pointerIndex)
         // число касаний
         val pointerCount: Int = event?.pointerCount ?: 0
 
-        val x = event?.x ?: 0F
-        val y = event?.y ?: 0F
+        val x = event?.getX(pointerIndex) ?: 0F
+        val y = event?.getY(pointerIndex) ?: 0F
+
         val widthJoystick = 50F * resources.displayMetrics.scaledDensity
 
-        var TouchLeftSide: Boolean = false
+        var touchLeftSide: Boolean = false
         if (x < resources.displayMetrics.widthPixels / 2)
-            TouchLeftSide = true
+            touchLeftSide = true
+
 
         when (actionMask) {
             // первое касание
             MotionEvent.ACTION_DOWN -> {
-                if (TouchLeftSide) {
+                if (touchLeftSide) {
                     leftSide.x = x
                     leftSide.y = y
                     leftSide.touch = true
@@ -94,7 +104,7 @@ class GameActivity : Activity() {
             }
             // последующие касания
             MotionEvent.ACTION_POINTER_DOWN -> {
-                if (TouchLeftSide) {
+                if (touchLeftSide) {
                     leftSide.x = x
                     leftSide.y = y
                     leftSide.touch = true
@@ -118,6 +128,7 @@ class GameActivity : Activity() {
                 for (i in 0 until pointerCount) {
                     val currentX: Float = event?.getX(i) ?: 0F
                     val currentY: Float = event?.getY(i) ?: 0F
+                    if (x==currentX && y==currentY) continue
                     if (currentX < resources.displayMetrics.widthPixels / 2)
                         isLeftSide=true
                     else
@@ -134,6 +145,7 @@ class GameActivity : Activity() {
 
             }
             // движение
+            //TODO Найти касание которое слева и с ним работать
             MotionEvent.ACTION_MOVE -> {
                 if (leftSide.touch) {
                     val deltaX = if (abs(x - leftSide.x) < sensivityX) 0F else x - leftSide.x
@@ -149,7 +161,7 @@ class GameActivity : Activity() {
         }
 
         //Для отладки на компьютере
-        gameThread?.controller?.get(0)?.fire=true
+//        gameThread?.controller?.get(0)?.fire=true
 
         return super.onTouchEvent(event)
     }
@@ -169,6 +181,7 @@ class GameActivity : Activity() {
 
 
 }
+
 
 
 

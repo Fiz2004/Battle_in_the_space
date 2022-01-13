@@ -5,16 +5,16 @@ import kotlin.math.sign
 
 object Physics {
 
-    var width:Double = 0.0
-    var height:Double = 0.0
+    var width: Double = 0.0
+    var height: Double = 0.0
 
-    fun createWorld(width:Double,height:Double){
-        this.width=width
-        this.height=height
+    fun createWorld(width: Double, height: Double) {
+        this.width = width
+        this.height = height
     }
 
     fun getSpeedFirstAfterKickback(speedFirst: Double, speedSecond: Double): Double {
-        if (sign(speedFirst) != sign(speedSecond))
+        if (sign(speedFirst) != sign(speedSecond) && speedFirst != 0.0)
             return -speedFirst
 
         if (abs(speedFirst) > abs(speedSecond))
@@ -23,7 +23,14 @@ object Physics {
         return speedFirst + speedSecond / 2
     }
 
-    fun overlap(centerX1:Double,centerY1:Double,size1:Double,centerX2:Double,centerY2:Double,size2:Double): Boolean {
+    fun overlap(
+        centerX1: Double,
+        centerY1: Double,
+        size1: Double,
+        centerX2: Double,
+        centerY2: Double,
+        size2: Double
+    ): Boolean {
         val halfSize1 = (size1 / 2)
         val halfSize2 = (size2 / 2)
         val l1 = changeXifBorder(centerX1 - halfSize1)
