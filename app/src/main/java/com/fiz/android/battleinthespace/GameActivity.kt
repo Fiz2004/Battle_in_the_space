@@ -19,11 +19,19 @@ class GameActivity : Activity() {
     private lateinit var gameSurfaceView: SurfaceView
     private lateinit var informationSurfaceView: SurfaceView
 
-    var lastX: Float = 0F
-    var lastY: Float = 0F
-    var touchDown: Boolean = false
     private val sensivityX: Float = 0F
     private val sensivityY: Float = 0F
+    private val leftSide = object {
+        var x: Float = 0F
+        var y: Float = 0F
+        var touch: Boolean = false
+    }
+    private val rightSide = object {
+        var x: Float = 0F
+        var y: Float = 0F
+        var touch: Boolean = false
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,79 +67,90 @@ class GameActivity : Activity() {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        // событие
+        val actionMask: Int = event?.actionMasked ?: 0
+        // число касаний
+        val pointerCount: Int = event?.pointerCount ?: 0
+
         val x = event?.x ?: 0F
         val y = event?.y ?: 0F
         val widthJoystick = 50F * resources.displayMetrics.scaledDensity
 
-        val type: String
+        var TouchLeftSide: Boolean = false
         if (x < resources.displayMetrics.widthPixels / 2)
-            type = "left"
-        else
-            type = "right"
+            TouchLeftSide = true
 
-        when (event?.action) {
+        when (actionMask) {
+            // первое касание
             MotionEvent.ACTION_DOWN -> {
-                if (type == "right")
+                if (TouchLeftSide) {
+                    leftSide.x = x
+                    leftSide.y = y
+                    leftSide.touch = true
+                } else {
                     gameThread?.controller?.get(0)?.fire = true
-                gameThread?.controller?.get(0)?.up = false
-                gameThread?.controller?.get(0)?.down = false
-                gameThread?.controller?.get(0)?.left = false
-                gameThread?.controller?.get(0)?.right = false
-                if (type == "left") {
-                    lastX = x
-                    lastY = y
-                    touchDown = true
+                    rightSide.touch = true
                 }
             }
-            MotionEvent.ACTION_MOVE -> {
-                if (touchDown) {
-                    gameThread?.controller?.get(0)?.left = false
-                    gameThread?.controller?.get(0)?.right = false
-                    if (x - lastX < -sensivityX) {
-                        gameThread?.controller?.get(0)?.left = true
-                    }
-                    if (x - lastX > +sensivityX) {
-                        gameThread?.controller?.get(0)?.right = true
-                    }
-                    val deltaX = if (abs(x - lastX) < sensivityX) 0F else x - lastX
-                    gameThread?.controller?.get(0)?.deltaX = deltaX
-                    Log.d ("onTouchEvent","dx=${deltaX}")
-
-                    gameThread?.controller?.get(0)?.up = false
-                    gameThread?.controller?.get(0)?.down = false
-                    if (y - lastY < -sensivityY) {
-                        gameThread?.controller?.get(0)?.up = true
-                    }
-                    if (y - lastY > +sensivityY) {
-                        gameThread?.controller?.get(0)?.down = true
-                    }
-                    val deltaY = if (abs(y - lastY) < sensivityY) 0F else y - lastY
-                    gameThread?.controller?.get(0)?.deltaY = deltaY
-                    Log.d ("onTouchEvent","dy=${deltaY}")
-
-                    var power = sqrt(deltaX * deltaX + deltaY * deltaY)/widthJoystick
-                    power =if (power>1) 1F else power
-                    gameThread?.controller?.get(0)?.power = power
-                    Log.d ("onTouchEvent","power=${power}")
-
-                    val angle=Math.atan2(deltaY.toDouble(),deltaX.toDouble())*180/Math.PI
-                    gameThread?.controller?.get(0)?.angle = angle.toFloat()
-                    Log.d ("onTouchEvent","angle=${gameThread?.controller?.get(0)?.angle}")
+            // последующие касания
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (TouchLeftSide) {
+                    leftSide.x = x
+                    leftSide.y = y
+                    leftSide.touch = true
+                } else {
+                    gameThread?.controller?.get(0)?.fire = true
+                    rightSide.touch = true
                 }
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                if (type == "right")
+            // прерывание последнего касания
+            MotionEvent.ACTION_UP -> {
+                leftSide.touch = false
+                gameThread?.controller?.get(0)?.power = 0F
+
+                rightSide.touch = false
+                gameThread?.controller?.get(0)?.fire = false
+            }
+            // прерывания касаний
+            MotionEvent.ACTION_POINTER_UP -> {
+                var isLeftSide=false
+                var isRightSide=false
+                for (i in 0 until pointerCount) {
+                    val currentX: Float = event?.getX(i) ?: 0F
+                    val currentY: Float = event?.getY(i) ?: 0F
+                    if (currentX < resources.displayMetrics.widthPixels / 2)
+                        isLeftSide=true
+                    else
+                        isRightSide=true
+                }
+                if (isLeftSide==false) {
+                    leftSide.touch = false
+                    gameThread?.controller?.get(0)?.power = 0F
+                }
+                if (isRightSide==false) {
+                    rightSide.touch = false
                     gameThread?.controller?.get(0)?.fire = false
-                gameThread?.controller?.get(0)?.up = false
-                gameThread?.controller?.get(0)?.down = false
-                gameThread?.controller?.get(0)?.left = false
-                gameThread?.controller?.get(0)?.right = false
-                if (type == "left") {
-                    touchDown = false
-                    gameThread?.controller?.get(0)?.power=0F
+                }
+
+            }
+            // движение
+            MotionEvent.ACTION_MOVE -> {
+                if (leftSide.touch) {
+                    val deltaX = if (abs(x - leftSide.x) < sensivityX) 0F else x - leftSide.x
+                    val deltaY = if (abs(y - leftSide.y) < sensivityY) 0F else y - leftSide.y
+                    var power = sqrt(deltaX * deltaX + deltaY * deltaY) / widthJoystick
+                    power = if (power > 1) 1F else power
+                    gameThread?.controller?.get(0)?.power = power
+
+                    val angle = Math.atan2(deltaY.toDouble(), deltaX.toDouble()) * 180 / Math.PI
+                    gameThread?.controller?.get(0)?.angle = angle.toFloat()
                 }
             }
         }
+
+        //Для отладки на компьютере
+        gameThread?.controller?.get(0)?.fire=true
+
         return super.onTouchEvent(event)
     }
 

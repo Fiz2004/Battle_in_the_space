@@ -9,14 +9,15 @@ import kotlin.math.min
 
 private const val NUMBER_BITMAP_BACKGROUND = 8
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
-private const val NUMBER_BITMAP_METEORITE_OPTION = 2
+const val NUMBER_BITMAP_METEORITE_OPTION = 4
 private const val NUMBER_BITMAP_SPACESHIP = 4
 private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
-private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 5
+private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
 private const val DIVISION = 6
+private const val DENSITY_MAX = 6
 
 class Display(
     private val resources: Resources,
@@ -80,6 +81,19 @@ class Display(
         return result
     }
 
+    private val bmpSpaceshipFly: Array<Bitmap> by lazy(::initBmpSpaceshipFly)
+    private fun initBmpSpaceshipFly(): Array<Bitmap> {
+        var result: Array<Bitmap> = emptyArray()
+        for (i in 1..NUMBER_BITMAP_SPACESHIP)
+            result += BitmapFactory.decodeResource(
+                resources, resources.getIdentifier(
+                    "spaceship_fly$i",
+                    "drawable", context.packageName
+                )
+            )
+        return result
+    }
+
     private val bmpSpaceshipDestroy: Array<Bitmap> by lazy(::initBmpSpaceshipDestroy)
     private fun initBmpSpaceshipDestroy(): Array<Bitmap> {
         val temp: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.spaceship_destroy)
@@ -103,11 +117,11 @@ class Display(
         return result
     }
 
-    private val scale: Float = resources.displayMetrics.density
+    private val density: Float = resources.displayMetrics.density
     private val sizeUnit = min(
         resources.displayMetrics.widthPixels,
         resources.displayMetrics.heightPixels
-    ) / scale / DIVISION
+    ) / density / DIVISION
 
     fun render(state: State, canvas: Canvas) {
         drawBackground(state, canvas)
@@ -148,79 +162,95 @@ class Display(
     private fun drawSpaceships(state: State, canvas: Canvas) {
         for (player in 0 until state.countPlayers)
             if (state.spaceShips[player].inGame) {
-                drawSpaceship(
-                    state.spaceShips[player].angle,
-                    state.spaceShips[player].centerX,
-                    state.spaceShips[player].centerY,
-                    player,
-                    canvas
-                )
+                if (state.spaceShips[player].isFly) {
+                    drawObjectWithAngle(
+                        bmpSpaceshipFly[player],
+                        state.spaceShips[player].angle,
+                        state.spaceShips[player].centerX,
+                        state.spaceShips[player].centerY,
+                        canvas
+                    )
+                } else {
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
+                        state.spaceShips[player].angle,
+                        state.spaceShips[player].centerX,
+                        state.spaceShips[player].centerY,
+                        canvas
+                    )
+                }
                 if (state.spaceShips[player].centerY + 1 >= canvas.height)
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX,
                         state.spaceShips[player].centerY - canvas.height,
-                        player,
                         canvas
                     )
                 if (state.spaceShips[player].centerX + 1 >= canvas.width)
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX - canvas.width,
                         state.spaceShips[player].centerY,
-                        player,
                         canvas
                     )
                 if ((state.spaceShips[player].centerX + 1 >= canvas.width) && (state.spaceShips[player].centerY + 1 >= canvas.height))
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX - canvas.width,
                         state.spaceShips[player].centerY - canvas.height,
-                        player,
                         canvas
                     )
                 if (state.spaceShips[player].centerX - 1 <= 0)
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX + canvas.width,
                         state.spaceShips[player].centerY,
-                        player,
                         canvas
                     )
                 if (state.spaceShips[player].centerY - 1 <= 0)
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX,
                         state.spaceShips[player].centerY + canvas.height,
-                        player,
                         canvas
                     )
                 if ((state.spaceShips[player].centerX - 1 <= 0) && (state.spaceShips[player].centerY - 1 <= 0))
-                    drawSpaceship(
+                    drawObjectWithAngle(
+                        bmpSpaceship[player],
                         state.spaceShips[player].angle,
                         state.spaceShips[player].centerX + canvas.width,
                         state.spaceShips[player].centerY + canvas.height,
-                        player,
                         canvas
                     )
             }
     }
 
-    private fun drawSpaceship(angle: Double, x: Double, y: Double, player: Int, canvas: Canvas) {
+    private fun drawObjectWithAngle(
+        bmp: Bitmap,
+        angle: Double,
+        x: Double,
+        y: Double,
+        canvas: Canvas
+    ) {
         canvas.save()
         canvas.translate(x.toFloat() * sizeUnit, y.toFloat() * sizeUnit)
         canvas.rotate(angle.toFloat())
 
         val rectSrc = Rect(
             0, 0,
-            bmpSpaceship[player].width, bmpSpaceship[player].height
+            bmp.width, bmp.height
         )
         val rectDst = RectF(
             -(sizeUnit / 2), -(sizeUnit / 2),
             sizeUnit / 2, sizeUnit / 2
         )
 
-        canvas.drawBitmap(bmpSpaceship[player], rectSrc, rectDst, paint)
+        canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
 
         canvas.restore()
     }
@@ -294,24 +324,19 @@ class Display(
 
 
     private fun drawAnimationSpaceshipDestroy(state: State, canvas: Canvas) {
-        val rectSrc = Rect(
-            0, 0,
-            bmpSpaceshipDestroy[0].width, bmpSpaceshipDestroy[0].height
-        )
         for (animationSpaceShipDestroy in state.animationSpaceShipDestroys) {
             val step =
                 animationSpaceShipDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
             val frame =
                 NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationSpaceShipDestroy.timeShow / step).toInt()
 
-            val rectDst = RectF(
-                (animationSpaceShipDestroy.centerX * sizeUnit - sizeUnit / 2).toFloat(),
-                (animationSpaceShipDestroy.centerY * sizeUnit - sizeUnit / 2).toFloat(),
-                (animationSpaceShipDestroy.centerX * sizeUnit + sizeUnit / 2).toFloat(),
-                (animationSpaceShipDestroy.centerY * sizeUnit + sizeUnit / 2).toFloat()
+            drawObjectWithAngle(
+                bmpSpaceshipDestroy[frame],
+                animationSpaceShipDestroy.angle,
+                animationSpaceShipDestroy.centerX,
+                animationSpaceShipDestroy.centerY,
+                canvas
             )
-
-            canvas.drawBitmap(bmpSpaceshipDestroy[frame], rectSrc, rectDst, paint)
         }
     }
 

@@ -10,13 +10,7 @@ import kotlin.math.min
 
 class Controller(
     var fire: Boolean = false,
-    var up: Boolean = false,
-    var left: Boolean = false,
-    var right: Boolean = false,
-    var down: Boolean = false,
     var timeLastFire: Int = 0,
-    var deltaX:Float=0F,
-    var deltaY:Float=0F,
     _angle:Float=0F,
     var power:Float=0F
 ){

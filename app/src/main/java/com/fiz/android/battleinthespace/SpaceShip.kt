@@ -21,19 +21,12 @@ class SpaceShip(
     size: Double = 1.0,
 
     var inGame: Boolean = true,
+    var isFly:Boolean=false
 ) : Actor(
     centerX, centerY, speedX, speedY, angle, size, SPEED_MAX
 ) {
-    fun moveRight(deltaTime: Int) {
-        val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
-        angle += step
-    }
-
     fun moveRotate(deltaTime: Int, controller: Controller) {
         val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
-        Log.d("moveRotate", "Step=$step")
-        Log.d("moveRotate", "angle=$angle")
-        Log.d("moveRotate", "controller.angle=${controller.angle}")
         if (abs(angle - controller.angle) > 180)
             if (angle > controller.angle)
                 if (abs(angle - controller.angle) < step)
@@ -65,32 +58,6 @@ class SpaceShip(
 
         speedY += step * sin(angle / 180.0 * Math.PI)
 
-    }
-
-    fun moveLeft(deltaTime: Int) {
-        val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
-        angle -= step
-    }
-
-    fun moveUp(deltaTime: Int) {
-        val step = (INCREASE_SPEED_PER_SECOND * deltaTime / 1000)
-
-        speedX += step * cos(angle / 180 * Math.PI)
-
-        speedY += step * sin(angle / 180 * Math.PI)
-
-    }
-
-    fun moveDown(deltaTime: Int) {
-//        val step = (INCREASE_SPEED_PER_SECOND * deltaTime / 1000)
-//
-//        speedY -= step * sin(angle / 180 * Math.PI)
-//        if (speedY < 0.0)
-//            speedY = 0.0
-//
-//        speedX -= step * cos(angle / 180 * Math.PI)
-//        if (speedX < 0.0)
-//            speedX = 0.0
     }
 
 }

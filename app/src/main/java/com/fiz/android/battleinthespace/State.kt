@@ -2,8 +2,6 @@ package com.fiz.android.battleinthespace
 
 import kotlin.math.*
 
-private const val speedSpaceShipMax = 500.0 / 1000
-private const val speedMeteoriteMax = 100.0 / 1000
 private const val speedBulletMax = 4.0
 
 class State(
@@ -44,8 +42,10 @@ class State(
             angle = 225.0
         )
     )
+    var lineRespawn: MutableList<SpaceShip> = mutableListOf()
 
     init {
+        Physics.createWorld(width, height)
         newGame()
     }
 
@@ -57,8 +57,6 @@ class State(
         for (n in 0 until countPlayers) {
             scores += 0
         }
-
-        round = 1
     }
 
     private fun newRound() {
@@ -80,16 +78,41 @@ class State(
                 angle = respawns[n].angle,
             )
         }
+        lineRespawn.clear()
 
         lifes.clear()
         for (numberPlayer in 0 until countPlayers) {
             lifes += 3
         }
 
-        //TODO Добавить создание метеоритов если их много в последующих раундах
         meteorites.clear()
-        for (n in 0 until round)
-            meteorites += Meteorite.create()
+        m2@ for (n in 0 until round) {
+            for (dx in (0 until width.toInt() / 2))
+                for (dy in (0 until height.toInt() / 2)) {
+                    val newMeteorite1 = Meteorite.createNew(
+                        width / 2.0 + dx,
+                        height / 2.0 + dy
+                    )
+                    var fl1 = true
+                    for (colMeteorite in meteorites)
+                        if (overlap(newMeteorite1, colMeteorite))
+                            fl1 = false
+                    if (fl1) {
+                        meteorites.add(newMeteorite1)
+                        continue@m2
+                    }
+                    val newMeteorite2 = Meteorite.createNew(
+                        width / 2.0 - dx,
+                        height / 2.0 - dy
+                    )
+                    var fl2 = true
+                    for (colMeteorite in meteorites)
+                        if (overlap(newMeteorite2, colMeteorite))
+                            fl2 = false
+                    if (fl2)
+                        meteorites.add(newMeteorite2)
+                }
+        }
 
         animationBulletDestroys.clear()
         animationSpaceShipDestroys.clear()
@@ -98,17 +121,12 @@ class State(
     fun update(controller: Array<Controller>, deltaTime: Int): Boolean {
         for (player in 0 until countPlayers) {
             if (controller[player].power != 0F) {
+                spaceShips[player].isFly = true
                 updateMoveRotate(player, deltaTime, controller[player])
                 updateMoveForward(player, deltaTime, controller[player])
+            } else {
+                spaceShips[player].isFly = false
             }
-//            if (controller[player].up)
-//                updateMoveUp(player, deltaTime)
-//            if (controller[player].down)
-//                updateMoveDown(player, deltaTime)
-//            if (controller[player].right)
-//                updateMoveRight(player, deltaTime)
-//            if (controller[player].left)
-//                updateMoveLeft(player, deltaTime)
             if (controller[player].fire) {
                 if (controller[player].timeLastFire == 0) {
                     updatePressFire(player, deltaTime)
@@ -149,22 +167,6 @@ class State(
         return true
     }
 
-    private fun updateMoveUp(numberPlayer: Int, deltaTime: Int) {
-        spaceShips[numberPlayer].moveUp(deltaTime)
-    }
-
-    private fun updateMoveDown(numberPlayer: Int, deltaTime: Int) {
-        spaceShips[numberPlayer].moveDown(deltaTime)
-    }
-
-    private fun updateMoveRight(numberPlayer: Int, deltaTime: Int) {
-        spaceShips[numberPlayer].moveRight(deltaTime)
-    }
-
-    private fun updateMoveLeft(numberPlayer: Int, deltaTime: Int) {
-        spaceShips[numberPlayer].moveLeft(deltaTime)
-    }
-
     private fun updateMoveRotate(numberPlayer: Int, deltaTime: Int, controller: Controller) {
         spaceShips[numberPlayer].moveRotate(deltaTime, controller)
     }
@@ -180,7 +182,7 @@ class State(
                 centerY = spaceShips[numberPlayer].centerY + 1 * sin(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
                 speedX = speedBulletMax * cos(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
                 speedY = speedBulletMax * sin(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
-                angle = 0.0,// TODO Возможно не требуется проверить
+                angle = spaceShips[numberPlayer].angle,
                 roadLength = 0.0,
                 player = numberPlayer
             )
@@ -191,13 +193,19 @@ class State(
         for (spaceShip in spaceShips)
             if (spaceShip.inGame)
                 spaceShip.update(deltaTime, width, height)
-            else
-                checkRespawn(spaceShip)
+
+        val lineRespawnDestroy: MutableList<SpaceShip> = mutableListOf()
+        for (spaceShip in lineRespawn)
+            if (respawnCheck(spaceShip))
+                lineRespawnDestroy.add(spaceShip)
+
+        for (spaceShip in lineRespawnDestroy)
+            lineRespawn.remove(spaceShip)
 
         collisionSpaceShips()
     }
 
-    private fun checkRespawn(currentSpaceShip: SpaceShip) {
+    private fun respawnCheck(currentSpaceShip: SpaceShip): Boolean {
         val numberPlayer = spaceShips.indexOf(currentSpaceShip)
         if (lifes[numberPlayer] > 0) {
             val respawn = respawns.find {
@@ -220,49 +228,19 @@ class State(
                     centerY = respawn.centerY,
                     angle = respawn.angle
                 )
+                return true
             }
         }
+        return false
     }
 
     private fun collisionSpaceShips() {
-        var speedSpaceShipX1: Double
-        var speedSpaceShipX2: Double
-        var speedSpaceShipY1: Double
-        var speedSpaceShipY2: Double
-
         if (countPlayers > 1) {
             for (n in 0 until (countPlayers - 1))
                 for (k in (n + 1) until countPlayers)
                     if (spaceShips[n].inGame && spaceShips[k].inGame)
                         if (overlap(spaceShips[n], spaceShips[k])) {
-                            speedSpaceShipX1 = spaceShips[n].speedX
-                            speedSpaceShipX2 = spaceShips[k].speedX
-                            speedSpaceShipY1 = spaceShips[n].speedY
-                            speedSpaceShipY2 = spaceShips[k].speedY
-                            if (((speedSpaceShipX1 > 0) && (speedSpaceShipX2 < 0)) || ((speedSpaceShipX1 < 0) && (speedSpaceShipX2 > 0))) {
-                                spaceShips[n].speedX = -speedSpaceShipX1
-                                spaceShips[k].speedX = -speedSpaceShipX2
-                            } else {
-                                spaceShips[n].speedX = (speedSpaceShipX1 + speedSpaceShipX2) / 2
-                                spaceShips[k].speedX = (speedSpaceShipX1 + speedSpaceShipX2) / 2
-                                if (abs(speedSpaceShipX1) > abs(speedSpaceShipX2))
-                                    spaceShips[k].speedX = 2 * spaceShips[k].speedX
-                                else
-                                    if (abs(speedSpaceShipX1) < abs(speedSpaceShipX2))
-                                        spaceShips[n].speedX = 2 * spaceShips[n].speedX
-                            }
-                            if ((speedSpaceShipY1 > 0 && speedSpaceShipY2 < 0) || (speedSpaceShipY1 < 0 && speedSpaceShipY2 > 0)) {
-                                spaceShips[n].speedY = -speedSpaceShipY1
-                                spaceShips[k].speedY = -speedSpaceShipY2
-                            } else {
-                                spaceShips[n].speedY = (speedSpaceShipY1 + speedSpaceShipY2) / 2
-                                spaceShips[k].speedY = (speedSpaceShipY1 + speedSpaceShipY2) / 2
-                                if (abs(speedSpaceShipY1) > abs(speedSpaceShipY2))
-                                    spaceShips[k].speedY *= 2
-                                else
-                                    if (abs(speedSpaceShipY1) < abs(speedSpaceShipY2))
-                                        spaceShips[n].speedY *= 2
-                            }
+                            kickback(spaceShips[n], spaceShips[k])
                         }
         }
     }
@@ -282,36 +260,16 @@ class State(
     }
 
     private fun collisionBulletSpaceShips() {
-        var speedSpaceShipX1: Double
-        var speedBulletX2: Double
-        var speedSpaceShipY1: Double
-        var speedBulletY2: Double
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
         if (bullets.size > 0) {
             for (spaceShip in spaceShips)
                 if (spaceShip.inGame)
                     for (bullet in bullets)
-                        if (overlap(
-                                bullet,
-                                spaceShip
-                            ) && spaceShips.indexOf(spaceShip) != bullet.player
+                        if (overlap(bullet, spaceShip)
+                            && spaceShips.indexOf(spaceShip) != bullet.player
                         ) {
-                            speedSpaceShipX1 = spaceShip.speedX
-                            speedBulletX2 = bullet.speedX
-                            speedSpaceShipY1 = spaceShip.speedY
-                            speedBulletY2 = bullet.speedY
-                            if (((speedSpaceShipX1 > 0) && (speedBulletX2 < 0)) || ((speedSpaceShipX1 < 0) && (speedBulletX2 > 0)))
-                                spaceShip.speedX = -speedSpaceShipX1
-                            else {
-                                spaceShip.speedX = (speedSpaceShipX1 + speedBulletX2) / 2
-                                spaceShip.speedX = 2 * spaceShip.speedX
-                            }
-                            if (((speedSpaceShipY1 > 0) && (speedBulletY2 < 0)) || ((speedSpaceShipY1 < 0) && (speedBulletY2 > 0)))
-                                spaceShip.speedY = -speedSpaceShipY1
-                            else {
-                                spaceShip.speedY = (speedSpaceShipY1 + speedBulletY2) / 2
-                                spaceShip.speedY = 2 * spaceShip.speedY
-                            }
+                            kickback(spaceShip, bullet)
+
                             animationBulletDestroys.add(
                                 AnimationBulletDestroy(
                                     centerX = bullet.centerX,
@@ -352,187 +310,131 @@ class State(
             for (meteorite in meteorites)
                 meteorite.update(deltaTime, width, height)
 
-            collisionMeteoriteMeteorite()
+            collisionMeteoriteMeteoriteBulletsSpaceShips()
         }
     }
 
-    private fun collisionMeteoriteMeteorite() {
-        var speedMeteoriteX1: Double
-        var speedMeteoriteX2: Double
-        var speedMeteoriteY1: Double
-        var speedMeteoriteY2: Double
-
+    private fun collisionMeteoriteMeteoriteBulletsSpaceShips() {
         for (n in 0 until (meteorites.size - 1))
             for (k in (n + 1) until meteorites.size)
                 if (overlap(meteorites[n], meteorites[k])) {
-                    speedMeteoriteX1 = meteorites[n].speedX
-                    speedMeteoriteX2 = meteorites[k].speedX
-                    speedMeteoriteY1 = meteorites[n].speedY
-                    speedMeteoriteY2 = meteorites[k].speedY
-                    if (((speedMeteoriteX1 > 0) && (speedMeteoriteX2 < 0)) || ((speedMeteoriteX1 < 0) && (speedMeteoriteX2 > 0))) {
-                        meteorites[n].speedX = -speedMeteoriteX1
-                        meteorites[k].speedX = -speedMeteoriteX2
-                    } else {
-                        meteorites[n].speedX = (speedMeteoriteX1 + speedMeteoriteX2) / 2
-                        meteorites[k].speedX = (speedMeteoriteX1 + speedMeteoriteX2) / 2
-                        if (abs(speedMeteoriteX1) > abs(speedMeteoriteX2))
-                            meteorites[k].speedX *= 2
-                        else
-                            if (abs(speedMeteoriteX1) < abs(speedMeteoriteX2))
-                                meteorites[n].speedX *= 2
-                    }
-
-                    if (((speedMeteoriteY1 > 0) && (speedMeteoriteY2 < 0)) || ((speedMeteoriteY1 < 0) && (speedMeteoriteY2 > 0))) {
-                        meteorites[n].speedY = -speedMeteoriteY1
-                        meteorites[k].speedY = -speedMeteoriteY2
-                    } else {
-                        meteorites[n].speedY = (speedMeteoriteY1 + speedMeteoriteY2) / 2
-                        meteorites[k].speedY = (speedMeteoriteY1 + speedMeteoriteY2) / 2
-                        if (abs(speedMeteoriteY1) > abs(speedMeteoriteY2))
-                            meteorites[k].speedY *= 2
-                        else
-                            if (abs(speedMeteoriteY1) < abs(speedMeteoriteY2))
-                                meteorites[n].speedY *= 2
-                    }
+                    kickback(meteorites[n], meteorites[k])
                 }
 
-        val listBulletDestroy: MutableList<Bullet> = mutableListOf()
-        val listMeteoritesDestroy: MutableList<Meteorite> = mutableListOf()
-        if (bullets.isNotEmpty())
-            if (meteorites.isNotEmpty())
-                for (meteorite in meteorites)
-                    for (bullet in bullets)
-                        if (overlap(bullet, meteorite)) {
-                            scores[bullet.player] =
-                                scores[bullet.player] + 100 * meteorite.viewSize
-                            listMeteoritesDestroy.add(meteorite)
 
-                            animationBulletDestroys.add(
-                                AnimationBulletDestroy(
-                                    centerX = bullet.centerX,
-                                    centerY = bullet.centerY,
-                                )
-                            )
-                            listBulletDestroy.add(bullet)
-                        }
+        val listMeteoritesDestroy: MutableList<Meteorite> = mutableListOf()
+        val listAngleMeteoritesDestroy: MutableList<Double> = mutableListOf()
+
+        val listBulletDestroy: MutableList<Bullet> = mutableListOf()
+        for (meteorite in meteorites)
+            for (bullet in bullets)
+                if (overlap(bullet, meteorite)) {
+                    scores[bullet.player] =
+                        scores[bullet.player] + 100 * meteorite.viewSize
+                    listMeteoritesDestroy.add(meteorite)
+                    listAngleMeteoritesDestroy.add(bullet.angle)
+
+                    animationBulletDestroys.add(
+                        AnimationBulletDestroy(
+                            centerX = bullet.centerX,
+                            centerY = bullet.centerY,
+                        )
+                    )
+                    listBulletDestroy.add(bullet)
+                }
 
         for (bullet in listBulletDestroy)
             bullets.remove(bullet)
 
+        spaceShipDestroy(listMeteoritesDestroy, listAngleMeteoritesDestroy)
+
+        meteoritesDestroy(listMeteoritesDestroy, listAngleMeteoritesDestroy)
+    }
+
+    private fun spaceShipDestroy(
+        listMeteoritesDestroy: MutableList<Meteorite>,
+        listAngleMeteoritesDestroy: MutableList<Double>
+    ) {
         for (spaceShip in spaceShips)
             for (meteorite in meteorites)
                 if (spaceShip.inGame)
                     if (overlap(spaceShip, meteorite)) {
                         lifes[spaceShips.indexOf(spaceShip)] -= 1
                         spaceShip.inGame = false
+                        if (lifes[spaceShips.indexOf(spaceShip)] > 0)
+                            lineRespawn.add(spaceShip)
                         listMeteoritesDestroy.add(meteorite)
+                        listAngleMeteoritesDestroy.add(spaceShip.angle)
 
-                        animationSpaceShipDestroys.add(
-                            AnimationSpaceShipDestroy(
-                                centerX = spaceShip.centerX,
-                                centerY = spaceShip.centerY,
-                            )
-                        )
+                        animationSpaceShipDestroys.add(AnimationSpaceShipDestroy(spaceShip))
                     }
+    }
 
-        //TODO поменять угол разлета метиоритов в зависимости от того под каким углом прилетела пуля
+    private fun meteoritesDestroy(
+        listMeteoritesDestroy: MutableList<Meteorite>,
+        listAngleMeteoritesDestroy: MutableList<Double>
+    ) {
         val listMeteoritesFullDestroy: MutableList<Meteorite> = mutableListOf()
-        if (listMeteoritesDestroy.isNotEmpty())
-            for (meteorite in listMeteoritesDestroy) {
-                meteorite.size = meteorite.size - 0.2
-                meteorite.viewSize = meteorite.viewSize + 1
-                if (meteorite.viewSize > 3) {
-                    listMeteoritesFullDestroy.add(meteorite)
-                } else {
-                    val speed=sqrt(meteorite.speedX*meteorite.speedX+meteorite.speedY*meteorite.speedY)
-                    meteorites.add(
-                        Meteorite(
-                            centerX = meteorite.centerX + (meteorite.size + (meteorite.size / 2 + 0.2) * sign(
-                                cos((meteorite.angle - 120) / 180.0 * Math.PI)
-                            )),
-                            centerY = meteorite.centerY + (meteorite.size + (meteorite.size / 2 + 0.2) * sign(
-                                sin((meteorite.angle - 120) / 180.0 * Math.PI)
-                            )),
-                            angle = meteorite.angle - 120,
-                            speedX = speed * cos((meteorite.angle- 120) / 180.0 * Math.PI),
-                            speedY = speed * sin((meteorite.angle- 120) / 180.0 * Math.PI),
-                            size = meteorite.size,
-                            viewSize = meteorite.viewSize,
-                            view = meteorite.view,
-                        )
-                    )
 
-                    meteorites.add(
-                        Meteorite(
-                            centerX = meteorite.centerX + (meteorite.size + (meteorite.size / 2 + 0.2) * sign(
-                                cos((meteorite.angle - 240) / 180.0 * Math.PI)
-                            )),
-                            centerY = meteorite.centerY + (meteorite.size + (meteorite.size / 2 + 0.2) * sign(
-                                sin((meteorite.angle - 240) / 180.0 * Math.PI)
-                            )),
-                            angle = meteorite.angle - 240,
-                            speedX = speed * cos((meteorite.angle-240) / 180.0 * Math.PI),
-                            speedY = speed * sin((meteorite.angle-240)  / 180.0 * Math.PI),
-                            size = meteorite.size,
-                            viewSize = meteorite.viewSize,
-                            view = meteorite.view,
-                        )
-                    )
-                }
-            }
+        for ((index, meteoriteDestroy) in listMeteoritesDestroy.withIndex()) {
+            val angleDestroy = listAngleMeteoritesDestroy[index]
 
-        for (meteorite in listMeteoritesFullDestroy) {
-            meteorites.remove(meteorite)
+            listMeteoritesFullDestroy.add(meteoriteDestroy)
+            if (meteoriteDestroy.viewSize + 1 > 3)
+                continue
+
+            createThreeMeteorites(meteoriteDestroy, angleDestroy)
+        }
+
+        listMeteoritesFullDestroy.forEach { meteorites.remove(it) }
+    }
+
+    private fun createThreeMeteorites(
+        meteoriteDestroy: Meteorite,
+        angleDestroy: Double
+    ) {
+        for (angle in (0 until 360) step 120) {
+            val newMeteorite = meteoriteDestroy.createMeteorite(angleDestroy, angle.toDouble())
+
+            if (CheckCanCreateNewMeteoriteIsOverlap(newMeteorite, meteoriteDestroy))
+                meteorites.add(newMeteorite)
         }
     }
 
+    private fun CheckCanCreateNewMeteoriteIsOverlap(
+        newMeteorite: Meteorite,
+        meteoriteDestroy: Meteorite,
+    ): Boolean {
+        for (colMeteorite in meteorites)
+            if (colMeteorite != meteoriteDestroy)
+                if (overlap(newMeteorite, colMeteorite))
+                    return false
+        return true
+    }
 
     private fun overlap(actor1: Actor, actor2: Actor): Boolean {
-        val size1 = (actor1.size / 2)
-        val size2 = (actor2.size / 2)
-        val L1 = changeXifBorder(actor1.centerX - size1)
-        val L2 = changeXifBorder(actor2.centerX - size2)
-        val R1 = changeXifBorder(actor1.centerX + size1)
-        val R2 = changeXifBorder(actor2.centerX + size2)
-        val U1 = changeYifBorder(actor1.centerY - size1)
-        val U2 = changeYifBorder(actor2.centerY - size2)
-        val D1 = changeYifBorder(actor1.centerY + size1)
-        val D2 = changeYifBorder(actor2.centerY + size2)
-        val LUA1 = L1 > L2 && L1 < R2 && U1 > U2 && U1 < D2
-        val RUA1 = R1 > L2 && R1 < R2 && U1 > U2 && U1 < D2
-        val LDA1 = L1 > L2 && L1 < R2 && D1 > U2 && D1 < D2
-        val RDA1 = R1 > L2 && R1 < R2 && D1 > U2 && D1 < D2
-
-        val LUA2 = L2 > L1 && L2 < R1 && U2 > U1 && U2 < D1
-        val RUA2 = R2 > L1 && R2 < R1 && U2 > U1 && U2 < D1
-        val LDA2 = L2 > L1 && L2 < R1 && D2 > U1 && D2 < D1
-        val RDA2 = R2 > L1 && R2 < R1 && D2 > U1 && D2 < D1
-
-        return LUA1 || RUA1 || LDA1 || RDA1 || LUA2 || RUA2 || LDA2 || RDA2
+        return Physics.overlap(
+            actor1.centerX, actor1.centerY, actor1.size,
+            actor2.centerX, actor2.centerY, actor2.size
+        )
     }
 
-    private fun changeXifBorder(coordinateCenterX: Double): Double {
-        var result = coordinateCenterX
-        if (coordinateCenterX > width)
-            result = coordinateCenterX - width
-        if (coordinateCenterX < 0)
-            result = coordinateCenterX + width
-        return result
-    }
+    private fun kickback(actor1: Actor, actor2: Actor) {
+        val speedActorX1: Double = actor1.speedX
+        val speedActorX2: Double = actor2.speedX
+        val speedActorY1: Double = actor1.speedY
+        val speedActorY2: Double = actor2.speedY
 
-    private fun changeYifBorder(coordinateCenterY: Double): Double {
-        var result = coordinateCenterY
-        if (coordinateCenterY > height)
-            result = coordinateCenterY - height
-        if (coordinateCenterY < 0)
-            result = coordinateCenterY + height
-        return result
+        actor1.speedX = Physics.getSpeedFirstAfterKickback(speedActorX1, speedActorX2)
+        actor2.speedX = Physics.getSpeedFirstAfterKickback(speedActorX2, speedActorX1)
+        actor1.speedY = Physics.getSpeedFirstAfterKickback(speedActorY1, speedActorY2)
+        actor2.speedY = Physics.getSpeedFirstAfterKickback(speedActorY2, speedActorY1)
     }
 
     fun clickPause() {
-        if (status == "playing")
-            status = "pause"
+        status = if (status == "playing")
+            "pause"
         else
-            status = "playing"
+            "playing"
     }
 }
