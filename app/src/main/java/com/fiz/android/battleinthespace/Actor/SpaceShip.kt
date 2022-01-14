@@ -1,12 +1,12 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.Actor
 
-import android.util.Log
+import com.fiz.android.battleinthespace.Controller
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
 private const val SPEED_ANGLE_PER_SECOND: Double = 200.0
-private const val INCREASE_SPEED_PER_SECOND: Double = 0.8
+private const val INCREASE_SPEED_PER_SECOND: Double = 1.2
 private const val SPEED_MAX: Double = 2.0
 
 class SpaceShip(

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.Actor
 
 data class AnimationBulletDestroy(
     var centerX: Double,

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.Actor
 
 open class Actor(
     var centerX: Double,

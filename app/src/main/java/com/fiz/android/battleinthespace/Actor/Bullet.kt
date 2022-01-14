@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.Actor
 
 import kotlin.math.sqrt
 
@@ -19,7 +19,7 @@ class Bullet(
 
     var player: Int,
 ) : Actor(
-    centerX, centerY, speedX, speedY, angle,size,SPEED_MAX
+    centerX, centerY, speedX, speedY, angle,size, SPEED_MAX
 ) {
     override fun update(deltaTime: Int, width: Double, height: Double) {
         super.update(deltaTime, width, height)

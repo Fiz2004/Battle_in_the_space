@@ -1,5 +1,6 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.Actor
 
+import com.fiz.android.battleinthespace.NUMBER_BITMAP_METEORITE_OPTION
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -25,7 +26,7 @@ class Meteorite(
     centerX, centerY, speedX, speedY, angle, size, SPEED_MAX
 ) {
 
-    fun createMeteorite(angleDestroy:Double,angleCreate:Double):Meteorite{
+    fun createMeteorite(angleDestroy:Double,angleCreate:Double): Meteorite {
         val speed =
             sqrt(speedX * speedX + speedY * speedY)
 
@@ -50,8 +51,8 @@ class Meteorite(
             return Meteorite(
                 centerX = x,
                 centerY = y,
-                speedX = 0.4*SPEED_MAX * cos(angle / 180.0 * Math.PI),
-                speedY = 0.4*SPEED_MAX * sin(angle / 180.0 * Math.PI),
+                speedX = 0.4* SPEED_MAX * cos(angle / 180.0 * Math.PI),
+                speedY = 0.4* SPEED_MAX * sin(angle / 180.0 * Math.PI),
                 angle = angle.toDouble(),
                 size = 1.0,
                 viewSize = 0,

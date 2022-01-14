@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace
 
+import com.fiz.android.battleinthespace.Actor.*
 import kotlin.math.*
 
 private const val speedBulletMax = 4.0
@@ -413,7 +414,7 @@ class State(
     }
 
     private fun overlap(actor1: Actor, actor2: Actor): Boolean {
-        return Physics.overlap(
+        return Physics.overlapCircle(
             actor1.centerX, actor1.centerY, actor1.size,
             actor2.centerX, actor2.centerY, actor2.size
         )
