@@ -10,18 +10,16 @@
     <string name="four_players_options_radiobutton">4 Players</string>
     <string name="name_options_textview">Name:</string>
     <string name="name_options_edittext">Enter name</string>
+
+    <string name="name1_options_edittext">Player 1 </string>
+    <string name="name2_options_edittext">Player 2</string>
+    <string name="name3_options_edittext">Player 3</string>
+    <string name="name4_options_edittext">Player 4</string>
+
     <string name="exit_options_button">Exit</string>
 
     <string name="new_game_game_button">New game</string>
     <string name="pause_game_button">Pause</string>
     <string name="resume_game_button">Resume</string>
     <string name="exit_game_button">Exit</string>
-    <string name="scores_game_textview">Scores:</string>
-    <string name="record_game_textview">Record:</string>
-    <string name="infobreath_game_textview">Suffocating. Seconds left:</string>
-
-    <string name="left_game_button">Left</string>
-    <string name="right_game_button">Right</string>
-    <string name="down_game_button">Down</string>
-    <string name="rotate_game_button">Rotate</string>
 </resources>

@@ -8,19 +8,14 @@
     tools:context=".OptionsActivity">
 
 
-    <RadioGroup
-        android:id="@+id/radios"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
@@ -36,13 +31,15 @@
             <EditText
                 android:id="@+id/one_players_options_edittext"
                 style="@style/EditTextStyle"
+                android:text="Player 1"
                 android:hint="@string/name_options_edittext" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/two"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
@@ -58,19 +55,20 @@
             <EditText
                 android:id="@+id/two_players_options_edittext"
                 style="@style/EditTextStyle"
+                android:text="Player 2"
                 android:hint="@string/name_options_edittext" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/three_players_options_radiobutton"
                 style="@style/RadioButtonStyle"
-                android:text="@string/two_players_options_radiobutton" />
+                android:text="@string/three_players_options_radiobutton" />
 
             <TextView
                 android:id="@+id/three_players_options_textview"
@@ -80,13 +78,14 @@
             <EditText
                 android:id="@+id/three_players_options_edittext"
                 style="@style/EditTextStyle"
+                android:text="Player 3"
                 android:hint="@string/name_options_edittext" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <RadioButton
@@ -102,12 +101,13 @@
             <EditText
                 android:id="@+id/four_players_options_edittext"
                 style="@style/EditTextStyle"
+                android:text="Player 4"
                 android:hint="@string/name_options_edittext" />
 
         </LinearLayout>
 
 
-    </RadioGroup>
+    </LinearLayout>
 
     <Button
         android:id="@+id/exit_options_button"

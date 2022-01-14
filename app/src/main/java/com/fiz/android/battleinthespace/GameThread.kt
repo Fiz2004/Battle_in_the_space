@@ -1,7 +1,6 @@
 package com.fiz.android.battleinthespace
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.*
 import android.view.SurfaceHolder
@@ -10,18 +9,32 @@ import kotlin.math.min
 
 class Controller(
     var fire: Boolean = false,
-    var timeLastFire: Int = 0,
-    _angle:Float=0F,
-    var power:Float=0F
-){
-    var angle:Float=_angle
-    set(value) {
-        field = value
-        if (value > 360)
-            field = value - 360
-        if (value < 0)
-            field = value + 360
+    _timeBetweenFireMin: Int =500,
+    _angle: Float = 0F,
+    var power: Float = 0F
+) {
+    private var timeBetweenFireMin=_timeBetweenFireMin
+    private var timeLastFire: Int = 0
+    fun isCanFire(deltaTime: Int): Boolean {
+        if (timeLastFire == 0) {
+            timeLastFire = timeBetweenFireMin
+            return true
+        }
+        timeLastFire -= deltaTime
+        if (timeLastFire < 0)
+            timeLastFire = 0
+        return false
     }
+
+
+    var angle: Float = _angle
+        set(value) {
+            field = value
+            if (value > 360)
+                field = value - 360
+            if (value < 0)
+                field = value + 360
+        }
 }
 
 class GameThread(
@@ -29,9 +42,11 @@ class GameThread(
     private val informationSurfaceHolder: SurfaceHolder,
     resources: Resources,
     context: Context,
-    pauseButton: Button
+    pauseButton: Button,
+    val countPlayers:Int,
+    val namePlayers:List<String>
 ) : Thread() {
-    var state = State(16.0, 16.0)
+    var state = State(16.0, 16.0,countPlayers,namePlayers)
     val controller: Array<Controller> = Array(4) { Controller() }
 
     private var prevTime = System.currentTimeMillis()
@@ -59,8 +74,8 @@ class GameThread(
 
     private fun displayUpdate(
     ) {
-        var canvas: Canvas?= null
-        var informationCanvas: Canvas?= null
+        var canvas: Canvas? = null
+        var informationCanvas: Canvas? = null
         try {
             canvas = surfaceHolder.lockCanvas()
             if (canvas == null) return
@@ -74,9 +89,9 @@ class GameThread(
                 display.renderInfo(state, informationCanvas)
             }
         } finally {
-            if (canvas!=null)
+            if (canvas != null)
                 surfaceHolder.unlockCanvasAndPost(canvas)
-            if (informationCanvas!=null)
+            if (informationCanvas != null)
                 informationSurfaceHolder.unlockCanvasAndPost(informationCanvas)
 
         }
@@ -97,7 +112,7 @@ class GameThread(
         }
 
         if (ending < 0 || state.status == "new game") {
-            state = State(16.0, 16.0)
+            state = State(16.0, 16.0,countPlayers,namePlayers)
             ending = 1000
         }
 

@@ -1,6 +1,7 @@
-package com.fiz.android.battleinthespace.Actor
+package com.fiz.android.battleinthespace.actor
 
 import com.fiz.android.battleinthespace.Controller
+import com.fiz.android.battleinthespace.Vec
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -10,8 +11,7 @@ private const val INCREASE_SPEED_PER_SECOND: Double = 1.2
 private const val SPEED_MAX: Double = 2.0
 
 class SpaceShip(
-    centerX: Double,
-    centerY: Double,
+    center: Vec,
 
     speedX: Double = 0.0,
     speedY: Double = 0.0,
@@ -23,8 +23,10 @@ class SpaceShip(
     var inGame: Boolean = true,
     var isFly:Boolean=false
 ) : Actor(
-    centerX, centerY, speedX, speedY, angle, size, SPEED_MAX
+    center, speedX, speedY, angle, size, SPEED_MAX
 ) {
+
+    constructor (respawn:Respawn):this(respawn.center, angle=respawn.angle)
     fun moveRotate(deltaTime: Int, controller: Controller) {
         val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
         if (abs(angle - controller.angle) > 180)

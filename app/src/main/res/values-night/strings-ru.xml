@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Битва в космосе</string>
+    <string name="new_game_main_button">Новая игра</string>
+    <string name="options_main_button">Настройки</string>
+    <string name="exit_main_button">Выход</string>
+
+    <string name="one_players_options_radiobutton">1 игрок </string>
+    <string name="two_players_options_radiobutton">2 игрока</string>
+    <string name="three_players_options_radiobutton">3 игрока</string>
+    <string name="four_players_options_radiobutton">4 игрока</string>
+    <string name="name_options_textview">Имя:</string>
+    <string name="name_options_edittext">Введите имя</string>
+
+    <string name="name1_options_edittext">Игрок 1 </string>
+    <string name="name2_options_edittext">Игрок 2</string>
+    <string name="name3_options_edittext">Игрок 3</string>
+    <string name="name4_options_edittext">Игрок 4</string>
+
+    <string name="exit_options_button">Выход</string>
+
+    <string name="new_game_game_button">Новая игра</string>
+    <string name="pause_game_button">Пауза</string>
+    <string name="resume_game_button">Продолжить</string>
+    <string name="exit_game_button">Выход</string>
+</resources>

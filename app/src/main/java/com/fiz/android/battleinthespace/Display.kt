@@ -166,65 +166,65 @@ class Display(
                     drawObjectWithAngle(
                         bmpSpaceshipFly[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX,
-                        state.spaceShips[player].centerY,
+                        state.spaceShips[player].center.x,
+                        state.spaceShips[player].center.y,
                         canvas
                     )
                 } else {
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX,
-                        state.spaceShips[player].centerY,
+                        state.spaceShips[player].center.x,
+                        state.spaceShips[player].center.y,
                         canvas
                     )
                 }
-                if (state.spaceShips[player].centerY + 1 >= canvas.height)
+                if (state.spaceShips[player].center.y + 1 >= canvas.height)
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX,
-                        state.spaceShips[player].centerY - canvas.height,
+                        state.spaceShips[player].center.x,
+                        state.spaceShips[player].center.y - canvas.height,
                         canvas
                     )
-                if (state.spaceShips[player].centerX + 1 >= canvas.width)
+                if (state.spaceShips[player].center.x + 1 >= canvas.width)
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX - canvas.width,
-                        state.spaceShips[player].centerY,
+                        state.spaceShips[player].center.x - canvas.width,
+                        state.spaceShips[player].center.y,
                         canvas
                     )
-                if ((state.spaceShips[player].centerX + 1 >= canvas.width) && (state.spaceShips[player].centerY + 1 >= canvas.height))
+                if ((state.spaceShips[player].center.x + 1 >= canvas.width) && (state.spaceShips[player].center.y + 1 >= canvas.height))
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX - canvas.width,
-                        state.spaceShips[player].centerY - canvas.height,
+                        state.spaceShips[player].center.x - canvas.width,
+                        state.spaceShips[player].center.y - canvas.height,
                         canvas
                     )
-                if (state.spaceShips[player].centerX - 1 <= 0)
+                if (state.spaceShips[player].center.x - 1 <= 0)
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX + canvas.width,
-                        state.spaceShips[player].centerY,
+                        state.spaceShips[player].center.x + canvas.width,
+                        state.spaceShips[player].center.y,
                         canvas
                     )
-                if (state.spaceShips[player].centerY - 1 <= 0)
+                if (state.spaceShips[player].center.y - 1 <= 0)
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX,
-                        state.spaceShips[player].centerY + canvas.height,
+                        state.spaceShips[player].center.x,
+                        state.spaceShips[player].center.y + canvas.height,
                         canvas
                     )
-                if ((state.spaceShips[player].centerX - 1 <= 0) && (state.spaceShips[player].centerY - 1 <= 0))
+                if ((state.spaceShips[player].center.x - 1 <= 0) && (state.spaceShips[player].center.y - 1 <= 0))
                     drawObjectWithAngle(
                         bmpSpaceship[player],
                         state.spaceShips[player].angle,
-                        state.spaceShips[player].centerX + canvas.width,
-                        state.spaceShips[player].centerY + canvas.height,
+                        state.spaceShips[player].center.x + canvas.width,
+                        state.spaceShips[player].center.y + canvas.height,
                         canvas
                     )
             }
@@ -266,10 +266,10 @@ class Display(
             for (n in 0 until state.bullets.size) {
                 val bullet = state.bullets[n]
                 val rectDst = RectF(
-                    (bullet.centerX * sizeUnit - size / 2).toFloat(),
-                    (bullet.centerY * sizeUnit - size / 2).toFloat(),
-                    (bullet.centerX * sizeUnit + size / 2).toFloat(),
-                    (bullet.centerY * sizeUnit + size / 2).toFloat()
+                    (bullet.center.x * sizeUnit - size / 2).toFloat(),
+                    (bullet.center.y * sizeUnit - size / 2).toFloat(),
+                    (bullet.center.x * sizeUnit + size / 2).toFloat(),
+                    (bullet.center.y * sizeUnit + size / 2).toFloat()
                 )
 
                 canvas.drawBitmap(bmpBullet, rectSrc, rectDst, paint)
@@ -290,10 +290,10 @@ class Display(
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(state.animationBulletDestroys[n].timeShow / step).toInt()
 
             val rectDst = RectF(
-                (state.animationBulletDestroys[n].centerX * sizeUnit - size / 2).toFloat(),
-                (state.animationBulletDestroys[n].centerY * sizeUnit - size / 2).toFloat(),
-                (state.animationBulletDestroys[n].centerX * sizeUnit + size / 2).toFloat(),
-                (state.animationBulletDestroys[n].centerY * sizeUnit + size / 2).toFloat()
+                (state.animationBulletDestroys[n].center.x * sizeUnit - size / 2).toFloat(),
+                (state.animationBulletDestroys[n].center.y * sizeUnit - size / 2).toFloat(),
+                (state.animationBulletDestroys[n].center.x * sizeUnit + size / 2).toFloat(),
+                (state.animationBulletDestroys[n].center.y * sizeUnit + size / 2).toFloat()
             )
 
             canvas.drawBitmap(bmpBulletDestroy[frame], rectSrc, rectDst, paint)
@@ -312,10 +312,10 @@ class Display(
                 )
 
                 val rectDst = RectF(
-                    (meteorite.centerX * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.centerY * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.centerX * sizeUnit + meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.centerY * sizeUnit + meteorite.size * sizeUnit / 2).toFloat()
+                    (meteorite.center.x * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.center.y * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.center.x * sizeUnit + meteorite.size * sizeUnit / 2).toFloat(),
+                    (meteorite.center.y * sizeUnit + meteorite.size * sizeUnit / 2).toFloat()
                 )
 
                 canvas.drawBitmap(bmpMeteorite, rectSrc, rectDst, paint)
@@ -333,8 +333,8 @@ class Display(
             drawObjectWithAngle(
                 bmpSpaceshipDestroy[frame],
                 animationSpaceShipDestroy.angle,
-                animationSpaceShipDestroy.centerX,
-                animationSpaceShipDestroy.centerY,
+                animationSpaceShipDestroy.center.x,
+                animationSpaceShipDestroy.center.y,
                 canvas
             )
         }
@@ -362,7 +362,11 @@ class Display(
                 4 -> Color.YELLOW
                 else -> Color.WHITE
             }
-            canvas.drawText("Player $n:", 0F, 70F + 70F * (n - 1) + sizeUnit / 2.5F / 2, paintFont)
+            canvas.drawText(
+                state.namePlayers[n - 1],
+                0F,
+                70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
+                paintFont)
 
             for (k in 0 until state.lifes[n - 1])
                 canvas.drawBitmap(

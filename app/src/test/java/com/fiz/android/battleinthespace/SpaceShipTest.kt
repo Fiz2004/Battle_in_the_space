@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace
 
-import com.fiz.android.battleinthespace.Actor.SpaceShip
+import com.fiz.android.battleinthespace.actor.SpaceShip
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
