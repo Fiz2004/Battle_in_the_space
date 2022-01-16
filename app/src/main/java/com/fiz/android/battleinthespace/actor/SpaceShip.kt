@@ -1,7 +1,7 @@
 package com.fiz.android.battleinthespace.actor
 
 import com.fiz.android.battleinthespace.Controller
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -26,7 +26,7 @@ class SpaceShip(
     center, speedX, speedY, angle, size, SPEED_MAX
 ) {
 
-    constructor (respawn:Respawn):this(respawn.center, angle=respawn.angle)
+    constructor (respawn:Respawn):this(Vec(respawn.center), angle=respawn.angle)
     fun moveRotate(deltaTime: Int, controller: Controller) {
         val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
         if (abs(angle - controller.angle) > 180)

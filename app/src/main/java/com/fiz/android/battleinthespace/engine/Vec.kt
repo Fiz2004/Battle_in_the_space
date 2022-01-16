@@ -1,13 +1,10 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.engine
 
-class Vec(var x: Double, var y: Double) {
+class Vec(val x: Double, val y: Double) {
+    constructor (vec: Vec):this(vec.x,vec.y)
+
     operator fun plus(vec: Vec): Vec {
         return Vec(x + vec.x, y + vec.y)
-    }
-
-    operator fun plusAssign(vec: Vec) {
-        x+=vec.x
-        y+=vec.y
     }
 
     operator fun times(factor: Double): Vec {

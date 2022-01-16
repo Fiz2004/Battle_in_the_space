@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace
 
+import com.fiz.android.battleinthespace.engine.Physics
 import org.junit.Assert.*
 import org.junit.Before
 
@@ -55,7 +56,7 @@ class PhysicsTest {
 
     @Test
     fun overlapRectangle2RectangleOverlap() {
-        val result=Physics.overlapRectangle(2.5,2.5,3.0,5.0,5.0,3.0)
+        val result= Physics.overlapRectangle(2.5,2.5,3.0,5.0,5.0,3.0)
         assertTrue(result)
     }
 
@@ -86,7 +87,7 @@ class PhysicsTest {
 
     @Test
     fun overlapCircle2CircleOverlap() {
-        val result=Physics.overlapCircle(2.5,2.5,3.0,4.0,4.0,3.0)
+        val result= Physics.overlapCircle(2.5,2.5,3.0,4.0,4.0,3.0)
         assertTrue(result)
     }
 

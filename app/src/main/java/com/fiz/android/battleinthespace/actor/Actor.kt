@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace.actor
 
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 
 open class Actor(
     var center: Vec,
@@ -42,18 +42,17 @@ open class Actor(
     }
 
     open fun update(deltaTime: Int, width: Double, height: Double) {
-        val stepX = speedX * deltaTime / 1000
-        center.x += stepX
-        if (center.x > width)
-            center.x = 0.0
-        if (center.x < 0)
-            center.x = width
+        val step= Vec(speedX * deltaTime / 1000,speedY * deltaTime / 1000)
+        center += step
 
-        val stepY = speedY * deltaTime / 1000
-        center.y += stepY
+        if (center.x > width)
+            center = Vec(center.x-width,center.y)
+        if (center.x < 0)
+            center = Vec(center.x+width,center.y)
+
         if (center.y > height)
-            center.y = 0.0
+            center = Vec(center.x,center.y-height)
         if (center.y < 0)
-            center.y = height
+            center = Vec(center.x,center.y+height)
     }
 }

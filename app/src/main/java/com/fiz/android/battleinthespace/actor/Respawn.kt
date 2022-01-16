@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace.actor
 
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 
 class Respawn(
     center: Vec,

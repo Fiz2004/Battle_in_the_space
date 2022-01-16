@@ -3,8 +3,12 @@ package com.fiz.android.battleinthespace
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.*
+import android.view.SurfaceView
 import android.widget.Button
+import com.fiz.android.battleinthespace.engine.Physics
 import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.min
 
 private const val NUMBER_BITMAP_BACKGROUND = 8
@@ -16,13 +20,11 @@ private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
-private const val DIVISION = 6
-private const val DENSITY_MAX = 6
-
 class Display(
     private val resources: Resources,
     private val context: Context,
-    private val pauseButton: Button
+    private val pauseButton: Button,
+    private val surface: SurfaceView
 ) {
     private val paint: Paint = Paint()
 
@@ -117,19 +119,46 @@ class Display(
         return result
     }
 
+    private val DIVISION_BY_SCREEN = 21
+    private val DENSITY_MAX = 6
     private val density: Float = resources.displayMetrics.density
-    private val sizeUnit = min(
-        resources.displayMetrics.widthPixels,
-        resources.displayMetrics.heightPixels
-    ) / density / DIVISION
+
+    // Определить почему в самом начале загрузки класса width=0
+    private var sizeUnit: Float = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
+
+    inner class Viewport {
+        var left: Double = 0.0
+        var top: Double = 0.0
+        var width: Double = .0
+        var height: Double = .0
+
+        fun update(state: State) {
+            // Определить почему в самом начале загрузки класса width=0
+            width = (surface.width / sizeUnit).toDouble()
+            height= (surface.height / sizeUnit).toDouble()
+
+            var marginX = surface.width / sizeUnit/2
+            var marginY = surface.height / sizeUnit/2
+            var spaceship = state.spaceShips[0]
+            var center = spaceship.center
+
+            left = center.x - marginX
+
+           top = center.y - marginY
+        }
+    }
+
+    val viewport = Viewport()
 
     fun render(state: State, canvas: Canvas) {
+        sizeUnit = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
+        viewport.update(state)
         drawBackground(state, canvas)
-        drawSpaceships(state, canvas)
-        drawBullet(state, canvas)
-        drawAnimationBulletDestroy(state, canvas)
-        drawMeteorite(state, canvas)
-        drawAnimationSpaceshipDestroy(state, canvas)
+//        drawSpaceships(state, canvas)
+//        drawBullet(state, canvas)
+//        drawAnimationBulletDestroy(state, canvas)
+//        drawMeteorite(state, canvas)
+//        drawAnimationSpaceshipDestroy(state, canvas)
     }
 
     fun renderInfo(state: State, canvasInfo: Canvas) {
@@ -143,16 +172,26 @@ class Display(
 
     private fun drawBackground(state: State, canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
+
+        val xStart = floor(viewport.left).toInt()
+        val xEnd = ceil(viewport.left + viewport.width).toInt()
+        val yStart = floor(viewport.top).toInt()
+        val yEnd = ceil(viewport.top + viewport.height).toInt()
+
         val rectSrc = Rect(
             0, 0,
             bmpBackground[0].width, bmpBackground[0].height
         )
-        for (n in 0 until state.height.toInt())
-            for (k in 0 until state.width.toInt()) {
-                val background = state.backgrounds[n][k]
+        for (n in xStart until xEnd)
+            for (k in yStart until yEnd) {
+                val x=Physics.changeXifBorderTop(n.toDouble())
+                val y=Physics.changeYifBorderTop(k.toDouble())
+                val background = state.backgrounds[x.toInt()][y.toInt()]
                 val rectDst = RectF(
-                    n * sizeUnit, k * sizeUnit,
-                    n * sizeUnit + sizeUnit, k * sizeUnit + sizeUnit
+                    (n-viewport.left).toFloat()* sizeUnit,
+                    (k-viewport.top).toFloat() * sizeUnit,
+                    (n-viewport.left).toFloat()* sizeUnit  + sizeUnit,
+                    (k-viewport.top).toFloat() * sizeUnit  + sizeUnit
                 )
 
                 canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
@@ -300,7 +339,6 @@ class Display(
         }
     }
 
-
     private fun drawMeteorite(state: State, canvas: Canvas) {
         if (state.meteorites.size > 0)
             for (n in 0 until state.meteorites.size) {
@@ -322,7 +360,6 @@ class Display(
             }
     }
 
-
     private fun drawAnimationSpaceshipDestroy(state: State, canvas: Canvas) {
         for (animationSpaceShipDestroy in state.animationSpaceShipDestroys) {
             val step =
@@ -339,7 +376,6 @@ class Display(
             )
         }
     }
-
 
     private fun drawInfo(state: State, canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
@@ -366,7 +402,8 @@ class Display(
                 state.namePlayers[n - 1],
                 0F,
                 70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
-                paintFont)
+                paintFont
+            )
 
             for (k in 0 until state.lifes[n - 1])
                 canvas.drawBitmap(

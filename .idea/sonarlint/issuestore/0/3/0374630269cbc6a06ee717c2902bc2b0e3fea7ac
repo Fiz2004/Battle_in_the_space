@@ -1,2 +1,8 @@
 
-pkotlin:S3776¢"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(Í­ïÞýÿÿÿÿ
+7kotlin:S1128"Remove this unused import.(õêäŸûÿÿÿÿ
+Qkotlin:S1144É"3Remove this unused private "drawSpaceships" method.(Í­ïÞýÿÿÿÿ
+Mkotlin:S1144©"/Remove this unused private "drawBullet" method.(§ÀÎÌøÿÿÿÿ
+Xkotlin:S1144¾"?Remove this unused private "drawAnimationBulletDestroy" method.(­¬Ùš
+Kkotlin:S1144Ö"2Remove this unused private "drawMeteorite" method.(“†¤Š
+[kotlin:S1144ë"BRemove this unused private "drawAnimationSpaceshipDestroy" method.(ÓÄ©•
+pkotlin:S3776É"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(Í­ïÞýÿÿÿÿ

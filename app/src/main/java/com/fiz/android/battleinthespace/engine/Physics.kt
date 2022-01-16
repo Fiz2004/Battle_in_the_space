@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.engine
 
 import kotlin.math.abs
 import kotlin.math.pow
@@ -10,8 +10,8 @@ object Physics {
     var height: Double = 0.0
 
     fun createWorld(width: Double, height: Double) {
-        this.width = width
-        this.height = height
+        Physics.width = width
+        Physics.height = height
     }
 
     fun getSpeedFirstAfterKickback(speedFirst: Double, speedSecond: Double): Double {
@@ -25,9 +25,9 @@ object Physics {
     }
 
     fun overlap(
-        center1:Vec,
+        center1: Vec,
         size1: Double,
-        center2:Vec,
+        center2: Vec,
         size2: Double
     ): Boolean {
         val halfSize1 = (size1 / 2)
@@ -54,9 +54,9 @@ object Physics {
     }
 
     fun overlapCircle(
-        center1:Vec,
+        center1: Vec,
         size1: Double,
-        center2:Vec,
+        center2: Vec,
         size2: Double
     ): Boolean {
         val radius1 = (size1 / 2)
@@ -71,9 +71,9 @@ object Physics {
     }
 
     fun overlapRectangle(
-        center1:Vec,
+        center1: Vec,
         size1: Double,
-        center2:Vec,
+        center2: Vec,
         size2: Double
     ): Boolean {
         val halfSize1 = (size1 / 2)
@@ -113,16 +113,32 @@ object Physics {
         }
     }
 
-    private fun changeXifBorder(centerX: Double): Double {
+    fun changeXifBorder(centerX: Double): Double {
         return when {
             (centerX < 0.0) -> centerX + width
             else -> centerX
         }
     }
 
-    private fun changeYifBorder(centerY: Double): Double {
+    fun changeYifBorder(centerY: Double): Double {
         return when {
             (centerY < 0.0) -> centerY + height
+            else -> centerY
+        }
+    }
+
+    fun changeXifBorderTop(centerX: Double): Double {
+        return when {
+            (centerX < 0.0) -> centerX + width
+            (centerX >=width) -> centerX - width
+            else -> centerX
+        }
+    }
+
+    fun changeYifBorderTop(centerY: Double): Double {
+        return when {
+            (centerY < 0.0) -> centerY + height
+            (centerY >=height) -> centerY - height
             else -> centerY
         }
     }

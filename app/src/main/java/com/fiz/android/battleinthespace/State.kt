@@ -1,14 +1,14 @@
 package com.fiz.android.battleinthespace
 
 import com.fiz.android.battleinthespace.actor.*
+import com.fiz.android.battleinthespace.engine.Physics
+import com.fiz.android.battleinthespace.engine.Vec
 
-
-// TODO Почему то при одном игроке меняется координаты респауна. Если сразу врезаться кораблем в метеорит
 class State(
     val width: Double,
     val height: Double,
     var countPlayers: Int = 4,
-    var namePlayers: List<String> = listOf("Player 1", "Player 2", "Player 3", "Player 4")
+    var namePlayers: List<String> = listOf("Player 1", "Player 2", "Player 3", "Player 4"),
 ) {
     var round: Int = 1
     var status = "playing"
@@ -186,24 +186,26 @@ class State(
     private fun respawnCheck(currentSpaceShip: SpaceShip): Boolean {
         val numberPlayer = spaceShips.indexOf(currentSpaceShip)
         if (lifes[numberPlayer] > 0) {
-            val respawn = respawns.find {
-                for (spaceShip in spaceShips)
-                    if (spaceShip.inGame && overlap(it, spaceShip))
-                        return false
-                for (bullet in bullets)
-                    if (overlap(it, bullet))
-                        return false
-                for (meteorite in meteorites)
-                    if (overlap(it, meteorite))
-                        return false
-                return true
-            }
+            val respawn = respawns.find (::findFreeRespawn)
             if (respawn != null) {
                 spaceShips[numberPlayer] = SpaceShip(respawn)
                 return true
             }
         }
         return false
+    }
+
+    private fun findFreeRespawn(it:Respawn):Boolean{
+        for (spaceShip in spaceShips)
+            if (spaceShip.inGame && overlap(it, spaceShip))
+                return false
+        for (bullet in bullets)
+            if (overlap(it, bullet))
+                return false
+        for (meteorite in meteorites)
+            if (overlap(it, meteorite))
+                return false
+        return true
     }
 
     private fun collisionSpaceShips() {

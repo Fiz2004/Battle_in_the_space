@@ -3,7 +3,7 @@ package com.fiz.android.battleinthespace
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.*
-import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.widget.Button
 import kotlin.math.min
 
@@ -38,8 +38,8 @@ class Controller(
 }
 
 class GameThread(
-    private val surfaceHolder: SurfaceHolder,
-    private val informationSurfaceHolder: SurfaceHolder,
+    private val surface: SurfaceView,
+    private val informationSurface: SurfaceView,
     resources: Resources,
     context: Context,
     pauseButton: Button,
@@ -56,7 +56,8 @@ class GameThread(
     private val display = Display(
         resources,
         context,
-        pauseButton
+        pauseButton,
+        surface
     )
 
     private var running = false
@@ -77,22 +78,22 @@ class GameThread(
         var canvas: Canvas? = null
         var informationCanvas: Canvas? = null
         try {
-            canvas = surfaceHolder.lockCanvas()
+            canvas = surface.holder.lockCanvas()
             if (canvas == null) return
-            synchronized(surfaceHolder) {
+            synchronized(surface.holder) {
                 display.render(state, canvas)
             }
 
-            informationCanvas = informationSurfaceHolder.lockCanvas()
+            informationCanvas = informationSurface.holder.lockCanvas()
             if (informationCanvas == null) return
-            synchronized(informationSurfaceHolder) {
+            synchronized(informationSurface.holder) {
                 display.renderInfo(state, informationCanvas)
             }
         } finally {
             if (canvas != null)
-                surfaceHolder.unlockCanvasAndPost(canvas)
+                surface.holder.unlockCanvasAndPost(canvas)
             if (informationCanvas != null)
-                informationSurfaceHolder.unlockCanvasAndPost(informationCanvas)
+                informationSurface.holder.unlockCanvasAndPost(informationCanvas)
 
         }
     }

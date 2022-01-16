@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace.actor
 
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 
 data class AnimationSpaceShipDestroy(
     var center: Vec,
@@ -10,5 +10,5 @@ data class AnimationSpaceShipDestroy(
     var timeShowMax:Int=1500,
     var timeShow:Int=timeShowMax
 ){
-    constructor(spaceShip: SpaceShip):this(spaceShip.center,spaceShip.angle)
+    constructor(spaceShip: SpaceShip):this(Vec(spaceShip.center),spaceShip.angle)
 }

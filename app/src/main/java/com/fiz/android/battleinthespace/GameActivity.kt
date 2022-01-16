@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceView
 import android.widget.Button
+import android.widget.TextView
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -18,6 +19,8 @@ class GameActivity : Activity() {
 
     private lateinit var gameSurfaceView: SurfaceView
     private lateinit var informationSurfaceView: SurfaceView
+
+    private lateinit var debug: TextView
 
     private val sensivityX: Float = 0F
     private val sensivityY: Float = 0F
@@ -36,7 +39,8 @@ class GameActivity : Activity() {
 
     class Options {
         var countPlayers = 4
-        var namePlayer: MutableList<String> = mutableListOf("Player 1", "Player 2", "Player 3", "Player 4")
+        var namePlayer: MutableList<String> =
+            mutableListOf("Player 1", "Player 2", "Player 3", "Player 4")
     }
 
     val options = Options()
@@ -58,17 +62,17 @@ class GameActivity : Activity() {
             options.countPlayers = extras.getInt("countPlayers")
 
         for (n in 0 until options.countPlayers)
-            options.namePlayer[n]=extras?.getString("namePlayer${n+1}")?:"Player ${n+1}"
+            options.namePlayer[n] = extras?.getString("namePlayer${n + 1}") ?: "Player ${n + 1}"
 
 
         gameThread = GameThread(
-            gameSurfaceView.holder,
-            informationSurfaceView.holder,
+            gameSurfaceView,
+            informationSurfaceView,
             resources,
             this.applicationContext,
             pauseButton,
             options.countPlayers,
-            options.namePlayer.toList()
+            options.namePlayer.toList(),
         )
 
         gameThread!!.setRunning(true)
@@ -86,14 +90,9 @@ class GameActivity : Activity() {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        // событие
         val actionMask: Int = event?.actionMasked ?: 0
-        // индекс касания
         val pointerIndex = event?.actionIndex ?: 0
-        // ID касания
         val pointerId = event?.getPointerId(pointerIndex)
-        // число касаний
-        // val pointerCount: Int = event?.pointerCount ?: 0
 
         var x = event?.getX(pointerIndex) ?: 0F
         var y = event?.getY(pointerIndex) ?: 0F
@@ -156,11 +155,8 @@ class GameActivity : Activity() {
 
             }
             // движение
-            //TODO Найти касание которое слева и с ним работать
             MotionEvent.ACTION_MOVE -> {
-                val isLeftSide = event?.findPointerIndex(pointerIndex) == leftSide.ID
-                val isRightSide = event?.findPointerIndex(pointerIndex) == rightSide.ID
-                if (leftSide.touch && isLeftSide) {
+                if (leftSide.touch ) {
                     x = event?.getX(event.findPointerIndex(leftSide.ID)) ?: 0F
                     y = event?.getY(event.findPointerIndex(leftSide.ID)) ?: 0F
                     val deltaX = if (abs(x - leftSide.x) < sensivityX) 0F else x - leftSide.x
@@ -190,7 +186,6 @@ class GameActivity : Activity() {
             }
         }
     }
-
 
 }
 

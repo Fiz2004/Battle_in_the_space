@@ -1,7 +1,7 @@
 package com.fiz.android.battleinthespace.actor
 
 import com.fiz.android.battleinthespace.NUMBER_BITMAP_METEORITE_OPTION
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -51,7 +51,7 @@ class Meteorite(
         fun createNew(x: Double, y: Double): Meteorite {
             val angle = (0..360).shuffled().first()
             return Meteorite(
-                center=Vec(x,y),
+                center= Vec(x,y),
                 speedX = 0.4 * SPEED_MAX * cos(angle / 180.0 * Math.PI),
                 speedY = 0.4 * SPEED_MAX * sin(angle / 180.0 * Math.PI),
                 angle = angle.toDouble(),

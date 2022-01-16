@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace.actor
 
-import com.fiz.android.battleinthespace.Vec
+import com.fiz.android.battleinthespace.engine.Vec
 
 data class AnimationBulletDestroy(
     var center: Vec,
@@ -9,6 +9,6 @@ data class AnimationBulletDestroy(
     var timeShow: Int = timeShowMax
 
 ) {
-    constructor(bullet: Bullet):this(bullet.center)
+    constructor(bullet: Bullet):this(Vec(bullet.center))
 }
 
