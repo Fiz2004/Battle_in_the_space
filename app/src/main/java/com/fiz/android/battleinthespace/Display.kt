@@ -6,6 +6,7 @@ import android.graphics.*
 import android.view.SurfaceView
 import android.widget.Button
 import com.fiz.android.battleinthespace.actor.Actor
+import com.fiz.android.battleinthespace.actor.SpaceShip
 import com.fiz.android.battleinthespace.engine.Physics
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.ceil
@@ -22,7 +23,7 @@ private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
-private const val DIVISION_BY_SCREEN = 13
+private const val DIVISION_BY_SCREEN = 11
 
 class Display(
     private val resources: Resources,
@@ -175,7 +176,10 @@ class Display(
             pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
     }
 
+    //TODO разобраться почему рябит фон
     private fun drawBackground(state: State, canvas: Canvas) {
+//        val tempBMP:Bitmap=Bitmap.createBitmap(surface.width,surface.height,Bitmap.Config.ARGB_8888)
+//        val tempCanvas = Canvas(tempBMP)
         canvas.drawColor(Color.BLACK)
 
         val xStart = floor(viewport.left).toInt()
@@ -204,39 +208,27 @@ class Display(
                     println("background=$background")
                 }
 
-                canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
+//                canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
             }
+//        canvas.drawBitmap(tempBMP, Rect(0,0,tempCanvas.width,tempCanvas.height), RectF(0F,0F,canvas.width.toFloat(),canvas.height.toFloat()), paint)
     }
 
     private fun drawSpaceships(state: State, canvas: Canvas) {
+        val countViewportXOnScreen = ceil(viewport.width / viewport.levelWidth)
+        val countViewportYOnScreen = ceil(viewport.height / viewport.levelHeight)
+        val widthAllViewportsOnScreen = viewport.levelWidth * countViewportXOnScreen
+        val heightAllViewportsOnScreen = viewport.levelHeight * countViewportYOnScreen
         for ((index, spaceShip) in state.level.spaceShips.withIndex())
             if (spaceShip.inGame) {
 
                 var relativeX =
-                    spaceShip.center.x - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+                    spaceShip.center.x - widthAllViewportsOnScreen
 
-                while (relativeX <= spaceShip.center.x + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+                while (relativeX <= spaceShip.center.x + widthAllViewportsOnScreen) {
                     var relativeY =
-                        spaceShip.center.y - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
-                    while (relativeY <= spaceShip.center.y + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
-                        if (spaceShip.isFly) {
-                            drawObjectWithAngle(
-                                bmpSpaceshipFly[index],
-                                spaceShip.angle,
-                                relativeX - viewport.left,
-                                relativeY - viewport.top,
-                                canvas
-                            )
-                        } else {
-                            drawObjectWithAngle(
-                                bmpSpaceship[index],
-                                spaceShip.angle,
-                                relativeX - viewport.left,
-                                relativeY - viewport.top,
-                                canvas
-                            )
-                        }
-
+                        spaceShip.center.y - heightAllViewportsOnScreen
+                    while (relativeY <= spaceShip.center.y + heightAllViewportsOnScreen) {
+                        drawSpaceShip(relativeX, relativeY, spaceShip, index, canvas)
 
                         relativeY += viewport.levelHeight
                     }
@@ -244,8 +236,33 @@ class Display(
                     relativeX += viewport.levelWidth
                 }
 
-
             }
+    }
+
+    private fun drawSpaceShip(
+        relativeX: Double,
+        relativeY: Double,
+        spaceShip: SpaceShip,
+        index: Int,
+        canvas: Canvas
+    ) {
+        if (spaceShip.isFly) {
+            drawObjectWithAngle(
+                bmpSpaceshipFly[index],
+                spaceShip.angle,
+                relativeX - viewport.left,
+                relativeY - viewport.top,
+                canvas
+            )
+        } else {
+            drawObjectWithAngle(
+                bmpSpaceship[index],
+                spaceShip.angle,
+                relativeX - viewport.left,
+                relativeY - viewport.top,
+                canvas
+            )
+        }
     }
 
     private fun drawObjectWithAngle(
@@ -306,20 +323,25 @@ class Display(
     }
 
     private fun drawActor(actor: Actor, bmp: Bitmap, canvas: Canvas) {
+        val countViewportXOnScreen = ceil(viewport.width / viewport.levelWidth)
+        val countViewportYOnScreen = ceil(viewport.height / viewport.levelHeight)
+        val widthAllViewportsOnScreen = viewport.levelWidth * countViewportXOnScreen
+        val heightAllViewportsOnScreen = viewport.levelHeight * countViewportYOnScreen
         var relativeX =
-            actor.center.x - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+            actor.center.x - widthAllViewportsOnScreen
 
-        while (relativeX <= actor.center.x + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+        while (relativeX <= actor.center.x + widthAllViewportsOnScreen) {
             var relativeY =
-                actor.center.y - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
-            while (relativeY <= actor.center.y + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+                actor.center.y - heightAllViewportsOnScreen
+            while (relativeY <= actor.center.y + heightAllViewportsOnScreen) {
 
                 drawOneFrame(
                     relativeX - viewport.left,
                     relativeY - viewport.top,
                     actor.size,
                     bmp,
-                    canvas)
+                    canvas
+                )
 
                 relativeY += viewport.levelHeight
             }

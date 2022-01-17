@@ -1,25 +1,20 @@
 package com.fiz.android.battleinthespace
 
 import com.fiz.android.battleinthespace.actor.*
+import com.fiz.android.battleinthespace.engine.Manifold
 import com.fiz.android.battleinthespace.engine.Physics
 import com.fiz.android.battleinthespace.engine.Vec
-
-class Level(val width: Double,
-            val height: Double){
-    var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
-    var spaceShips: MutableList<SpaceShip> = mutableListOf()
-    var bullets: MutableList<Bullet> = mutableListOf()
-    var meteorites: MutableList<Meteorite> = mutableListOf()
-}
+import com.fiz.android.battleinthespace.engine.Vec2
+import kotlin.math.sqrt
 
 class State(
     var countPlayers: Int = 4,
     var namePlayers: List<String> = listOf("Player 1", "Player 2", "Player 3", "Player 4"),
 ) {
-    val level:Level=Level(20.0,20.0)
+    val level: Level = Level(20.0, 20.0)
     var round: Int = 1
-    var status:String = "playing"
-    var mainPlayer: Int=0
+    var status: String = "playing"
+    var mainPlayer: Int = 0
 
     private var scores: MutableList<Int> = mutableListOf()
     var lifes: MutableList<Int> = mutableListOf()
@@ -27,19 +22,19 @@ class State(
     var animationSpaceShipDestroys: MutableList<AnimationDestroy> = mutableListOf()
     private var respawns: MutableList<Respawn> = mutableListOf(
         Respawn(
-            Vec(level.width/4, level.height/4),
+            Vec(level.width / 4, level.height / 4),
             angle = 45.0
         ),
         Respawn(
-            Vec(level.width - level.width/4, level.height/4),
+            Vec(level.width - level.width / 4, level.height / 4),
             angle = 135.0
         ),
         Respawn(
-            Vec(level.width/4, level.height - level.height/4),
+            Vec(level.width / 4, level.height - level.height / 4),
             angle = 315.0
         ),
         Respawn(
-            Vec(level.width - level.width/4, level.height - level.height/4),
+            Vec(level.width - level.width / 4, level.height - level.height / 4),
             angle = 225.0
         )
     )
@@ -97,12 +92,16 @@ class State(
         for (dx in (0 until level.width.toInt() / 2))
             for (dy in (0 until level.height.toInt() / 2)) {
                 if (isCreateMeteoriteWithoutOverlap(
-                            level.width / 2.0 + dx + 0.1,
-                            level.height / 2.0 + dy + 0.1))
+                        level.width / 2.0 + dx + 0.1,
+                        level.height / 2.0 + dy + 0.1
+                    )
+                )
                     return
                 if (isCreateMeteoriteWithoutOverlap(
-                            level.width / 2.0 - dx + 0.1,
-                            level.height / 2.0 - dy + 0.1))
+                        level.width / 2.0 - dx + 0.1,
+                        level.height / 2.0 - dy + 0.1
+                    )
+                )
                     return
             }
     }
@@ -178,8 +177,9 @@ class State(
 
         val lineRespawnDestroy: MutableList<SpaceShip> = mutableListOf()
         for (spaceShip in lineRespawn)
-            if (respawnCheck(spaceShip))
-                lineRespawnDestroy.add(spaceShip)
+            if (spaceShip.isCanRespawn(deltaTime))
+                if (respawnCheck(spaceShip))
+                    lineRespawnDestroy.add(spaceShip)
 
         for (spaceShip in lineRespawnDestroy)
             lineRespawn.remove(spaceShip)
@@ -190,7 +190,7 @@ class State(
     private fun respawnCheck(currentSpaceShip: SpaceShip): Boolean {
         val numberPlayer = level.spaceShips.indexOf(currentSpaceShip)
         if (lifes[numberPlayer] > 0) {
-            val respawn = respawns.find (::findFreeRespawn)
+            val respawn = respawns.find(::findFreeRespawn)
             if (respawn != null) {
                 level.spaceShips[numberPlayer] = SpaceShip(respawn)
                 return true
@@ -199,7 +199,7 @@ class State(
         return false
     }
 
-    private fun findFreeRespawn(it:Respawn):Boolean{
+    private fun findFreeRespawn(it: Respawn): Boolean {
         for (spaceShip in level.spaceShips)
             if (spaceShip.inGame && overlap(it, spaceShip))
                 return false
@@ -217,7 +217,8 @@ class State(
             for (n in 0 until (countPlayers - 1))
                 for (k in (n + 1) until countPlayers)
                     if (level.spaceShips[n].inGame && level.spaceShips[k].inGame
-                            && overlap(level.spaceShips[n], level.spaceShips[k])) {
+                        && overlap(level.spaceShips[n], level.spaceShips[k])
+                    ) {
                         kickback(level.spaceShips[n], level.spaceShips[k])
                     }
         }
@@ -243,7 +244,8 @@ class State(
             if (spaceShip.inGame)
                 for (bullet in level.bullets)
                     if (overlap(bullet, spaceShip)
-                            && level.spaceShips.indexOf(spaceShip) != bullet.player) {
+                        && level.spaceShips.indexOf(spaceShip) != bullet.player
+                    ) {
                         kickback(spaceShip, bullet)
 
                         animationBulletDestroys.add(AnimationDestroy(bullet))
@@ -254,7 +256,6 @@ class State(
             level.bullets.remove(bullet)
         }
     }
-
 
     private fun collisionBulletBullet() {
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
@@ -286,7 +287,6 @@ class State(
                 if (overlap(level.meteorites[n], level.meteorites[k])) {
                     kickback(level.meteorites[n], level.meteorites[k])
                 }
-
 
         val listMeteoritesDestroy: MutableList<Meteorite> = mutableListOf()
         val listAngleMeteoritesDestroy: MutableList<Double> = mutableListOf()
@@ -383,6 +383,34 @@ class State(
         val speedActorX2: Double = moveableActor2.speed.x
         val speedActorY1: Double = moveableActor1.speed.y
         val speedActorY2: Double = moveableActor2.speed.y
+
+        // Вычислить вектор поступательного движения, который является нормальным
+        val normal: Vec = moveableActor2.center - moveableActor1.center
+
+        val distSqr: Double = normal.sumPow2()
+        val radius: Double = moveableActor1.size/2 + moveableActor2.size/2
+
+        val manifold=Manifold(moveableActor1,moveableActor2)
+        // Не в контакте
+        if (distSqr >= radius * radius) {
+            manifold.contact_count = 0
+            return
+        }
+
+        val distance: Double = sqrt(distSqr)
+
+        manifold.contact_count = 1
+
+        if (distance == 0.0) {
+            manifold.penetration = moveableActor1.size/2
+            manifold.normal = Vec(1.0, 0.0)
+            manifold.contacts[0] = moveableActor1.center
+        } else {
+            manifold.penetration = radius - distance
+            // Быстрее, чем при использовании нормализованного, так как мы уже выполнили sqrt
+            manifold.normal = normal / distance
+            manifold.contacts[0] = manifold.normal * moveableActor1.size/2.0 + moveableActor1.center
+        }
 
         moveableActor1.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX1, speedActorX2)
         moveableActor2.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX2, speedActorX1)

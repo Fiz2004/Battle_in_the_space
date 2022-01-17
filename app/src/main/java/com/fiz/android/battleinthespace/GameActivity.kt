@@ -156,7 +156,7 @@ class GameActivity : Activity() {
                         if (abs(point.x - leftSide.point.x) > sensivity.x) point.x - leftSide.point.x else 0.0,
                         if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0)
 
-                    var power = delta.lengthSqrt() / widthJoystick
+                    var power = delta.length() / widthJoystick
                     power = if (power > 1) 1.0 else power
                     gameThread?.controller?.get(0)?.power = power.toFloat()
 

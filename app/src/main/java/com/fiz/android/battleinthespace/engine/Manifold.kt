@@ -1,7 +1,7 @@
 package com.fiz.android.battleinthespace.engine
 
-import com.fiz.android.battleinthespace.Dispatch
 import com.fiz.android.battleinthespace.EPSILON
+import com.fiz.android.battleinthespace.actor.MoveableActor
 import com.fiz.android.battleinthespace.dt
 import com.fiz.android.battleinthespace.gravity
 import kotlin.math.abs
@@ -9,15 +9,15 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class Manifold(var A: Body, var B: Body) {
+class Manifold(var A: MoveableActor, var B: MoveableActor) {
     // Глубина проникновения от столкновения
     var penetration: Double = 0.0
 
     // Из A в B
-    var normal: Vec2 = Vec2(0.0, 0.0)
+    var normal: Vec = Vec(0.0, 0.0)
 
     // Точки соприкосновения во время столкновения
-    var contacts: Array<Vec2> = arrayOf(Vec2(0.0, 0.0), Vec2(0.0, 0.0))
+    var contacts: Array<Vec> = arrayOf(Vec(0.0, 0.0), Vec(0.0, 0.0))
 
     // Количество контактов, произошедших во время столкновения
     var contact_count: Int = 0
@@ -32,9 +32,9 @@ class Manifold(var A: Body, var B: Body) {
     var sf: Double = 0.0
 
     // Генерировать контактную информацию
-    fun Solve() {
-        Dispatch(A, B)
-    }
+//    fun Solve() {
+//        Dispatch(A, B)
+//    }
 
     // Предварительные расчеты для импульсного решения
     fun Initialize() {
@@ -47,18 +47,18 @@ class Manifold(var A: Body, var B: Body) {
 
         for (i in 0 until contact_count) {
             // Рассчитать радиусы от COM до контакта
-            val ra: Vec2 = contacts[i] - A.position
-            val rb: Vec2 = contacts[i] - B.position
+            val ra: Vec = contacts[i] - A.center
+            val rb: Vec = contacts[i] - B.center
 
-            val rv: Vec2 = B.velocity + Cross(B.angularVelocity, rb) - A.velocity - Cross(
-                A.angularVelocity,
+            val rv: Vec = B.speed + Cross(B.angleSpeed, rb) - A.speed - Cross(
+                A.angleSpeed,
                 ra
             );
 
             // Определите, следует ли нам выполнять столкновение в состоянии покоя или нет
             // Идея в том, что если единственное, что движет этим объектом, - это гравитация,
             // то столкновение должно быть выполнено без какой-либо компенсации
-            if (rv.LenSqr() < (dt * gravity).LenSqr() + EPSILON)
+            if (rv.sumPow2() < (dt * gravity).LenSqr() + EPSILON)
                 e = 0.0;
         }
     }
@@ -73,12 +73,12 @@ class Manifold(var A: Body, var B: Body) {
 
         for (i in 0 until contact_count) {
             //Рассчитать радиусы от COM до контакта
-            val ra: Vec2 = contacts[i] - A.position
-            val rb: Vec2 = contacts[i] - B.position
+            val ra: Vec = contacts[i] - A.center
+            val rb: Vec = contacts[i] - B.center
 
             // Относительная скорость
-            var rv: Vec2 = B.velocity + Cross(B.angularVelocity, rb) - A.velocity - Cross(
-                A.angularVelocity,
+            var rv: Vec = B.speed + Cross(B.angleSpeed, rb) - A.speed - Cross(
+                A.angleSpeed,
                 ra
             )
 
@@ -99,16 +99,16 @@ class Manifold(var A: Body, var B: Body) {
             j /= contact_count.toDouble()
 
             // Применить импульс
-            val impulse: Vec2 = normal * j
+            val impulse: Vec = normal * j
             A.ApplyImpulse(-impulse, ra)
             B.ApplyImpulse(impulse, rb)
 
             // Импульс трения
-            rv = B.velocity + Cross(B.angularVelocity, rb) - A.velocity - Cross(
-                A.angularVelocity,
+            rv = B.speed + Cross(B.angleSpeed, rb) - A.speed - Cross(
+                A.angleSpeed,
                 ra)
 
-            val t: Vec2 = rv - (normal * Dot(rv, normal));
+            val t: Vec = rv - (normal * Dot(rv, normal));
             t.Normalize();
 
             // j тангенс величины
@@ -121,7 +121,7 @@ class Manifold(var A: Body, var B: Body) {
                 return;
 
             // Закон Кулона
-            var tangentImpulse: Vec2
+            var tangentImpulse: Vec
             if (abs(jt) < j * sf)
                 tangentImpulse = t * jt;
             else
@@ -139,13 +139,13 @@ class Manifold(var A: Body, var B: Body) {
         val k_slop: Double = 0.05
         //процент проникновения, чтобы исправить
         val percent: Double = 0.4
-        val correction: Vec2 = (max(penetration - k_slop, 0.0) / (A.im + B.im)) * normal * percent
-        A.position -= correction * A.im
-        B.position += correction * B.im
+        val correction: Vec = (max(penetration - k_slop, 0.0) / (A.im + B.im)) * normal * percent
+        A.center -= correction * A.im
+        B.center += correction * B.im
     }
 
     fun InfiniteMassCorrection() {
-        A.velocity.Set(0.0, 0.0)
-        B.velocity.Set(0.0, 0.0)
+        A.speed.Set(0.0, 0.0)
+        B.speed.Set(0.0, 0.0)
     }
 }

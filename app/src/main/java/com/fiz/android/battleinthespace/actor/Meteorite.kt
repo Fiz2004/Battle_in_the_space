@@ -25,7 +25,7 @@ class Meteorite(
 ) {
 
     fun createMeteorite(angleDestroy: Double, angleCreate: Double): Meteorite {
-        val currentSpeed = speed.lengthSqrt()
+        val currentSpeed = speed.length()
         val currentAngleToRadians = (angleDestroy - angleCreate) / 180.0 * Math.PI
 
         return Meteorite(

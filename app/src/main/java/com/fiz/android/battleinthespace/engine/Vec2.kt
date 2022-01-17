@@ -6,8 +6,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class Vec2(var x: Double, var y: Double) {
-    var m: Array<Array<Double>> = arrayOf(emptyArray())
-    var v: Array<Double> = emptyArray()
+
 
     fun Set(x: Double, y: Double) {
         this.x = x
