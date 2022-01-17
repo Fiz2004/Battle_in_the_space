@@ -4,6 +4,6 @@ import com.fiz.android.battleinthespace.engine.Vec
 
 class Respawn(
     center: Vec,
-    angle: Double
-): Actor(center,0.0,0.0,angle,4.0,0.0){
-}
+    angle: Double,
+    size:Double=4.0
+):Actor(center,angle,size)

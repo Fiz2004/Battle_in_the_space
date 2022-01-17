@@ -7,36 +7,6 @@ import android.view.SurfaceView
 import android.widget.Button
 import kotlin.math.min
 
-class Controller(
-    var fire: Boolean = false,
-    _timeBetweenFireMin: Int =500,
-    _angle: Float = 0F,
-    var power: Float = 0F
-) {
-    private var timeBetweenFireMin=_timeBetweenFireMin
-    private var timeLastFire: Int = 0
-    fun isCanFire(deltaTime: Int): Boolean {
-        if (timeLastFire == 0) {
-            timeLastFire = timeBetweenFireMin
-            return true
-        }
-        timeLastFire -= deltaTime
-        if (timeLastFire < 0)
-            timeLastFire = 0
-        return false
-    }
-
-
-    var angle: Float = _angle
-        set(value) {
-            field = value
-            if (value > 360)
-                field = value - 360
-            if (value < 0)
-                field = value + 360
-        }
-}
-
 class GameThread(
     private val surface: SurfaceView,
     private val informationSurface: SurfaceView,
@@ -46,7 +16,7 @@ class GameThread(
     val countPlayers:Int,
     val namePlayers:List<String>
 ) : Thread() {
-    var state = State(16.0, 16.0,countPlayers,namePlayers)
+    var state = State(countPlayers,namePlayers)
     val controller: Array<Controller> = Array(4) { Controller() }
 
     private var prevTime = System.currentTimeMillis()
@@ -60,11 +30,7 @@ class GameThread(
         surface
     )
 
-    private var running = false
-
-    fun setRunning(running: Boolean) {
-        this.running = running
-    }
+    var running = false
 
     override fun run() {
         while (running) {
@@ -113,7 +79,7 @@ class GameThread(
         }
 
         if (ending < 0 || state.status == "new game") {
-            state = State(16.0, 16.0,countPlayers,namePlayers)
+            state = State(countPlayers,namePlayers)
             ending = 1000
         }
 

@@ -5,20 +5,24 @@ import android.content.res.Resources
 import android.graphics.*
 import android.view.SurfaceView
 import android.widget.Button
+import com.fiz.android.battleinthespace.actor.Actor
 import com.fiz.android.battleinthespace.engine.Physics
+import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.math.min
+
+const val NUMBER_BITMAP_METEORITE_OPTION = 4
 
 private const val NUMBER_BITMAP_BACKGROUND = 8
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
-const val NUMBER_BITMAP_METEORITE_OPTION = 4
 private const val NUMBER_BITMAP_SPACESHIP = 4
 private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
+
+private const val DIVISION_BY_SCREEN = 13
 
 class Display(
     private val resources: Resources,
@@ -119,46 +123,47 @@ class Display(
         return result
     }
 
-    private val DIVISION_BY_SCREEN = 21
-    private val DENSITY_MAX = 6
-    private val density: Float = resources.displayMetrics.density
-
     // Определить почему в самом начале загрузки класса width=0
     private var sizeUnit: Float = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
 
     inner class Viewport {
         var left: Double = 0.0
         var top: Double = 0.0
-        var width: Double = .0
-        var height: Double = .0
+        var width: Double = 0.0
+        var height: Double = 0.0
+        var levelWidth: Double = 0.0
+        var levelHeight: Double = 0.0
 
         fun update(state: State) {
             // Определить почему в самом начале загрузки класса width=0
             width = (surface.width / sizeUnit).toDouble()
-            height= (surface.height / sizeUnit).toDouble()
+            height = (surface.height / sizeUnit).toDouble()
 
-            var marginX = surface.width / sizeUnit/2
-            var marginY = surface.height / sizeUnit/2
-            var spaceship = state.spaceShips[0]
-            var center = spaceship.center
+            levelWidth = state.level.width
+            levelHeight = state.level.height
+
+            val marginX = surface.width / sizeUnit / 2
+            val marginY = surface.height / sizeUnit / 2
+            val spaceship = state.level.spaceShips[state.mainPlayer]
+            val center = spaceship.center
 
             left = center.x - marginX
 
-           top = center.y - marginY
+            top = center.y - marginY
         }
     }
 
-    val viewport = Viewport()
+    private val viewport = Viewport()
 
     fun render(state: State, canvas: Canvas) {
         sizeUnit = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
         viewport.update(state)
         drawBackground(state, canvas)
-//        drawSpaceships(state, canvas)
-//        drawBullet(state, canvas)
-//        drawAnimationBulletDestroy(state, canvas)
-//        drawMeteorite(state, canvas)
-//        drawAnimationSpaceshipDestroy(state, canvas)
+        drawSpaceships(state, canvas)
+        drawBullets(state, canvas)
+        drawAnimationBulletDestroys(state, canvas)
+        drawMeteorites(state, canvas)
+        drawAnimationSpaceshipDestroys(state, canvas)
     }
 
     fun renderInfo(state: State, canvasInfo: Canvas) {
@@ -184,88 +189,62 @@ class Display(
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
-                val x=Physics.changeXifBorderTop(n.toDouble())
-                val y=Physics.changeYifBorderTop(k.toDouble())
-                val background = state.backgrounds[x.toInt()][y.toInt()]
+                val x = Physics.changeXifBorderTop(n.toDouble())
+                val y = Physics.changeYifBorderTop(k.toDouble())
+                val background = state.level.backgrounds[x.toInt()][y.toInt()]
                 val rectDst = RectF(
-                    (n-viewport.left).toFloat()* sizeUnit,
-                    (k-viewport.top).toFloat() * sizeUnit,
-                    (n-viewport.left).toFloat()* sizeUnit  + sizeUnit,
-                    (k-viewport.top).toFloat() * sizeUnit  + sizeUnit
+                    (n - viewport.left).toFloat() * sizeUnit,
+                    (k - viewport.top).toFloat() * sizeUnit,
+                    (n - viewport.left).toFloat() * sizeUnit + sizeUnit,
+                    (k - viewport.top).toFloat() * sizeUnit + sizeUnit
                 )
+
+                if (n == 2 && k == 2) {
+                    println("rectDst=$rectDst")
+                    println("background=$background")
+                }
 
                 canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
             }
     }
 
     private fun drawSpaceships(state: State, canvas: Canvas) {
-        for (player in 0 until state.countPlayers)
-            if (state.spaceShips[player].inGame) {
-                if (state.spaceShips[player].isFly) {
-                    drawObjectWithAngle(
-                        bmpSpaceshipFly[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x,
-                        state.spaceShips[player].center.y,
-                        canvas
-                    )
-                } else {
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x,
-                        state.spaceShips[player].center.y,
-                        canvas
-                    )
+        for ((index, spaceShip) in state.level.spaceShips.withIndex())
+            if (spaceShip.inGame) {
+
+                var relativeX =
+                    spaceShip.center.x - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+
+                while (relativeX <= spaceShip.center.x + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+                    var relativeY =
+                        spaceShip.center.y - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+                    while (relativeY <= spaceShip.center.y + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+                        if (spaceShip.isFly) {
+                            drawObjectWithAngle(
+                                bmpSpaceshipFly[index],
+                                spaceShip.angle,
+                                relativeX - viewport.left,
+                                relativeY - viewport.top,
+                                canvas
+                            )
+                        } else {
+                            drawObjectWithAngle(
+                                bmpSpaceship[index],
+                                spaceShip.angle,
+                                relativeX - viewport.left,
+                                relativeY - viewport.top,
+                                canvas
+                            )
+                        }
+
+
+                        relativeY += viewport.levelHeight
+                    }
+
+                    relativeX += viewport.levelWidth
                 }
-                if (state.spaceShips[player].center.y + 1 >= canvas.height)
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x,
-                        state.spaceShips[player].center.y - canvas.height,
-                        canvas
-                    )
-                if (state.spaceShips[player].center.x + 1 >= canvas.width)
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x - canvas.width,
-                        state.spaceShips[player].center.y,
-                        canvas
-                    )
-                if ((state.spaceShips[player].center.x + 1 >= canvas.width) && (state.spaceShips[player].center.y + 1 >= canvas.height))
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x - canvas.width,
-                        state.spaceShips[player].center.y - canvas.height,
-                        canvas
-                    )
-                if (state.spaceShips[player].center.x - 1 <= 0)
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x + canvas.width,
-                        state.spaceShips[player].center.y,
-                        canvas
-                    )
-                if (state.spaceShips[player].center.y - 1 <= 0)
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x,
-                        state.spaceShips[player].center.y + canvas.height,
-                        canvas
-                    )
-                if ((state.spaceShips[player].center.x - 1 <= 0) && (state.spaceShips[player].center.y - 1 <= 0))
-                    drawObjectWithAngle(
-                        bmpSpaceship[player],
-                        state.spaceShips[player].angle,
-                        state.spaceShips[player].center.x + canvas.width,
-                        state.spaceShips[player].center.y + canvas.height,
-                        canvas
-                    )
+
+
             }
     }
 
@@ -294,87 +273,77 @@ class Display(
         canvas.restore()
     }
 
-    private fun drawBullet(state: State, canvas: Canvas) {
-        val size = sizeUnit / 10
-        val rectSrc = Rect(
-            0, 0,
-            bmpBullet.width, bmpBullet.height
-        )
-
-        if (state.bullets.size > 0)
-            for (n in 0 until state.bullets.size) {
-                val bullet = state.bullets[n]
-                val rectDst = RectF(
-                    (bullet.center.x * sizeUnit - size / 2).toFloat(),
-                    (bullet.center.y * sizeUnit - size / 2).toFloat(),
-                    (bullet.center.x * sizeUnit + size / 2).toFloat(),
-                    (bullet.center.y * sizeUnit + size / 2).toFloat()
-                )
-
-                canvas.drawBitmap(bmpBullet, rectSrc, rectDst, paint)
-            }
+    private fun drawBullets(state: State, canvas: Canvas) {
+        for (bullet in state.level.bullets)
+            drawActor(bullet, bmpBullet, canvas)
     }
 
-    private fun drawAnimationBulletDestroy(state: State, canvas: Canvas) {
-
-        val rectSrc = Rect(
-            0, 0,
-            bmpBulletDestroy[0].width, bmpBulletDestroy[0].height
-        )
-        val size = sizeUnit / 10
-        for (n in 0 until state.animationBulletDestroys.size) {
+    private fun drawAnimationBulletDestroys(state: State, canvas: Canvas) {
+        for (animationBulletDestroy in state.animationBulletDestroys) {
             val step =
-                state.animationBulletDestroys[n].timeShowMax / NUMBER_BITMAP_BULLET_DESTROY.toDouble()
+                animationBulletDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY.toDouble()
             val frame =
-                NUMBER_BITMAP_BULLET_DESTROY - ceil(state.animationBulletDestroys[n].timeShow / step).toInt()
+                NUMBER_BITMAP_BULLET_DESTROY - ceil(animationBulletDestroy.timeShow / step).toInt()
 
-            val rectDst = RectF(
-                (state.animationBulletDestroys[n].center.x * sizeUnit - size / 2).toFloat(),
-                (state.animationBulletDestroys[n].center.y * sizeUnit - size / 2).toFloat(),
-                (state.animationBulletDestroys[n].center.x * sizeUnit + size / 2).toFloat(),
-                (state.animationBulletDestroys[n].center.y * sizeUnit + size / 2).toFloat()
-            )
-
-            canvas.drawBitmap(bmpBulletDestroy[frame], rectSrc, rectDst, paint)
+            drawActor(animationBulletDestroy, bmpBulletDestroy[frame], canvas)
         }
     }
 
-    private fun drawMeteorite(state: State, canvas: Canvas) {
-        if (state.meteorites.size > 0)
-            for (n in 0 until state.meteorites.size) {
-                val meteorite = state.meteorites[n]
-                val bmpMeteorite = bmpMeteorites[meteorite.view][meteorite.viewSize]
-                val rectSrc = Rect(
-                    0, 0,
-                    bmpMeteorite.width, bmpMeteorite.height
-                )
-
-                val rectDst = RectF(
-                    (meteorite.center.x * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.center.y * sizeUnit - meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.center.x * sizeUnit + meteorite.size * sizeUnit / 2).toFloat(),
-                    (meteorite.center.y * sizeUnit + meteorite.size * sizeUnit / 2).toFloat()
-                )
-
-                canvas.drawBitmap(bmpMeteorite, rectSrc, rectDst, paint)
-            }
+    private fun drawMeteorites(state: State, canvas: Canvas) {
+        for (meteorite in state.level.meteorites)
+            drawActor(meteorite, bmpMeteorites[meteorite.view][meteorite.viewSize], canvas)
     }
 
-    private fun drawAnimationSpaceshipDestroy(state: State, canvas: Canvas) {
+    private fun drawAnimationSpaceshipDestroys(state: State, canvas: Canvas) {
         for (animationSpaceShipDestroy in state.animationSpaceShipDestroys) {
             val step =
                 animationSpaceShipDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
             val frame =
                 NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationSpaceShipDestroy.timeShow / step).toInt()
 
-            drawObjectWithAngle(
-                bmpSpaceshipDestroy[frame],
-                animationSpaceShipDestroy.angle,
-                animationSpaceShipDestroy.center.x,
-                animationSpaceShipDestroy.center.y,
-                canvas
-            )
+            drawActor(animationSpaceShipDestroy, bmpSpaceshipDestroy[frame], canvas)
         }
+    }
+
+    private fun drawActor(actor: Actor, bmp: Bitmap, canvas: Canvas) {
+        var relativeX =
+            actor.center.x - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+
+        while (relativeX <= actor.center.x + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+            var relativeY =
+                actor.center.y - viewport.levelWidth * floor(viewport.width / viewport.levelWidth)
+            while (relativeY <= actor.center.y + viewport.levelWidth * floor(viewport.width / viewport.levelWidth)) {
+
+                drawOneFrame(
+                    relativeX - viewport.left,
+                    relativeY - viewport.top,
+                    actor.size,
+                    bmp,
+                    canvas)
+
+                relativeY += viewport.levelHeight
+            }
+
+            relativeX += viewport.levelWidth
+        }
+    }
+
+    private fun drawOneFrame(x: Double, y: Double, size: Double, bmp: Bitmap, canvas: Canvas) {
+        val rectSrc = Rect(
+            0, 0,
+            bmp.width, bmp.height
+        )
+
+        val rectDst = RectF(
+            (x * sizeUnit - size * sizeUnit / 2).toFloat(),
+            (y * sizeUnit - size * sizeUnit / 2).toFloat(),
+            (x * sizeUnit + size * sizeUnit / 2).toFloat(),
+            (y * sizeUnit + size * sizeUnit / 2).toFloat()
+        )
+
+        println(rectDst)
+
+        canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
     }
 
     private fun drawInfo(state: State, canvas: Canvas) {

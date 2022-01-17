@@ -13,53 +13,56 @@ private const val SPEED_MAX: Double = 2.0
 class SpaceShip(
     center: Vec,
 
-    speedX: Double = 0.0,
-    speedY: Double = 0.0,
+    speed: Vec = Vec(0.0, 0.0),
 
     angle: Double,
 
     size: Double = 1.0,
 
     var inGame: Boolean = true,
-    var isFly:Boolean=false
-) : Actor(
-    center, speedX, speedY, angle, size, SPEED_MAX
+    var isFly: Boolean = false
+) : MoveableActor(
+    center, speed, angle, size, SPEED_MAX
 ) {
+    constructor (respawn: Respawn) : this(Vec(respawn.center), angle = respawn.angle)
 
-    constructor (respawn:Respawn):this(Vec(respawn.center), angle=respawn.angle)
     fun moveRotate(deltaTime: Int, controller: Controller) {
         val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
-        if (abs(angle - controller.angle) > 180)
-            if (angle > controller.angle)
-                if (abs(angle - controller.angle) < step)
-                    angle = controller.angle.toDouble()
-                else
-                    angle += step
-            else
-                if (abs(angle - controller.angle) < step)
-                    angle = controller.angle.toDouble()
-                else
-                    angle -= step
+
+        if (abs(angle - controller.angle) < step) {
+            angle = controller.angle.toDouble()
+            return
+        }
+
+        angle += getStepRotateIfABSAngleMinusControllerAngleCompareTo180(controller,step)
+    }
+
+    private fun getStepRotateIfABSAngleMinusControllerAngleCompareTo180(controller: Controller,step:Double):Double{
+        return if (abs(angle - controller.angle)  > 180)
+            getStepRotateIfAngleCompareToControllerAngle(controller,step)
         else
-            if (angle < controller.angle)
-                if (abs(angle - controller.angle) < step)
-                    angle = controller.angle.toDouble()
-                else
-                    angle += step
-            else
-                if (abs(angle - controller.angle) < step)
-                    angle = controller.angle.toDouble()
-                else
-                    angle -= step
+            getStepRotateIfControllerAngleCompareToAngle(controller,step)
+    }
+
+
+    private fun getStepRotateIfAngleCompareToControllerAngle(controller: Controller,step:Double):Double{
+        return if (angle > controller.angle)
+            step
+        else
+            -step
+    }
+
+    private fun getStepRotateIfControllerAngleCompareToAngle(controller: Controller,step:Double):Double{
+        return if (angle < controller.angle)
+            step
+        else
+            -step
     }
 
     fun moveForward(deltaTime: Int, controller: Controller) {
         val step = (INCREASE_SPEED_PER_SECOND * deltaTime / 1000) * controller.power
 
-        speedX += step * cos(angle / 180.0 * Math.PI)
-
-        speedY += step * sin(angle / 180.0 * Math.PI)
-
+        speed += Vec(step * cos(angleToRadians), step * sin(angleToRadians))
     }
 
 }

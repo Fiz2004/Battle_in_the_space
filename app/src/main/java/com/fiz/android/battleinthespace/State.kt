@@ -4,45 +4,49 @@ import com.fiz.android.battleinthespace.actor.*
 import com.fiz.android.battleinthespace.engine.Physics
 import com.fiz.android.battleinthespace.engine.Vec
 
+class Level(val width: Double,
+            val height: Double){
+    var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
+    var spaceShips: MutableList<SpaceShip> = mutableListOf()
+    var bullets: MutableList<Bullet> = mutableListOf()
+    var meteorites: MutableList<Meteorite> = mutableListOf()
+}
+
 class State(
-    val width: Double,
-    val height: Double,
     var countPlayers: Int = 4,
     var namePlayers: List<String> = listOf("Player 1", "Player 2", "Player 3", "Player 4"),
 ) {
+    val level:Level=Level(20.0,20.0)
     var round: Int = 1
-    var status = "playing"
+    var status:String = "playing"
+    var mainPlayer: Int=0
 
-    var spaceShips: MutableList<SpaceShip> = mutableListOf()
     private var scores: MutableList<Int> = mutableListOf()
     var lifes: MutableList<Int> = mutableListOf()
-    var bullets: MutableList<Bullet> = mutableListOf()
-    var meteorites: MutableList<Meteorite> = mutableListOf()
-    var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
-    var animationBulletDestroys: MutableList<AnimationBulletDestroy> = mutableListOf()
-    var animationSpaceShipDestroys: MutableList<AnimationSpaceShipDestroy> = mutableListOf()
+    var animationBulletDestroys: MutableList<AnimationDestroy> = mutableListOf()
+    var animationSpaceShipDestroys: MutableList<AnimationDestroy> = mutableListOf()
     private var respawns: MutableList<Respawn> = mutableListOf(
         Respawn(
-            Vec(2.0, 2.0),
+            Vec(level.width/4, level.height/4),
             angle = 45.0
         ),
         Respawn(
-            Vec(width - 2.0, 2.0),
+            Vec(level.width - level.width/4, level.height/4),
             angle = 135.0
         ),
         Respawn(
-            Vec(2.0, height - 2.0),
+            Vec(level.width/4, level.height - level.height/4),
             angle = 315.0
         ),
         Respawn(
-            Vec(width - 2.0, height - 2.0),
+            Vec(level.width - level.width/4, level.height - level.height/4),
             angle = 225.0
         )
     )
     private var lineRespawn: MutableList<SpaceShip> = mutableListOf()
 
     init {
-        Physics.createWorld(width, height)
+        Physics.createWorld(level.width, level.height)
         newGame()
     }
 
@@ -59,17 +63,17 @@ class State(
     private fun newRound() {
         round += 1
 
-        backgrounds.clear()
-        for (n in 0 until height.toInt()) {
+        level.backgrounds.clear()
+        for (n in 0 until level.height.toInt()) {
             val row: MutableList<Int> = mutableListOf()
-            for (k in 0 until width.toInt())
+            for (k in 0 until level.width.toInt())
                 row += (0..7).shuffled().first()
-            backgrounds += row
+            level.backgrounds += row
         }
 
-        spaceShips.clear()
+        level.spaceShips.clear()
         for (n in 0 until countPlayers)
-            spaceShips += SpaceShip(respawns[n])
+            level.spaceShips += SpaceShip(respawns[n])
         lineRespawn.clear()
 
         lifes.clear()
@@ -84,21 +88,21 @@ class State(
     }
 
     private fun createMeteorites() {
-        meteorites.clear()
+        level.meteorites.clear()
         for (n in 0 until round)
             createMeteorite()
     }
 
     private fun createMeteorite() {
-        for (dx in (0 until width.toInt() / 2))
-            for (dy in (0 until height.toInt() / 2)) {
+        for (dx in (0 until level.width.toInt() / 2))
+            for (dy in (0 until level.height.toInt() / 2)) {
                 if (isCreateMeteoriteWithoutOverlap(
-                            width / 2.0 + dx + 0.1,
-                            height / 2.0 + dy + 0.1))
+                            level.width / 2.0 + dx + 0.1,
+                            level.height / 2.0 + dy + 0.1))
                     return
                 if (isCreateMeteoriteWithoutOverlap(
-                            width / 2.0 - dx + 0.1,
-                            height / 2.0 - dy + 0.1))
+                            level.width / 2.0 - dx + 0.1,
+                            level.height / 2.0 - dy + 0.1))
                     return
             }
     }
@@ -106,22 +110,22 @@ class State(
     private fun isCreateMeteoriteWithoutOverlap(dx: Double, dy: Double): Boolean {
         val newMeteorite1 = Meteorite.createNew(dx, dy)
 
-        for (colMeteorite in meteorites)
+        for (colMeteorite in level.meteorites)
             if (overlap(newMeteorite1, colMeteorite))
                 return false
 
-        meteorites.add(newMeteorite1)
+        level.meteorites.add(newMeteorite1)
         return true
     }
 
     fun update(controller: Array<Controller>, deltaTime: Int): Boolean {
         for (player in 0 until countPlayers) {
             if (controller[player].power != 0F) {
-                spaceShips[player].isFly = true
+                level.spaceShips[player].isFly = true
                 updateMoveRotate(player, deltaTime, controller[player])
                 updateMoveForward(player, deltaTime, controller[player])
             } else {
-                spaceShips[player].isFly = false
+                level.spaceShips[player].isFly = false
             }
             if (controller[player].fire && controller[player].isCanFire(deltaTime))
                 updatePressFire(player, deltaTime)
@@ -145,7 +149,7 @@ class State(
             it.timeShow > 0
         }.toMutableList()
 
-        if (lifes.none { it > 0 } || meteorites.isEmpty())
+        if (lifes.none { it > 0 } || level.meteorites.isEmpty())
             newRound()
 
         if (round == 11)
@@ -155,22 +159,22 @@ class State(
     }
 
     private fun updateMoveRotate(numberPlayer: Int, deltaTime: Int, controller: Controller) {
-        spaceShips[numberPlayer].moveRotate(deltaTime, controller)
+        level.spaceShips[numberPlayer].moveRotate(deltaTime, controller)
     }
 
     private fun updateMoveForward(numberPlayer: Int, deltaTime: Int, controller: Controller) {
-        spaceShips[numberPlayer].moveForward(deltaTime, controller)
+        level.spaceShips[numberPlayer].moveForward(deltaTime, controller)
     }
 
     private fun updatePressFire(numberPlayer: Int, deltaTime: Int) {
-        if (spaceShips[numberPlayer].inGame)
-            bullets += Bullet(spaceShips, numberPlayer)
+        if (level.spaceShips[numberPlayer].inGame)
+            level.bullets += Bullet.create(level.spaceShips, numberPlayer)
     }
 
     private fun updateSpaceShips(deltaTime: Int) {
-        for (spaceShip in spaceShips)
+        for (spaceShip in level.spaceShips)
             if (spaceShip.inGame)
-                spaceShip.update(deltaTime, width, height)
+                spaceShip.update(deltaTime, level.width, level.height)
 
         val lineRespawnDestroy: MutableList<SpaceShip> = mutableListOf()
         for (spaceShip in lineRespawn)
@@ -184,11 +188,11 @@ class State(
     }
 
     private fun respawnCheck(currentSpaceShip: SpaceShip): Boolean {
-        val numberPlayer = spaceShips.indexOf(currentSpaceShip)
+        val numberPlayer = level.spaceShips.indexOf(currentSpaceShip)
         if (lifes[numberPlayer] > 0) {
             val respawn = respawns.find (::findFreeRespawn)
             if (respawn != null) {
-                spaceShips[numberPlayer] = SpaceShip(respawn)
+                level.spaceShips[numberPlayer] = SpaceShip(respawn)
                 return true
             }
         }
@@ -196,13 +200,13 @@ class State(
     }
 
     private fun findFreeRespawn(it:Respawn):Boolean{
-        for (spaceShip in spaceShips)
+        for (spaceShip in level.spaceShips)
             if (spaceShip.inGame && overlap(it, spaceShip))
                 return false
-        for (bullet in bullets)
+        for (bullet in level.bullets)
             if (overlap(it, bullet))
                 return false
-        for (meteorite in meteorites)
+        for (meteorite in level.meteorites)
             if (overlap(it, meteorite))
                 return false
         return true
@@ -212,22 +216,22 @@ class State(
         if (countPlayers > 1) {
             for (n in 0 until (countPlayers - 1))
                 for (k in (n + 1) until countPlayers)
-                    if (spaceShips[n].inGame && spaceShips[k].inGame
-                            && overlap(spaceShips[n], spaceShips[k])) {
-                        kickback(spaceShips[n], spaceShips[k])
+                    if (level.spaceShips[n].inGame && level.spaceShips[k].inGame
+                            && overlap(level.spaceShips[n], level.spaceShips[k])) {
+                        kickback(level.spaceShips[n], level.spaceShips[k])
                     }
         }
     }
 
     private fun updateBullets(deltaTime: Int) {
-        if (bullets.isNotEmpty()) {
-            for (bullet in bullets)
-                bullet.update(deltaTime, width, height)
+        if (level.bullets.isNotEmpty()) {
+            for (bullet in level.bullets)
+                bullet.update(deltaTime, level.width, level.height)
 
             collisionBulletSpaceShips()
             collisionBulletBullet()
 
-            bullets = bullets.filter {
+            level.bullets = level.bullets.filter {
                 it.roadLength <= 6
             }.toMutableList()
         }
@@ -235,19 +239,19 @@ class State(
 
     private fun collisionBulletSpaceShips() {
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
-        for (spaceShip in spaceShips)
+        for (spaceShip in level.spaceShips)
             if (spaceShip.inGame)
-                for (bullet in bullets)
+                for (bullet in level.bullets)
                     if (overlap(bullet, spaceShip)
-                            && spaceShips.indexOf(spaceShip) != bullet.player) {
+                            && level.spaceShips.indexOf(spaceShip) != bullet.player) {
                         kickback(spaceShip, bullet)
 
-                        animationBulletDestroys.add(AnimationBulletDestroy(bullet))
+                        animationBulletDestroys.add(AnimationDestroy(bullet))
                         listBulletDestroy.add(bullet)
                     }
 
         for (bullet in listBulletDestroy) {
-            bullets.remove(bullet)
+            level.bullets.remove(bullet)
         }
     }
 
@@ -255,32 +259,32 @@ class State(
     private fun collisionBulletBullet() {
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
 
-        for (n in 0 until (bullets.size - 1))
-            for (k in (n + 1) until bullets.size)
-                if (overlap(bullets[n], bullets[k])) {
-                    animationBulletDestroys.add(AnimationBulletDestroy(bullets[k]))
-                    listBulletDestroy.add(bullets[k])
+        for (n in 0 until (level.bullets.size - 1))
+            for (k in (n + 1) until level.bullets.size)
+                if (overlap(level.bullets[n], level.bullets[k])) {
+                    animationBulletDestroys.add(AnimationDestroy(level.bullets[k]))
+                    listBulletDestroy.add(level.bullets[k])
                 }
 
         for (bullet in listBulletDestroy) {
-            bullets.remove(bullet)
+            level.bullets.remove(bullet)
         }
     }
 
     private fun updateMeteorites(deltaTime: Int) {
-        if (meteorites.isNotEmpty()) {
-            for (meteorite in meteorites)
-                meteorite.update(deltaTime, width, height)
+        if (level.meteorites.isNotEmpty()) {
+            for (meteorite in level.meteorites)
+                meteorite.update(deltaTime, level.width, level.height)
 
             collisionMeteoriteMeteoriteBulletsSpaceShips()
         }
     }
 
     private fun collisionMeteoriteMeteoriteBulletsSpaceShips() {
-        for (n in 0 until (meteorites.size - 1))
-            for (k in (n + 1) until meteorites.size)
-                if (overlap(meteorites[n], meteorites[k])) {
-                    kickback(meteorites[n], meteorites[k])
+        for (n in 0 until (level.meteorites.size - 1))
+            for (k in (n + 1) until level.meteorites.size)
+                if (overlap(level.meteorites[n], level.meteorites[k])) {
+                    kickback(level.meteorites[n], level.meteorites[k])
                 }
 
 
@@ -288,20 +292,20 @@ class State(
         val listAngleMeteoritesDestroy: MutableList<Double> = mutableListOf()
 
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
-        for (meteorite in meteorites)
-            for (bullet in bullets)
+        for (meteorite in level.meteorites)
+            for (bullet in level.bullets)
                 if (overlap(bullet, meteorite)) {
                     scores[bullet.player] =
                         scores[bullet.player] + 100 * meteorite.viewSize
                     listMeteoritesDestroy.add(meteorite)
                     listAngleMeteoritesDestroy.add(bullet.angle)
 
-                    animationBulletDestroys.add(AnimationBulletDestroy(bullet))
+                    animationBulletDestroys.add(AnimationDestroy(bullet))
                     listBulletDestroy.add(bullet)
                 }
 
         for (bullet in listBulletDestroy)
-            bullets.remove(bullet)
+            level.bullets.remove(bullet)
 
         spaceShipDestroy(listMeteoritesDestroy, listAngleMeteoritesDestroy)
 
@@ -312,17 +316,17 @@ class State(
         listMeteoritesDestroy: MutableList<Meteorite>,
         listAngleMeteoritesDestroy: MutableList<Double>
     ) {
-        for (spaceShip in spaceShips)
-            for (meteorite in meteorites)
+        for (spaceShip in level.spaceShips)
+            for (meteorite in level.meteorites)
                 if (spaceShip.inGame && overlap(spaceShip, meteorite)) {
-                    lifes[spaceShips.indexOf(spaceShip)] -= 1
+                    lifes[level.spaceShips.indexOf(spaceShip)] -= 1
                     spaceShip.inGame = false
-                    if (lifes[spaceShips.indexOf(spaceShip)] > 0)
+                    if (lifes[level.spaceShips.indexOf(spaceShip)] > 0)
                         lineRespawn.add(spaceShip)
                     listMeteoritesDestroy.add(meteorite)
                     listAngleMeteoritesDestroy.add(spaceShip.angle)
 
-                    animationSpaceShipDestroys.add(AnimationSpaceShipDestroy(spaceShip))
+                    animationSpaceShipDestroys.add(AnimationDestroy(spaceShip))
                 }
     }
 
@@ -342,7 +346,7 @@ class State(
             createThreeMeteorites(meteoriteDestroy, angleDestroy)
         }
 
-        listMeteoritesFullDestroy.forEach { meteorites.remove(it) }
+        listMeteoritesFullDestroy.forEach { level.meteorites.remove(it) }
     }
 
     private fun createThreeMeteorites(
@@ -353,7 +357,7 @@ class State(
             val newMeteorite = meteoriteDestroy.createMeteorite(angleDestroy, angle.toDouble())
 
             if (checkCanCreateNewMeteoriteIsOverlap(newMeteorite, meteoriteDestroy))
-                meteorites.add(newMeteorite)
+                level.meteorites.add(newMeteorite)
         }
     }
 
@@ -361,7 +365,7 @@ class State(
         newMeteorite: Meteorite,
         meteoriteDestroy: Meteorite,
     ): Boolean {
-        for (colMeteorite in meteorites)
+        for (colMeteorite in level.meteorites)
             if (colMeteorite != meteoriteDestroy && overlap(newMeteorite, colMeteorite))
                 return false
         return true
@@ -374,16 +378,16 @@ class State(
         )
     }
 
-    private fun kickback(actor1: Actor, actor2: Actor) {
-        val speedActorX1: Double = actor1.speedX
-        val speedActorX2: Double = actor2.speedX
-        val speedActorY1: Double = actor1.speedY
-        val speedActorY2: Double = actor2.speedY
+    private fun kickback(moveableActor1: MoveableActor, moveableActor2: MoveableActor) {
+        val speedActorX1: Double = moveableActor1.speed.x
+        val speedActorX2: Double = moveableActor2.speed.x
+        val speedActorY1: Double = moveableActor1.speed.y
+        val speedActorY2: Double = moveableActor2.speed.y
 
-        actor1.speedX = Physics.getSpeedFirstAfterKickback(speedActorX1, speedActorX2)
-        actor2.speedX = Physics.getSpeedFirstAfterKickback(speedActorX2, speedActorX1)
-        actor1.speedY = Physics.getSpeedFirstAfterKickback(speedActorY1, speedActorY2)
-        actor2.speedY = Physics.getSpeedFirstAfterKickback(speedActorY2, speedActorY1)
+        moveableActor1.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX1, speedActorX2)
+        moveableActor2.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX2, speedActorX1)
+        moveableActor1.speed.y = Physics.getSpeedFirstAfterKickback(speedActorY1, speedActorY2)
+        moveableActor2.speed.y = Physics.getSpeedFirstAfterKickback(speedActorY2, speedActorY1)
     }
 
     fun clickPause() {

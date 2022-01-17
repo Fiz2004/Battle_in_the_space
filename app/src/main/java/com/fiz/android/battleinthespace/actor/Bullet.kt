@@ -10,8 +10,7 @@ private const val SPEED_MAX:Double = 4.0
 class Bullet(
     center: Vec,
 
-    speedX: Double,
-    speedY: Double,
+    speed:Vec,
 
     angle: Double,
 
@@ -20,22 +19,26 @@ class Bullet(
     var roadLength: Double,
 
     var player: Int,
-) : Actor(
-    center, speedX, speedY, angle,size, SPEED_MAX
+) : MoveableActor(
+    center, speed, angle,size, SPEED_MAX
 ) {
-    constructor(spaceShips:MutableList<SpaceShip>,numberPlayer:Int):this(
-        center= Vec(spaceShips[numberPlayer].center.x + 1 * cos(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
-        spaceShips[numberPlayer].center.y + 1 * sin(spaceShips[numberPlayer].angle / 180.0 * Math.PI)),
-        speedX = SPEED_MAX * cos(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
-        speedY = SPEED_MAX * sin(spaceShips[numberPlayer].angle / 180.0 * Math.PI),
-        angle = spaceShips[numberPlayer].angle,
-        roadLength = 0.0,
-        player = numberPlayer
-    )
+    companion object {
+        fun create(spaceShips: MutableList<SpaceShip>, player: Int): Bullet {
+            val spaceship=spaceShips[player]
+            val center = Vec(
+                spaceship.center.x + spaceship.size * cos(spaceship.angleToRadians),
+                spaceship.center.y + spaceship.size * sin(spaceship.angleToRadians))
+            val speed = Vec(
+                SPEED_MAX * cos(spaceship.angleToRadians),
+                SPEED_MAX * sin(spaceship.angleToRadians))
+            val angle = spaceship.angle
+            val roadLength = 0.0
+            return Bullet(center, speed, angle, 0.1, roadLength, player)
+        }
+    }
+
     override fun update(deltaTime: Int, width: Double, height: Double) {
         super.update(deltaTime, width, height)
-        val roadX=speedX*deltaTime/1000
-        val roadY=speedY*deltaTime/1000
-        roadLength += sqrt(roadX*roadX+roadY*roadY)
+        roadLength += sqrt(speed.length())*deltaTime/1000
     }
 }

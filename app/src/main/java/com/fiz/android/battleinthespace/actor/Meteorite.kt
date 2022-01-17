@@ -5,15 +5,13 @@ import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 private const val SPEED_MAX: Double = 1.0
 
 class Meteorite(
     center: Vec,
 
-    speedX: Double = 0.0,
-    speedY: Double = 0.0,
+    speed: Vec = Vec(0.0, 0.0),
 
     angle: Double,
 
@@ -22,25 +20,22 @@ class Meteorite(
     var viewSize: Int,
 
     var view: Int
-) : Actor(
-    center, speedX, speedY, angle, size, SPEED_MAX
+) : MoveableActor(
+    center, speed, angle, size, SPEED_MAX
 ) {
 
     fun createMeteorite(angleDestroy: Double, angleCreate: Double): Meteorite {
-        val speed =
-            sqrt(speedX * speedX + speedY * speedY)
+        val currentSpeed = speed.lengthSqrt()
+        val currentAngleToRadians = (angleDestroy - angleCreate) / 180.0 * Math.PI
 
         return Meteorite(
             Vec(
-                center.x + (size / 2) * sign(
-                    cos((angleDestroy - angleCreate) / 180.0 * Math.PI)
-                ),
-                center.y + (size / 2) * sign(
-                    sin((angleDestroy - angleCreate) / 180.0 * Math.PI)
-                )),
+                center.x + (size / 2) * sign(cos(currentAngleToRadians)),
+                center.y + (size / 2) * sign(sin(currentAngleToRadians))),
             angle = angleDestroy - angleCreate,
-            speedX = 1.2 * speed * cos((angleDestroy - angleCreate) / 180.0 * Math.PI),
-            speedY = 1.2 * speed * sin((angleDestroy - angleCreate) / 180.0 * Math.PI),
+            speed = Vec(
+                1.2 * currentSpeed * cos(currentAngleToRadians),
+                1.2 * currentSpeed * sin(currentAngleToRadians)),
             size = size - 0.2,
             viewSize = viewSize + 1,
             view = view,
@@ -50,10 +45,12 @@ class Meteorite(
     companion object {
         fun createNew(x: Double, y: Double): Meteorite {
             val angle = (0..360).shuffled().first()
+            val angleToRadians = angle / 180.0 * Math.PI
             return Meteorite(
-                center= Vec(x,y),
-                speedX = 0.4 * SPEED_MAX * cos(angle / 180.0 * Math.PI),
-                speedY = 0.4 * SPEED_MAX * sin(angle / 180.0 * Math.PI),
+                center = Vec(x, y),
+                speed = Vec(
+                    0.4 * SPEED_MAX * cos(angleToRadians),
+                    0.4 * SPEED_MAX * sin(angleToRadians)),
                 angle = angle.toDouble(),
                 size = 1.0,
                 viewSize = 0,
@@ -65,8 +62,7 @@ class Meteorite(
     override fun toString(): String {
         return "center.x= $center.x\n" +
                 "center.y = $center.y\n" +
-                "speedX = $speedX\n" +
-                "speedY = $speedY\n" +
+                "speed = ${speed.x},${speed.y}\n" +
                 "angle = $angle\n" +
                 "size = $size\n" +
                 "viewSize = $viewSize\n" +

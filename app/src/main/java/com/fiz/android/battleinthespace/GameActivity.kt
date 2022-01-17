@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceView
 import android.widget.Button
-import android.widget.TextView
+import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.sqrt
 
 class GameActivity : Activity() {
     private var gameThread: GameThread? = null
@@ -20,22 +19,17 @@ class GameActivity : Activity() {
     private lateinit var gameSurfaceView: SurfaceView
     private lateinit var informationSurfaceView: SurfaceView
 
-    private lateinit var debug: TextView
+    private val sensivity: Vec = Vec(0.0, 0.0)
 
-    private val sensivityX: Float = 0F
-    private val sensivityY: Float = 0F
-    private val leftSide = object {
-        var x: Float = 0F
-        var y: Float = 0F
+    class Side {
+        var point: Vec = Vec(0.0, 0.0)
         var touch: Boolean = false
         var ID: Int = 0
     }
-    private val rightSide = object {
-        var x: Float = 0F
-        var y: Float = 0F
-        var touch: Boolean = false
-        var ID: Int = 0
-    }
+
+    private val leftSide = Side()
+    private val rightSide = Side()
+
 
     class Options {
         var countPlayers = 4
@@ -64,7 +58,6 @@ class GameActivity : Activity() {
         for (n in 0 until options.countPlayers)
             options.namePlayer[n] = extras?.getString("namePlayer${n + 1}") ?: "Player ${n + 1}"
 
-
         gameThread = GameThread(
             gameSurfaceView,
             informationSurfaceView,
@@ -75,14 +68,14 @@ class GameActivity : Activity() {
             options.namePlayer.toList(),
         )
 
-        gameThread!!.setRunning(true)
-        gameThread!!.start()
+        gameThread?.running = true
+        gameThread?.start()
 
         newGameButton.setOnClickListener {
-            gameThread!!.state.status = "new game"
+            gameThread?.state?.status = "new game"
         }
         pauseButton.setOnClickListener {
-            gameThread!!.state.clickPause()
+            gameThread?.state?.clickPause()
         }
         exitButton.setOnClickListener {
             finish()
@@ -90,46 +83,44 @@ class GameActivity : Activity() {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        val actionMask: Int = event?.actionMasked ?: 0
-        val pointerIndex = event?.actionIndex ?: 0
-        val pointerId = event?.getPointerId(pointerIndex)
+        if (event == null) return false
 
-        var x = event?.getX(pointerIndex) ?: 0F
-        var y = event?.getY(pointerIndex) ?: 0F
+        val pointerIndex = event.actionIndex
+        val pointerId = event.getPointerId(pointerIndex)
+
+        var point = Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
 
         val widthJoystick = 50F * resources.displayMetrics.scaledDensity
 
         var touchLeftSide = false
-        if (x < resources.displayMetrics.widthPixels / 2)
+        if (point.x < resources.displayMetrics.widthPixels / 2)
             touchLeftSide = true
 
 
-        when (actionMask) {
+        when (event.actionMasked) {
             // первое касание
             MotionEvent.ACTION_DOWN -> {
                 if (touchLeftSide) {
-                    leftSide.x = x
-                    leftSide.y = y
+                    leftSide.point = point.copy()
                     leftSide.touch = true
-                    leftSide.ID = pointerId ?: 0
+                    leftSide.ID = pointerId
                 } else {
                     gameThread?.controller?.get(0)?.fire = true
                     rightSide.touch = true
-                    rightSide.ID = pointerId ?: 0
+                    rightSide.ID = pointerId
                 }
             }
             // последующие касания
             MotionEvent.ACTION_POINTER_DOWN -> {
                 if (!leftSide.touch && touchLeftSide) {
-                    leftSide.x = x
-                    leftSide.y = y
+                    leftSide.point = point.copy()
                     leftSide.touch = true
-                    leftSide.ID = pointerId ?: 0
+                    leftSide.ID = pointerId
                 }
                 if (!rightSide.touch && !touchLeftSide) {
                     gameThread?.controller?.get(0)?.fire = true
                     rightSide.touch = true
-                    rightSide.ID = pointerId ?: 0
+                    rightSide.ID = pointerId
                 }
             }
             // прерывание последнего касания
@@ -142,8 +133,8 @@ class GameActivity : Activity() {
             }
             // прерывания касаний
             MotionEvent.ACTION_POINTER_UP -> {
-                val isLeftSide = event?.findPointerIndex(pointerIndex) == leftSide.ID
-                val isRightSide = event?.findPointerIndex(pointerIndex) == rightSide.ID
+                val isLeftSide = event.findPointerIndex(pointerIndex) == leftSide.ID
+                val isRightSide = event.findPointerIndex(pointerIndex) == rightSide.ID
                 if (isLeftSide) {
                     leftSide.touch = false
                     gameThread?.controller?.get(0)?.power = 0F
@@ -156,16 +147,20 @@ class GameActivity : Activity() {
             }
             // движение
             MotionEvent.ACTION_MOVE -> {
-                if (leftSide.touch ) {
-                    x = event?.getX(event.findPointerIndex(leftSide.ID)) ?: 0F
-                    y = event?.getY(event.findPointerIndex(leftSide.ID)) ?: 0F
-                    val deltaX = if (abs(x - leftSide.x) < sensivityX) 0F else x - leftSide.x
-                    val deltaY = if (abs(y - leftSide.y) < sensivityY) 0F else y - leftSide.y
-                    var power = sqrt(deltaX * deltaX + deltaY * deltaY) / widthJoystick
-                    power = if (power > 1) 1F else power
-                    gameThread?.controller?.get(0)?.power = power
+                if (leftSide.touch) {
+                    point = Vec(
+                        event.getX(event.findPointerIndex(leftSide.ID)).toDouble(),
+                        event.getY(event.findPointerIndex(leftSide.ID)).toDouble())
 
-                    val angle = atan2(deltaY.toDouble(), deltaX.toDouble()) * 180 / Math.PI
+                    val delta = Vec(
+                        if (abs(point.x - leftSide.point.x) > sensivity.x) point.x - leftSide.point.x else 0.0,
+                        if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0)
+
+                    var power = delta.lengthSqrt() / widthJoystick
+                    power = if (power > 1) 1.0 else power
+                    gameThread?.controller?.get(0)?.power = power.toFloat()
+
+                    val angle = atan2(delta.y, delta.x) * 180 / Math.PI
                     gameThread?.controller?.get(0)?.angle = angle.toFloat()
                 }
             }
@@ -176,11 +171,15 @@ class GameActivity : Activity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        gameThreadStop()
+    }
+
+    fun gameThreadStop() {
         var retry = true
-        gameThread!!.setRunning(false)
+        gameThread?.running = false
         while (retry) {
             try {
-                gameThread!!.join()
+                gameThread?.join()
                 retry = false
             } catch (e: InterruptedException) {
             }
