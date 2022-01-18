@@ -65,8 +65,8 @@ class Collision(var actor1: MoveableActor, var actor2: MoveableActor) {
         //процент проникновения, чтобы исправить
         val percent = 0.4
         val correction: Vec =
-            (max(penetration - kSlop, 0.0) / (actor1.inverseWeight + actor2.inverseWeight)) * normal * percent
-        actor1.center -= correction * actor1.inverseWeight
-        actor2.center += correction * actor2.inverseWeight
+            (max(penetration - kSlop, 0.0) / (actor1.size + actor2.size)) * normal * percent
+        actor1.center -= correction * actor1.size
+        actor2.center += correction * actor2.size
     }
 }

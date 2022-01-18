@@ -61,5 +61,6 @@ open class MoveableActor(
             center = Vec(center.x, center.y + height)
 
         angle+=angleSpeed*180/Math.PI * (deltaTime / 1000.0)
+        angleSpeed=0.0
     }
 }

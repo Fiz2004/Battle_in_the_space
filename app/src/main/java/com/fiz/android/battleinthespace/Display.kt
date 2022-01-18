@@ -15,7 +15,7 @@ import kotlin.math.min
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
 
-private const val NUMBER_BITMAP_BACKGROUND = 8
+const val NUMBER_BITMAP_BACKGROUND = 8
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
 private const val NUMBER_BITMAP_SPACESHIP = 4
 private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
@@ -176,10 +176,7 @@ class Display(
             pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
     }
 
-    //TODO разобраться почему рябит фон
     private fun drawBackground(state: State, canvas: Canvas) {
-//        val tempBMP:Bitmap=Bitmap.createBitmap(surface.width,surface.height,Bitmap.Config.ARGB_8888)
-//        val tempCanvas = Canvas(tempBMP)
         canvas.drawColor(Color.BLACK)
 
         val xStart = floor(viewport.left).toInt()
@@ -203,15 +200,9 @@ class Display(
                     (k - viewport.top).toFloat() * sizeUnit + sizeUnit
                 )
 
-                if (n == 2 && k == 2) {
-                    println("rectDst=$rectDst")
-                    println("background=$background")
-                }
-
-//                canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
+                canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
             }
-//        canvas.drawBitmap(tempBMP, Rect(0,0,tempCanvas.width,tempCanvas.height), RectF(0F,0F,canvas.width.toFloat(),canvas.height.toFloat()), paint)
-    }
+ }
 
     private fun drawSpaceships(state: State, canvas: Canvas) {
         val countViewportXOnScreen = ceil(viewport.width / viewport.levelWidth)
@@ -296,7 +287,7 @@ class Display(
     }
 
     private fun drawAnimationBulletDestroys(state: State, canvas: Canvas) {
-        for (animationBulletDestroy in state.animationBulletDestroys) {
+        for (animationBulletDestroy in state.level.animationBulletDestroys) {
             val step =
                 animationBulletDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY.toDouble()
             val frame =
@@ -312,7 +303,7 @@ class Display(
     }
 
     private fun drawAnimationSpaceshipDestroys(state: State, canvas: Canvas) {
-        for (animationSpaceShipDestroy in state.animationSpaceShipDestroys) {
+        for (animationSpaceShipDestroy in state.level.animationSpaceShipDestroys) {
             val step =
                 animationSpaceShipDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
             val frame =
@@ -396,17 +387,24 @@ class Display(
                 paintFont
             )
 
-            for (k in 0 until state.lifes[n - 1])
+            for (k in 0 until state.level.lifes[n - 1])
                 canvas.drawBitmap(
                     bmpSpaceshipLife[n - 1], rectSrc,
                     RectF(
-                        200F + sizeUnit / 2.5F * k,
+                        160F + sizeUnit / 2.5F * k,
                         55F + 70F * (n - 1),
-                        200F + sizeUnit / 2.5F * k + sizeUnit / 2.5F,
+                        160F + sizeUnit / 2.5F * k + sizeUnit / 2.5F,
                         55F + 70F * (n - 1) + sizeUnit / 2.5F
                     ),
                     paint
                 )
+
+            canvas.drawText(
+                state.scores[n - 1].toString(),
+                160F + sizeUnit / 2.5F * 4 ,
+                70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
+                paintFont
+            )
         }
 
     }
