@@ -27,7 +27,6 @@ class SpaceShip(
 ) {
     constructor (respawn: Respawn) : this(Vec(respawn.center), angle = respawn.angle)
 
-    private var timeRespawnMin=TIME_RESPAWN_MIN
     private var timeRespawn: Int = TIME_RESPAWN_MIN
 
     fun isCanRespawn(deltaTime: Int): Boolean {

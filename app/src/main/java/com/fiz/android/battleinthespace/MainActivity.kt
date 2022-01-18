@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var optionsButton: Button
     private lateinit var exitButton: Button
 
-    private class Options() {
+    private class Options {
         var countPlayers = 4
         var namePlayer1 = "Player 1"
         var namePlayer2 = "Player 2"
@@ -29,8 +29,8 @@ class MainActivity : AppCompatActivity() {
     var mStartForResult = registerForActivityResult(
         StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            val intent: Intent? = result.getData()
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent: Intent? = result.data
             val countPlayer: Int = intent?.getIntExtra("countPlayers", 1) ?: 1
             options.countPlayers = countPlayer
             var result=""

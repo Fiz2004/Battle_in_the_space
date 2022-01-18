@@ -1,23 +1,18 @@
 package com.fiz.android.battleinthespace.engine
 
-import com.fiz.android.battleinthespace.EPSILON
-import kotlin.math.sqrt
+import kotlin.math.*
+
+const val EPSILON: Double = 0.0001
 
 class Vec(var x: Double, var y: Double) {
-
-
-    constructor (vec: Vec):this(vec.x,vec.y)
-
-    fun Set(x: Double, y: Double) {
-        this.x = x
-        this.y = y
-    }
-
-    var m: Array<Array<Double>> = arrayOf(emptyArray())
-    var v: Array<Double> = emptyArray()
+    constructor (vec: Vec) : this(vec.x, vec.y)
 
     operator fun plus(vec: Vec): Vec {
         return Vec(x + vec.x, y + vec.y)
+    }
+
+    operator fun plus(s: Double): Vec {
+        return Vec(x + s, y + s)
     }
 
     operator fun minus(vec: Vec): Vec {
@@ -36,19 +31,30 @@ class Vec(var x: Double, var y: Double) {
         return Vec(x / s, y / s)
     }
 
-    fun copy():Vec{
-        return Vec(x,y)
+    fun copy(): Vec {
+        return Vec(x, y)
     }
 
-    fun sumPow2():Double{
-        return x*x+y*y
+    fun sumPow2(): Double {
+        return x * x + y * y
     }
 
-    fun length():Double{
+    fun length(): Double {
         return sqrt(sumPow2())
     }
 
-    fun Normalize() {
+    fun rotate(radians: Double) {
+        val c: Double = cos(radians)
+        val s: Double = sin(radians)
+
+        val xp: Double = x * c - y * s
+        val yp: Double = x * s + y * c
+
+        x = xp
+        y = yp
+    }
+
+    fun normalize() {
         val len: Double = length()
 
         if (len > EPSILON) {
@@ -60,22 +66,22 @@ class Vec(var x: Double, var y: Double) {
 
 }
 
-inline operator fun Double.times(v: Vec): Vec {
+operator fun Double.times(v: Vec): Vec {
     return Vec(this * v.x, this * v.y)
 }
 
-inline fun Cross(v: Vec, a: Double): Vec {
-    return Vec(a * v.y, -a * v.x)
-}
-
-inline fun Cross(a: Double, v: Vec): Vec {
+fun cross(a: Double, v: Vec): Vec {
     return Vec(-a * v.y, a * v.x)
 }
 
-inline fun Cross(a: Vec, b: Vec): Double {
-    return a.x * b.y - a.y * b.x;
+fun cross(a: Vec, b: Vec): Double {
+    return a.x * b.y - a.y * b.x
 }
 
-inline fun Dot(a: Vec, b: Vec): Double {
+fun dot(a: Vec, b: Vec): Double {
     return a.x * b.x + a.y * b.y
+}
+
+fun sqr(a: Double): Double {
+    return a * a
 }

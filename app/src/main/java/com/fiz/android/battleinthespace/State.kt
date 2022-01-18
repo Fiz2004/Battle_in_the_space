@@ -1,10 +1,9 @@
 package com.fiz.android.battleinthespace
 
 import com.fiz.android.battleinthespace.actor.*
-import com.fiz.android.battleinthespace.engine.Manifold
+import com.fiz.android.battleinthespace.engine.Collision
 import com.fiz.android.battleinthespace.engine.Physics
 import com.fiz.android.battleinthespace.engine.Vec
-import com.fiz.android.battleinthespace.engine.Vec2
 import kotlin.math.sqrt
 
 class State(
@@ -92,15 +91,15 @@ class State(
         for (dx in (0 until level.width.toInt() / 2))
             for (dy in (0 until level.height.toInt() / 2)) {
                 if (isCreateMeteoriteWithoutOverlap(
-                        level.width / 2.0 + dx + 0.1,
-                        level.height / 2.0 + dy + 0.1
-                    )
+                            level.width / 2.0 + dx + 0.1,
+                            level.height / 2.0 + dy + 0.1
+                        )
                 )
                     return
                 if (isCreateMeteoriteWithoutOverlap(
-                        level.width / 2.0 - dx + 0.1,
-                        level.height / 2.0 - dy + 0.1
-                    )
+                            level.width / 2.0 - dx + 0.1,
+                            level.height / 2.0 - dy + 0.1
+                        )
                 )
                     return
             }
@@ -217,10 +216,9 @@ class State(
             for (n in 0 until (countPlayers - 1))
                 for (k in (n + 1) until countPlayers)
                     if (level.spaceShips[n].inGame && level.spaceShips[k].inGame
-                        && overlap(level.spaceShips[n], level.spaceShips[k])
-                    ) {
+                            && overlap(level.spaceShips[n], level.spaceShips[k]))
                         kickback(level.spaceShips[n], level.spaceShips[k])
-                    }
+
         }
     }
 
@@ -244,7 +242,7 @@ class State(
             if (spaceShip.inGame)
                 for (bullet in level.bullets)
                     if (overlap(bullet, spaceShip)
-                        && level.spaceShips.indexOf(spaceShip) != bullet.player
+                            && level.spaceShips.indexOf(spaceShip) != bullet.player
                     ) {
                         kickback(spaceShip, bullet)
 
@@ -379,44 +377,10 @@ class State(
     }
 
     private fun kickback(moveableActor1: MoveableActor, moveableActor2: MoveableActor) {
-        val speedActorX1: Double = moveableActor1.speed.x
-        val speedActorX2: Double = moveableActor2.speed.x
-        val speedActorY1: Double = moveableActor1.speed.y
-        val speedActorY2: Double = moveableActor2.speed.y
-
-        // Вычислить вектор поступательного движения, который является нормальным
-        val normal: Vec = moveableActor2.center - moveableActor1.center
-
-        val distSqr: Double = normal.sumPow2()
-        val radius: Double = moveableActor1.size/2 + moveableActor2.size/2
-
-        val manifold=Manifold(moveableActor1,moveableActor2)
-        // Не в контакте
-        if (distSqr >= radius * radius) {
-            manifold.contact_count = 0
-            return
-        }
-
-        val distance: Double = sqrt(distSqr)
-
-        manifold.contact_count = 1
-
-        if (distance == 0.0) {
-            manifold.penetration = moveableActor1.size/2
-            manifold.normal = Vec(1.0, 0.0)
-            manifold.contacts[0] = moveableActor1.center
-        } else {
-            manifold.penetration = radius - distance
-            // Быстрее, чем при использовании нормализованного, так как мы уже выполнили sqrt
-            manifold.normal = normal / distance
-            manifold.contacts[0] = manifold.normal * moveableActor1.size/2.0 + moveableActor1.center
-        }
-
-        moveableActor1.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX1, speedActorX2)
-        moveableActor2.speed.x = Physics.getSpeedFirstAfterKickback(speedActorX2, speedActorX1)
-        moveableActor1.speed.y = Physics.getSpeedFirstAfterKickback(speedActorY1, speedActorY2)
-        moveableActor2.speed.y = Physics.getSpeedFirstAfterKickback(speedActorY2, speedActorY1)
-    }
+        val manifold = Collision(moveableActor1, moveableActor2)
+        manifold.applyImpulse()
+        manifold.positionalCorrection()
+  }
 
     fun clickPause() {
         status = if (status == "playing")

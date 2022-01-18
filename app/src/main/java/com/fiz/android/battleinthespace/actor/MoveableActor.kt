@@ -12,53 +12,26 @@ open class MoveableActor(
     private var speedMax: Double
 ) :Actor(center,angle,size){
     var angleSpeed: Double=0.0
-    var torque: Double=0.0
-
-    //радианы
-    var orient: Double= Random(-Math.PI, Math.PI)
-
-    var force: Vec = Vec(0.0, 0.0)
 
     // Устанавливается по форме
-    // момент инерции
-    var I: Double=0.0
-
-    // обратная инерция
-    var iI: Double=0.0
-
+    var density=1.0
     // масса
-    private var m: Double=0.0
+    private var weight: Double=Math.PI /** (size/2) * (size/2)*/ *density
 
     // обратный масса
-    var im: Double=0.0
+    var inverseWeight: Double=1.0 / weight
 
-    var staticFriction: Double= 0.5
-    var dynamicFriction: Double= 0.3
-    var restitution: Double= 0.2
+    // момент инерции
+    private var momentInertia: Double=weight * (size/2) * (size/2)/1000000000000000
 
-    // Сохранение цвета в формате RGB
-    var r: Double= Random(0.2, 1.0)
-    var g: Double= Random(0.2, 1.0)
-    var b: Double= Random(0.2, 1.0)
+    // обратная инерция
+    var inverseMomentInertia: Double=1.0 / momentInertia
 
-    fun Initialize() {
-        ComputeMass(1.0)
-    }
+    var restitution: Double= 1.0
 
-    fun ComputeMass(density: Double) {
-        m = Math.PI * (size/2) * (size/2) * density
-        im =  1.0 / m
-        I = m * (size/2) * (size/2)
-        iI =  1.0 / I
-    }
-
-    fun ApplyForce( f: Vec)    {
-        force += f
-    }
-
-    fun ApplyImpulse(impulse: Vec, contactVector: Vec)    {
-        speed += im * impulse
-        angleSpeed += iI * Cross(contactVector, impulse)
+    fun applyImpulse(impulse: Vec, contactVector: Vec)    {
+        speed += inverseWeight * impulse
+        angleSpeed += inverseMomentInertia * cross(contactVector, impulse)
     }
 
     var speed: Vec = _speed.copy()
@@ -86,5 +59,7 @@ open class MoveableActor(
             center = Vec(center.x, center.y - height)
         if (center.y < 0)
             center = Vec(center.x, center.y + height)
+
+        angle+=angleSpeed*180/Math.PI * (deltaTime / 1000.0)
     }
 }

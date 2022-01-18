@@ -14,16 +14,6 @@ object Physics {
         Physics.height = height
     }
 
-    fun getSpeedFirstAfterKickback(speedFirst: Double, speedSecond: Double): Double {
-        if (sign(speedFirst) != sign(speedSecond) && speedFirst != 0.0)
-            return -speedFirst
-
-        if (abs(speedFirst) > abs(speedSecond))
-            return speedFirst / 2
-
-        return speedFirst + speedSecond / 2
-    }
-
     fun overlap(
         center1: Vec,
         size1: Double,

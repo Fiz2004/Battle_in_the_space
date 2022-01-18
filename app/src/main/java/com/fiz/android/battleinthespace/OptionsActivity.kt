@@ -138,6 +138,7 @@ class OptionsActivity : AppCompatActivity() {
                 data.putExtra("countPlayers", 1)
             }
             if (twoPlayersRadioButton.isChecked) {
+                data.putExtra("countPlayers", 2)
             }
             if (threePlayersRadioButton.isChecked) {
                 data.putExtra("countPlayers", 3)

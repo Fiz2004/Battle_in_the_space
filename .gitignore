@@ -42,7 +42,8 @@ captures/
 .idea/dictionaries
 .idea/libraries
 .idea/caches
-.idea/sonarlint/*
+.idea/sonarlint/
+.idea/sonarlint/issuestore/
 
 # Keystore files
 # Uncomment the following lines if you do not want to check your keystore files in.
@@ -66,5 +67,3 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
-
-
