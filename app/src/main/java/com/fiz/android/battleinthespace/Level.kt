@@ -166,10 +166,14 @@ class Level(
             if (spaceShip.inGame)
                 spaceShip.update(deltaTime, width, height)
 
+        val lineRespawnDestroy: MutableList<SpaceShip> = mutableListOf()
         for (spaceShip in lineRespawn)
             if (spaceShip.isCanRespawnFromTime(deltaTime))
                 if (respawnCheck(spaceShip))
-                    lineRespawn.remove(spaceShip)
+                    lineRespawnDestroy.add(spaceShip)
+
+        for (spaceShip in lineRespawnDestroy)
+            lineRespawn.remove(spaceShip)
 
         collisionSpaceShips()
     }

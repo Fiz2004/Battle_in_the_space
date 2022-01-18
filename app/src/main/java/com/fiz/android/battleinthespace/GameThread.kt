@@ -17,7 +17,7 @@ class GameThread(
     val namePlayers:List<String>
 ) : Thread() {
     var state = State(countPlayers,namePlayers)
-    val controller: Array<Controller> = Array(4) { Controller() }
+    val controller: Array<Controller> = Array(4) { Controller(resources=resources) }
 
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
@@ -49,7 +49,7 @@ class GameThread(
             canvas = surface.holder.lockCanvas()
             if (canvas == null) return
             synchronized(surface.holder) {
-                display.render(state, canvas)
+                display.render(state, controller[0],canvas)
             }
 
             informationCanvas = informationSurface.holder.lockCanvas()

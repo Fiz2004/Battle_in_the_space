@@ -38,8 +38,6 @@ class SpaceShip(
         return false
     }
 
-
-
     fun moveRotate(deltaTime: Double, controller: Controller) {
         val step = SPEED_ANGLE_PER_SECOND * deltaTime
 
@@ -48,25 +46,25 @@ class SpaceShip(
             return
         }
 
-        angle += getStepRotateIfABSAngleMinusControllerAngleCompareTo180(controller,step)
+        angle += getSignStepRotate(controller,step)
     }
 
-    private fun getStepRotateIfABSAngleMinusControllerAngleCompareTo180(controller: Controller,step:Double):Double{
+    private fun getSignStepRotate(controller: Controller, step:Double):Double{
         return if (abs(angle - controller.angle)  > 180)
-            getStepRotateIfAngleCompareToControllerAngle(controller,step)
+            getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller,step)
         else
-            getStepRotateIfControllerAngleCompareToAngle(controller,step)
+            getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller,step)
     }
 
 
-    private fun getStepRotateIfAngleCompareToControllerAngle(controller: Controller,step:Double):Double{
+    private fun getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller: Controller, step:Double):Double{
         return if (angle > controller.angle)
             step
         else
             -step
     }
 
-    private fun getStepRotateIfControllerAngleCompareToAngle(controller: Controller,step:Double):Double{
+    private fun getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller: Controller, step:Double):Double{
         return if (angle < controller.angle)
             step
         else

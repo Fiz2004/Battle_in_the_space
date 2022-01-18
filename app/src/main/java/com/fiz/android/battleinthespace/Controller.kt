@@ -1,16 +1,24 @@
 package com.fiz.android.battleinthespace
 
+import android.content.res.Resources
+import android.view.MotionEvent
 import com.fiz.android.battleinthespace.engine.Vec
+import kotlin.math.abs
+import kotlin.math.atan2
 
 class Controller(
     var fire: Boolean = false,
-    _timeBetweenFireMin: Double =0.250,
+    _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F,
-    var power: Float = 0F
+    var power: Float = 0F,
+    resources: Resources
 ) {
-    var press: Vec =Vec(0.0,0.0)
+    var press: Vec = Vec(0.0, 0.0)
 
-    private var timeBetweenFireMin=_timeBetweenFireMin
+    val widthJoystick = 50F * resources.displayMetrics.scaledDensity
+    private val sensivity: Vec = Vec(0.0, 0.0)
+
+    private var timeBetweenFireMin = _timeBetweenFireMin
     private var timeLastFire: Double = 0.0
 
     fun isCanFire(deltaTime: Double): Boolean {
@@ -24,7 +32,6 @@ class Controller(
         return false
     }
 
-
     var angle: Float = _angle
         set(value) {
             field = value
@@ -33,4 +40,78 @@ class Controller(
             if (value < 0)
                 field = value + 360
         }
+
+    class Side {
+        var point: Vec = Vec(0.0, 0.0)
+        var touch: Boolean = false
+        var ID: Int = 0
+    }
+
+    val leftSide = Side()
+    val rightSide = Side()
+
+    fun ACTION_DOWN(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
+        if (touchLeftSide) {
+            leftSide.point = point.copy()
+            leftSide.touch = true
+            leftSide.ID = pointerId
+        } else {
+            fire = true
+            rightSide.touch = true
+        }
+    }
+
+    fun ACTION_POINTER_DOWN(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
+        if (!leftSide.touch && touchLeftSide) {
+            leftSide.point = point.copy()
+            leftSide.touch = true
+            leftSide.ID = pointerId
+        }
+        if (!rightSide.touch && !touchLeftSide) {
+            fire = true
+            rightSide.touch = true
+            rightSide.ID = pointerId
+        }
+    }
+
+    fun ACTION_UP() {
+        leftSide.touch = false
+        power = 0F
+
+        rightSide.touch = false
+        fire = false
+    }
+
+    fun ACTION_POINTER_UP(event: MotionEvent) {
+        val pointerIndex = event.actionIndex
+        val isLeftSide = event.findPointerIndex(pointerIndex) == leftSide.ID
+        val isRightSide = event.findPointerIndex(pointerIndex) == rightSide.ID
+        if (isLeftSide) {
+            leftSide.touch = false
+            power = 0F
+        }
+        if (isRightSide) {
+            rightSide.touch = false
+            fire = false
+        }
+    }
+
+    fun ACTION_MOVE(event: MotionEvent) {
+        if (leftSide.touch) {
+            val point = Vec(
+                event.getX(event.findPointerIndex(leftSide.ID)).toDouble(),
+                event.getY(event.findPointerIndex(leftSide.ID)).toDouble()
+            )
+
+            val delta = Vec(
+                if (abs(point.x - leftSide.point.x) > sensivity.x) point.x - leftSide.point.x else 0.0,
+                if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0
+            )
+
+            val tempPower = delta.length() / widthJoystick
+            power = (if (tempPower > 1) 1.0 else power).toFloat()
+
+            angle = (atan2(delta.y, delta.x) * 180 / Math.PI).toFloat()
+        }
+    }
 }

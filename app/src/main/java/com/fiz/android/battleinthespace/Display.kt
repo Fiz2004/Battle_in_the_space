@@ -8,10 +8,7 @@ import android.widget.Button
 import com.fiz.android.battleinthespace.actor.Actor
 import com.fiz.android.battleinthespace.actor.SpaceShip
 import com.fiz.android.battleinthespace.engine.Physics
-import com.fiz.android.battleinthespace.engine.Vec
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.min
+import kotlin.math.*
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
 
@@ -156,7 +153,7 @@ class Display(
 
     private val viewport = Viewport()
 
-    fun render(state: State, canvas: Canvas) {
+    fun render(state: State, controller: Controller, canvas: Canvas) {
         sizeUnit = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
         viewport.update(state)
         drawBackground(state, canvas)
@@ -165,10 +162,12 @@ class Display(
         drawAnimationBulletDestroys(state, canvas)
         drawMeteorites(state, canvas)
         drawAnimationSpaceshipDestroys(state, canvas)
+        drawJoystick(controller, canvas)
     }
 
     fun renderInfo(state: State, canvasInfo: Canvas) {
         drawInfo(state, canvasInfo)
+
 
         if (state.status == "pause")
             pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
@@ -202,7 +201,7 @@ class Display(
 
                 canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
             }
- }
+    }
 
     private fun drawSpaceships(state: State, canvas: Canvas) {
         val countViewportXOnScreen = ceil(viewport.width / viewport.levelWidth)
@@ -354,8 +353,6 @@ class Display(
             (y * sizeUnit + size * sizeUnit / 2).toFloat()
         )
 
-        println(rectDst)
-
         canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
     }
 
@@ -401,7 +398,7 @@ class Display(
 
             canvas.drawText(
                 state.scores[n - 1].toString(),
-                160F + sizeUnit / 2.5F * 4 ,
+                160F + sizeUnit / 2.5F * 4,
                 70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
                 paintFont
             )
@@ -409,5 +406,32 @@ class Display(
 
     }
 
+    private fun drawJoystick(controller: Controller, canvas: Canvas) {
+        val paintFont = Paint()
+        paintFont.color = Color.RED
+        paintFont.style = Paint.Style.STROKE
+        paintFont.alpha=80
+        paintFont.strokeWidth = 6F
+
+        if (controller.leftSide.touch)
+            canvas.drawCircle(
+                surface.left + controller.leftSide.point.x.toFloat(),
+                surface.top + controller.leftSide.point.y.toFloat()-controller.widthJoystick,
+                controller.widthJoystick,
+                paintFont
+            )
+
+        paintFont.color = Color.GREEN
+        paintFont.style = Paint.Style.FILL;
+        paintFont.alpha=80
+        paintFont.strokeWidth = 10F
+        if (controller.leftSide.touch)
+            canvas.drawCircle(
+                (surface.left + controller.leftSide.point.x.toFloat()+controller.widthJoystick*controller.power*cos(controller.angle/ 180.0 * Math.PI)).toFloat(),
+                (surface.top + controller.leftSide.point.y.toFloat()+controller.widthJoystick*controller.power*sin(controller.angle/ 180.0 * Math.PI)-controller.widthJoystick).toFloat(),
+                10F,
+                paintFont
+            )
+    }
 }
 
