@@ -30,7 +30,7 @@ class State(
         level = Level(20.0, 20.0,countPlayers, round)
     }
 
-    fun update(controller: Array<Controller>, deltaTime: Int): Boolean {
+    fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
         if (!level.update(controller,deltaTime))
             newRound()
 

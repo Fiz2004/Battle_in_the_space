@@ -20,8 +20,7 @@ class GameThread(
     val controller: Array<Controller> = Array(4) { Controller() }
 
     private var prevTime = System.currentTimeMillis()
-    private var deltaTime = 0
-    private var ending = 1000
+    private var ending = 1.0
 
     private val display = Display(
         resources,
@@ -31,11 +30,14 @@ class GameThread(
     )
 
     var running = false
+    var pause = false
 
     override fun run() {
         while (running) {
-            stateUpdate()
-            displayUpdate()
+            if (!pause) {
+                stateUpdate()
+                displayUpdate()
+            }
         }
     }
 
@@ -66,24 +68,22 @@ class GameThread(
 
     private fun stateUpdate() {
         val now = System.currentTimeMillis()
-        deltaTime = min(now - prevTime, 100).toInt()
-
+        val deltaTime = min(now - prevTime, 100).toInt()/1000.0
 
         if (state.status != "pause") {
             var status = true
-            if (ending == 1000)
+            if (ending == 1.0)
                 status = state.update(controller, deltaTime)
 
-            if (!status || ending != 1000)
+            if (!status || ending != 1.0)
                 ending -= deltaTime
         }
 
         if (ending < 0 || state.status == "new game") {
             state = State(countPlayers,namePlayers)
-            ending = 1000
+            ending = 1.0
         }
 
-        deltaTime = 0
         prevTime = now
     }
 }

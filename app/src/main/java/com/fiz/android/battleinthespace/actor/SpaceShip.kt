@@ -9,7 +9,7 @@ import kotlin.math.sin
 private const val SPEED_ANGLE_PER_SECOND: Double = 200.0
 private const val INCREASE_SPEED_PER_SECOND: Double = 1.2
 private const val SPEED_MAX: Double = 2.0
-private const val TIME_RESPAWN_MIN: Int = 1000
+private const val TIME_RESPAWN_MIN: Double = 1.0
 
 class SpaceShip(
     center: Vec,
@@ -27,9 +27,9 @@ class SpaceShip(
 ) {
     constructor (respawn: Respawn) : this(Vec(respawn.center), angle = respawn.angle)
 
-    private var timeRespawn: Int = TIME_RESPAWN_MIN
+    private var timeRespawn: Double = TIME_RESPAWN_MIN
 
-    fun isCanRespawn(deltaTime: Int): Boolean {
+    fun isCanRespawnFromTime(deltaTime: Double): Boolean {
         timeRespawn -= deltaTime
         if (timeRespawn < 0) {
             timeRespawn = TIME_RESPAWN_MIN
@@ -40,8 +40,8 @@ class SpaceShip(
 
 
 
-    fun moveRotate(deltaTime: Int, controller: Controller) {
-        val step = (SPEED_ANGLE_PER_SECOND * deltaTime / 1000)
+    fun moveRotate(deltaTime: Double, controller: Controller) {
+        val step = SPEED_ANGLE_PER_SECOND * deltaTime
 
         if (abs(angle - controller.angle) < step) {
             angle = controller.angle.toDouble()
@@ -73,8 +73,8 @@ class SpaceShip(
             -step
     }
 
-    fun moveForward(deltaTime: Int, controller: Controller) {
-        val step = (INCREASE_SPEED_PER_SECOND * deltaTime / 1000) * controller.power
+    fun moveForward(deltaTime: Double, controller: Controller) {
+        val step = INCREASE_SPEED_PER_SECOND * deltaTime * controller.power
 
         speed += Vec(step * cos(angleToRadians), step * sin(angleToRadians))
     }

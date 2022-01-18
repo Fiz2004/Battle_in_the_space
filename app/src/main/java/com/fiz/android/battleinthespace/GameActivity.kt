@@ -62,7 +62,7 @@ class GameActivity : Activity() {
             gameSurfaceView,
             informationSurfaceView,
             resources,
-            this.applicationContext,
+            applicationContext,
             pauseButton,
             options.countPlayers,
             options.namePlayer.toList(),
@@ -82,6 +82,17 @@ class GameActivity : Activity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (gameThread?.pause==true)
+            gameThread?.pause=false
+    }
+
+    override fun onPause() {
+        super.onPause()
+        gameThread?.pause=true
+    }
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) return false
 
@@ -93,7 +104,7 @@ class GameActivity : Activity() {
         val widthJoystick = 50F * resources.displayMetrics.scaledDensity
 
         var touchLeftSide = false
-        if (point.x < resources.displayMetrics.widthPixels / 2)
+        if (point.x < gameSurfaceView.width)
             touchLeftSide = true
 
 

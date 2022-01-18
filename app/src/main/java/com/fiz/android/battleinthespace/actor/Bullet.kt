@@ -37,8 +37,8 @@ class Bullet(
         }
     }
 
-    override fun update(deltaTime: Int, width: Double, height: Double) {
+    override fun update(deltaTime: Double, width: Double, height: Double) {
         super.update(deltaTime, width, height)
-        roadLength += sqrt(speed.sumPow2())*deltaTime/1000
+        roadLength += sqrt(speed.sumPow2())*deltaTime
     }
 }

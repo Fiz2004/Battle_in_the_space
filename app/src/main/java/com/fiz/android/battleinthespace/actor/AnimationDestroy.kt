@@ -7,11 +7,11 @@ class AnimationDestroy(
     _angle:Double=0.0,
     _size:Double,
 
-    var timeShowMax: Int,
-    var timeShow: Int = timeShowMax
+    var timeShowMax: Double,
+    var timeShow: Double = timeShowMax
 
 ):Actor(_center,_angle,_size) {
-    constructor(bullet: Bullet):this(Vec(bullet.center),bullet.angle,bullet.size,1000)
-    constructor(spaceShip: SpaceShip):this(Vec(spaceShip.center),spaceShip.angle,spaceShip.size,1500)
+    constructor(bullet: Bullet):this(Vec(bullet.center),bullet.angle,bullet.size,1.0)
+    constructor(spaceShip: SpaceShip):this(Vec(spaceShip.center),spaceShip.angle,spaceShip.size,1.5)
 }
 

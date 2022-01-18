@@ -47,8 +47,8 @@ open class MoveableActor(
             field = Vec(x, y)
         }
 
-    open fun update(deltaTime: Int, width: Double, height: Double) {
-        center += speed * (deltaTime / 1000.0)
+    open fun update(deltaTime: Double, width: Double, height: Double) {
+        center += speed * deltaTime
 
         if (center.x > width)
             center = Vec(center.x - width, center.y)
@@ -60,7 +60,7 @@ open class MoveableActor(
         if (center.y < 0)
             center = Vec(center.x, center.y + height)
 
-        angle+=angleSpeed*180/Math.PI * (deltaTime / 1000.0)
+        angle+=angleSpeed*180/Math.PI * deltaTime
         angleSpeed=0.0
     }
 }
