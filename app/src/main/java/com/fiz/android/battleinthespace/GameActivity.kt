@@ -8,8 +8,6 @@ import android.view.SurfaceView
 import android.view.Window
 import android.widget.Button
 import com.fiz.android.battleinthespace.engine.Vec
-import kotlin.math.abs
-import kotlin.math.atan2
 
 class GameActivity : Activity() {
     private var gameThread: GameThread? = null
@@ -23,11 +21,11 @@ class GameActivity : Activity() {
 
     class Options {
         var countPlayers = 4
-        var namePlayer: MutableList<String> =
-            mutableListOf("Player 1", "Player 2", "Player 3", "Player 4")
+        var name: MutableList<String> = MutableList(4) { i -> "Player ${i + 1}" }
+        var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true,false,false,false)
     }
 
-    val options = Options()
+    private val options = Options()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +45,10 @@ class GameActivity : Activity() {
             options.countPlayers = extras.getInt("countPlayers")
 
         for (n in 0 until options.countPlayers)
-            options.namePlayer[n] = extras?.getString("namePlayer${n + 1}") ?: "Player ${n + 1}"
+            options.name[n] = extras?.getString("namePlayer${n + 1}") ?: "Player ${n + 1}"
+
+        for (n in 0 until options.countPlayers)
+            options.playerControllerPlayer[n] = extras?.getBoolean("controller${n + 1}") ?: false
 
         gameThread = GameThread(
             gameSurfaceView,
@@ -56,7 +57,8 @@ class GameActivity : Activity() {
             applicationContext,
             pauseButton,
             options.countPlayers,
-            options.namePlayer.toList(),
+            options.name.toList(),
+            options.playerControllerPlayer.toList()
         )
 
         gameThread?.running = true
@@ -101,25 +103,16 @@ class GameActivity : Activity() {
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> {
-                gameThread?.controller?.get(0)?.ACTION_DOWN(touchLeftSide, point, pointerId)
-            }
+            MotionEvent.ACTION_DOWN -> gameThread?.controller?.get(0)?.ACTION_DOWN(touchLeftSide, point, pointerId)
             // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> {
-                gameThread?.controller?.get(0)?.ACTION_POINTER_DOWN(touchLeftSide, point, pointerId)
-            }
+            MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controller?.get(0)
+                ?.ACTION_POINTER_DOWN(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> {
-                gameThread?.controller?.get(0)?.ACTION_UP()
-            }
+            MotionEvent.ACTION_UP -> gameThread?.controller?.get(0)?.ACTION_UP()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> {
-                gameThread?.controller?.get(0)?.ACTION_POINTER_UP(event)
-            }
+            MotionEvent.ACTION_POINTER_UP -> gameThread?.controller?.get(0)?.ACTION_POINTER_UP(event)
             // движение
-            MotionEvent.ACTION_MOVE -> {
-                gameThread?.controller?.get(0)?.ACTION_MOVE(event)
-            }
+            MotionEvent.ACTION_MOVE -> gameThread?.controller?.get(0)?.ACTION_MOVE(event)
         }
 
         return super.onTouchEvent(event)
@@ -130,7 +123,7 @@ class GameActivity : Activity() {
         gameThreadStop()
     }
 
-    fun gameThreadStop() {
+    private fun gameThreadStop() {
         var retry = true
         gameThread?.running = false
         while (retry) {

@@ -66,8 +66,8 @@ class Vec(var x: Double, var y: Double) {
 
 }
 
-operator fun Double.times(v: Vec): Vec {
-    return Vec(this * v.x, this * v.y)
+operator fun Double.times(vec: Vec): Vec {
+    return Vec(this * vec.x, this * vec.y)
 }
 
 fun cross(a: Double, v: Vec): Vec {

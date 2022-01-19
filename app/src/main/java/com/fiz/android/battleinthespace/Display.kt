@@ -29,6 +29,9 @@ class Display(
     private val surface: SurfaceView
 ) {
     private val paint: Paint = Paint()
+    private lateinit var canvas: Canvas
+    private lateinit var canvasInfo: Canvas
+    private lateinit var state: State
 
     private val bmpBackground: Array<Bitmap> by lazy(::initBmpBackground)
     private fun initBmpBackground(): Array<Bitmap> {
@@ -132,7 +135,7 @@ class Display(
         var levelWidth: Double = 0.0
         var levelHeight: Double = 0.0
 
-        fun update(state: State) {
+        fun update() {
             // Определить почему в самом начале загрузки класса width=0
             width = (surface.width / sizeUnit).toDouble()
             height = (surface.height / sizeUnit).toDouble()
@@ -154,20 +157,28 @@ class Display(
     private val viewport = Viewport()
 
     fun render(state: State, controller: Controller, canvas: Canvas) {
+        this.state=state
+        this.canvas=canvas
+
+        println (this.state)
+        println (this.canvas)
+
         sizeUnit = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
-        viewport.update(state)
-        drawBackground(state, canvas)
-        drawSpaceships(state, canvas)
-        drawBullets(state, canvas)
-        drawAnimationBulletDestroys(state, canvas)
-        drawMeteorites(state, canvas)
-        drawAnimationSpaceshipDestroys(state, canvas)
-        drawJoystick(controller, canvas)
+        viewport.update()
+        drawBackground()
+        drawSpaceships()
+        drawBullets()
+        drawAnimationBulletDestroys()
+        drawMeteorites()
+        drawAnimationSpaceshipDestroys()
+        drawJoystick(controller)
     }
 
     fun renderInfo(state: State, canvasInfo: Canvas) {
-        drawInfo(state, canvasInfo)
+        this.state=state
+        this.canvasInfo=canvasInfo
 
+        drawInfo()
 
         if (state.status == "pause")
             pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
@@ -175,7 +186,7 @@ class Display(
             pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
     }
 
-    private fun drawBackground(state: State, canvas: Canvas) {
+    private fun drawBackground() {
         canvas.drawColor(Color.BLACK)
 
         val xStart = floor(viewport.left).toInt()
@@ -206,7 +217,7 @@ class Display(
             }
     }
 
-    private fun drawSpaceships(state: State, canvas: Canvas) {
+    private fun drawSpaceships() {
         val countViewportXOnScreen = ceil(viewport.width / viewport.levelWidth)
         val countViewportYOnScreen = ceil(viewport.height / viewport.levelHeight)
         val widthAllViewportsOnScreen = viewport.levelWidth * countViewportXOnScreen
@@ -283,12 +294,12 @@ class Display(
         canvas.restore()
     }
 
-    private fun drawBullets(state: State, canvas: Canvas) {
+    private fun drawBullets() {
         for (bullet in state.level.bullets)
             drawActor(bullet, bmpBullet, canvas)
     }
 
-    private fun drawAnimationBulletDestroys(state: State, canvas: Canvas) {
+    private fun drawAnimationBulletDestroys() {
         for (animationBulletDestroy in state.level.animationBulletDestroys) {
             val step =
                 animationBulletDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY.toDouble()
@@ -299,12 +310,12 @@ class Display(
         }
     }
 
-    private fun drawMeteorites(state: State, canvas: Canvas) {
+    private fun drawMeteorites() {
         for (meteorite in state.level.meteorites)
             drawActor(meteorite, bmpMeteorites[meteorite.view][meteorite.viewSize], canvas)
     }
 
-    private fun drawAnimationSpaceshipDestroys(state: State, canvas: Canvas) {
+    private fun drawAnimationSpaceshipDestroys() {
         for (animationSpaceShipDestroy in state.level.animationSpaceShipDestroys) {
             val step =
                 animationSpaceShipDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY.toDouble()
@@ -359,57 +370,80 @@ class Display(
         canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
     }
 
-    private fun drawInfo(state: State, canvas: Canvas) {
-        canvas.drawColor(Color.BLACK)
+    private fun drawInfo() {
+        val width=canvasInfo.width
+        val height=canvasInfo.height
+        val minCharacteristic=min(width,height)
+        val bmplife=minCharacteristic/3/3
+
+        canvasInfo.drawColor(Color.BLACK)
         val paintFont = Paint()
         val rectSrc = Rect(
             0, 0,
             bmpSpaceshipLife[0].width, bmpSpaceshipLife[0].height
         )
 
-        paintFont.textSize = 36F
+        val baseTextSize=minCharacteristic/6F
+        val textSize=baseTextSize*0.75F
+        paintFont.textSize = baseTextSize
         paintFont.color = Color.WHITE
-        canvas.drawText("Round ${state.round}", canvas.width / 2F, 25F, paintFont)
+        paintFont.textAlign=Paint.Align.CENTER
+        canvasInfo.drawText("Round ${state.round}", canvasInfo.width / 2F, baseTextSize, paintFont)
 
-        for (n in 1..state.countPlayers) {
+        val maxTextWidth = getMaxTextWidth(paintFont)
+
+        for (n in 0 until state.countPlayers) {
+            paintFont.textSize = textSize
+            paintFont.textAlign=Paint.Align.LEFT
             paintFont.color = when (n) {
-                1 -> Color.GREEN
-                2 -> Color.CYAN
+                0 -> Color.GREEN
+                1 -> Color.CYAN
                 // Color = pink
-                3 -> Color.rgb(255, 192, 203)
-                4 -> Color.YELLOW
+                2 -> Color.rgb(255, 192, 203)
+                3 -> Color.YELLOW
                 else -> Color.WHITE
             }
-            canvas.drawText(
-                state.namePlayers[n - 1],
+            canvasInfo.drawText(
+                state.namePlayers[n ],
                 0F,
-                70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
+                baseTextSize + (textSize * (n+1)),
                 paintFont
             )
 
-            for (k in 0 until state.level.lifes[n - 1])
-                canvas.drawBitmap(
-                    bmpSpaceshipLife[n - 1], rectSrc,
+            for (k in 0 until state.level.lifes[n ])
+                canvasInfo.drawBitmap(
+                    bmpSpaceshipLife[n], rectSrc,
                     RectF(
-                        160F + sizeUnit / 2.5F * k,
-                        55F + 70F * (n - 1),
-                        160F + sizeUnit / 2.5F * k + sizeUnit / 2.5F,
-                        55F + 70F * (n - 1) + sizeUnit / 2.5F
+                        maxTextWidth + bmplife * (k-1).toFloat(),
+                        baseTextSize + textSize * n,
+                        (maxTextWidth + bmplife * (k -1)+ bmplife).toFloat(),
+                        baseTextSize + textSize * n + textSize
                     ),
                     paint
                 )
 
-            canvas.drawText(
-                state.scores[n - 1].toString(),
-                160F + sizeUnit / 2.5F * 4,
-                70F + 70F * (n - 1) + sizeUnit / 2.5F / 2,
+            canvasInfo.drawText(
+                state.scores[n ].toString(),
+                (maxTextWidth + bmplife * 2).toFloat(),
+                baseTextSize + textSize * (n+1),
                 paintFont
             )
         }
 
     }
 
-    private fun drawJoystick(controller: Controller, canvas: Canvas) {
+    private fun getMaxTextWidth(paintFont: Paint): Int {
+        var result = 0
+        for (namePlayer in state.namePlayers) {
+            val mTextBoundRect = Rect(0, 0, 0, 0)
+            paintFont.getTextBounds(namePlayer, 0, namePlayer.length, mTextBoundRect)
+            val textWidth = mTextBoundRect.width()
+            result = max(textWidth, result)
+        }
+        return result
+    }
+
+    private fun drawJoystick(controller: Controller) {
         val paintFont = Paint()
         paintFont.color = Color.RED
         paintFont.style = Paint.Style.STROKE
@@ -433,7 +467,7 @@ class Display(
         }
 
         paintFont.color = Color.GREEN
-        paintFont.style = Paint.Style.FILL;
+        paintFont.style = Paint.Style.FILL
         paintFont.alpha=40
         paintFont.strokeWidth = 30F
         cx+=controller.widthJoystick*controller.power*cos(controller.angle/ 180.0 * Math.PI).toFloat()

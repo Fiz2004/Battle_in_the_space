@@ -14,9 +14,10 @@ class GameThread(
     context: Context,
     pauseButton: Button,
     val countPlayers:Int,
-    val namePlayers:List<String>
+    val name:List<String>,
+    val playerControllerPlayer: List<Boolean>
 ) : Thread() {
-    var state = State(countPlayers,namePlayers)
+    var state = State(countPlayers,name)
     val controller: Array<Controller> = Array(4) { Controller(resources=resources) }
 
     private var prevTime = System.currentTimeMillis()
@@ -80,7 +81,7 @@ class GameThread(
         }
 
         if (ending < 0 || state.status == "new game") {
-            state = State(countPlayers,namePlayers)
+            state = State(countPlayers,name)
             ending = 1.0
         }
 

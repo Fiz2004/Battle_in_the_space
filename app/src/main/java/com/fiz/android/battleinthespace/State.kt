@@ -34,9 +34,11 @@ class State(
         if (!level.update(controller,deltaTime))
             newRound()
 
-        val tempScores=level.getScoresForUpdate()
-        for (n in scores.indices)
-            scores[n]+=tempScores[n]
+        if (scores.isNotEmpty()) {
+            val tempScores = level.getScoresForUpdate()
+            for (n in scores.indices)
+                scores[n] += tempScores[n]
+        }
 
         if (round == 11)
             return false

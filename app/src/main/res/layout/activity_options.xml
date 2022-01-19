@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -31,13 +31,19 @@
             <EditText
                 android:id="@+id/one_players_options_edittext"
                 style="@style/EditTextStyle"
-                android:text="Player 1"
+                android:text="@string/name1_options_edittext"
                 android:hint="@string/name_options_edittext" />
+
+            <ToggleButton
+                android:id="@+id/one_players_options_togglebutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOn="@string/controller_options_togglebutton_on"
+                android:textOff="@string/controller_options_togglebutton_off"/>
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/two"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -55,8 +61,15 @@
             <EditText
                 android:id="@+id/two_players_options_edittext"
                 style="@style/EditTextStyle"
-                android:text="Player 2"
+                android:text="@string/name2_options_edittext"
                 android:hint="@string/name_options_edittext" />
+
+            <ToggleButton
+                android:id="@+id/two_players_options_togglebutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOn="@string/controller_options_togglebutton_on"
+                android:textOff="@string/controller_options_togglebutton_off"/>
 
         </LinearLayout>
 
@@ -78,8 +91,15 @@
             <EditText
                 android:id="@+id/three_players_options_edittext"
                 style="@style/EditTextStyle"
-                android:text="Player 3"
+                android:text="@string/name3_options_edittext"
                 android:hint="@string/name_options_edittext" />
+
+            <ToggleButton
+                android:id="@+id/three_players_options_togglebutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOn="@string/controller_options_togglebutton_on"
+                android:textOff="@string/controller_options_togglebutton_off"/>
 
         </LinearLayout>
 
@@ -101,8 +121,15 @@
             <EditText
                 android:id="@+id/four_players_options_edittext"
                 style="@style/EditTextStyle"
-                android:text="Player 4"
+                android:text="@string/name4_options_edittext"
                 android:hint="@string/name_options_edittext" />
+
+            <ToggleButton
+                android:id="@+id/four_players_options_togglebutton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOn="@string/controller_options_togglebutton_on"
+                android:textOff="@string/controller_options_togglebutton_off"/>
 
         </LinearLayout>
 
