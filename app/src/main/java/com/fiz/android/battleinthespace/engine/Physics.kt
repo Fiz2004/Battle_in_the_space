@@ -103,14 +103,14 @@ object Physics {
         }
     }
 
-    fun changeXifBorder(centerX: Double): Double {
+    private fun changeXifBorder(centerX: Double): Double {
         return when {
             (centerX < 0.0) -> centerX + width
             else -> centerX
         }
     }
 
-    fun changeYifBorder(centerY: Double): Double {
+    private fun changeYifBorder(centerY: Double): Double {
         return when {
             (centerY < 0.0) -> centerY + height
             else -> centerY

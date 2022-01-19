@@ -26,8 +26,8 @@ class Bullet(
         fun create(spaceShips: MutableList<SpaceShip>, player: Int): Bullet {
             val spaceship=spaceShips[player]
             val center = Vec(
-                spaceship.center.x + spaceship.size * cos(spaceship.angleToRadians),
-                spaceship.center.y + spaceship.size * sin(spaceship.angleToRadians))
+                spaceship.center.x + (spaceship.halfSize) * cos(spaceship.angleToRadians),
+                spaceship.center.y + (spaceship.halfSize) * sin(spaceship.angleToRadians))
             val speed = Vec(
                 SPEED_MAX * cos(spaceship.angleToRadians),
                 SPEED_MAX * sin(spaceship.angleToRadians))

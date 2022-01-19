@@ -30,8 +30,8 @@ class Meteorite(
 
         return Meteorite(
             Vec(
-                center.x + (size / 2) * sign(cos(currentAngleToRadians)),
-                center.y + (size / 2) * sign(sin(currentAngleToRadians))),
+                center.x + halfSize * sign(cos(currentAngleToRadians)),
+                center.y + halfSize * sign(sin(currentAngleToRadians))),
             angle = angleDestroy - angleCreate,
             speed = Vec(
                 1.2 * currentSpeed * cos(currentAngleToRadians),

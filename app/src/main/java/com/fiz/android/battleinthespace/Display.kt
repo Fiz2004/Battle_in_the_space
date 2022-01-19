@@ -192,11 +192,14 @@ class Display(
                 val x = Physics.changeXifBorderTop(n.toDouble())
                 val y = Physics.changeYifBorderTop(k.toDouble())
                 val background = state.level.backgrounds[x.toInt()][y.toInt()]
+
+                val xStartDst = (n - viewport.left).toFloat() * sizeUnit
+                val yStartDst = (k - viewport.top).toFloat() * sizeUnit
                 val rectDst = RectF(
-                    (n - viewport.left).toFloat() * sizeUnit,
-                    (k - viewport.top).toFloat() * sizeUnit,
-                    (n - viewport.left).toFloat() * sizeUnit + sizeUnit,
-                    (k - viewport.top).toFloat() * sizeUnit + sizeUnit
+                    xStartDst,
+                    yStartDst,
+                    xStartDst + sizeUnit,
+                    yStartDst + sizeUnit
                 )
 
                 canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
@@ -413,23 +416,33 @@ class Display(
         paintFont.alpha=80
         paintFont.strokeWidth = 6F
 
-        if (controller.leftSide.touch)
+        val a= IntArray(2)
+        surface.getLocationOnScreen(a)
+        val left=a[0]
+        val top=a[1]
+
+        var cx = controller.leftSide.point.x.toFloat()-left
+        var cy = controller.leftSide.point.y.toFloat()-top
+        if (controller.leftSide.touch) {
             canvas.drawCircle(
-                surface.left + controller.leftSide.point.x.toFloat(),
-                surface.top + controller.leftSide.point.y.toFloat()-controller.widthJoystick,
+                cx,
+                cy,
                 controller.widthJoystick,
                 paintFont
             )
+        }
 
         paintFont.color = Color.GREEN
         paintFont.style = Paint.Style.FILL;
-        paintFont.alpha=80
-        paintFont.strokeWidth = 10F
+        paintFont.alpha=40
+        paintFont.strokeWidth = 30F
+        cx+=controller.widthJoystick*controller.power*cos(controller.angle/ 180.0 * Math.PI).toFloat()
+        cy+=controller.widthJoystick*controller.power*sin(controller.angle/ 180.0 * Math.PI).toFloat()
         if (controller.leftSide.touch)
             canvas.drawCircle(
-                (surface.left + controller.leftSide.point.x.toFloat()+controller.widthJoystick*controller.power*cos(controller.angle/ 180.0 * Math.PI)).toFloat(),
-                (surface.top + controller.leftSide.point.y.toFloat()+controller.widthJoystick*controller.power*sin(controller.angle/ 180.0 * Math.PI)-controller.widthJoystick).toFloat(),
-                10F,
+                cx,
+                cy,
+                30F,
                 paintFont
             )
     }

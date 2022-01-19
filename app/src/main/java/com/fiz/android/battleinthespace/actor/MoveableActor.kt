@@ -2,6 +2,7 @@ package com.fiz.android.battleinthespace.actor
 
 import com.fiz.android.battleinthespace.engine.*
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.sign
 
 open class MoveableActor(
@@ -14,7 +15,7 @@ open class MoveableActor(
     var angleSpeed: Double=0.0
 
     // Устанавливается по форме
-    var density=1.0
+    private var density=1.0
     // масса
     private var weight: Double=Math.PI /** (size/2) * (size/2)*/ *density
 
@@ -22,7 +23,7 @@ open class MoveableActor(
     var inverseWeight: Double=1.0 / weight
 
     // момент инерции
-    private var momentInertia: Double=weight * (size/2) * (size/2)/1000000000000000
+    private var momentInertia: Double=weight * halfSize.pow(2) /1000000000000000
 
     // обратная инерция
     var inverseMomentInertia: Double=1.0 / momentInertia

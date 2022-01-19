@@ -108,8 +108,8 @@ class Controller(
                 if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0
             )
 
-            val tempPower = delta.length() / widthJoystick
-            power = (if (tempPower > 1) 1.0 else power).toFloat()
+            val tempPower = delta.length() / (widthJoystick*3)
+            power = (if (tempPower > 1) 1.0 else tempPower).toFloat()
 
             angle = (atan2(delta.y, delta.x) * 180 / Math.PI).toFloat()
         }

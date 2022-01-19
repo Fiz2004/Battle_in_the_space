@@ -9,7 +9,7 @@ class Collision(var actor1: MoveableActor, var actor2: MoveableActor) {
     // Вычислить вектор поступательного движения, который является нормальным
     private val normalVec: Vec = actor2.center - actor1.center
     private val distSqr: Double = normalVec.sumPow2()
-    private val radius: Double = actor1.size / 2 + actor2.size / 2
+    private val radius: Double = actor1.halfSize + actor2.halfSize
     private val distance: Double = sqrt(distSqr)
 
     // Глубина проникновения от столкновения
@@ -19,7 +19,7 @@ class Collision(var actor1: MoveableActor, var actor2: MoveableActor) {
     var normal: Vec = normalVec / distance
 
     // Точки соприкосновения во время столкновения
-    var contact: Vec = normal * actor1.size / 2.0 + actor1.center
+    var contact: Vec = normal * actor1.halfSize + actor1.center
 
     // Смешанная реституция
     // Рассчитать среднюю реституцию
