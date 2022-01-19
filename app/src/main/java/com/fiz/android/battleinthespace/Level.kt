@@ -39,7 +39,7 @@ class Level(
             angle = 225.0
         )
     )
-    private var lineRespawn: MutableList<SpaceShip> = mutableListOf()
+    private var lineSpaceShipsOnRespawn: MutableList<SpaceShip> = mutableListOf()
 
     private var scores: MutableList<Int> = mutableListOf()
 
@@ -81,14 +81,14 @@ class Level(
     }
 
     private fun createMeteorite() {
-        var x=0
+        var x = 0
         while (true) {
             val dx = (0 until width.toInt()).shuffled().first().toDouble()
             val dy = (0 until height.toInt()).shuffled().first().toDouble()
             if (isCreateMeteoriteWithoutOverlap(dx, dy))
                 return
-            x+=1
-            if (x>1000) throw Error("Превышено время ожидания функции createMeteorite")
+            x += 1
+            if (x > 1000) throw Error("Превышено время ожидания функции createMeteorite")
         }
     }
 
@@ -166,14 +166,9 @@ class Level(
             if (spaceShip.inGame)
                 spaceShip.update(deltaTime, width, height)
 
-        val lineRespawnDestroy: MutableList<SpaceShip> = mutableListOf()
-        for (spaceShip in lineRespawn)
-            if (spaceShip.isCanRespawnFromTime(deltaTime))
-                if (respawnCheck(spaceShip))
-                    lineRespawnDestroy.add(spaceShip)
-
-        for (spaceShip in lineRespawnDestroy)
-            lineRespawn.remove(spaceShip)
+        lineSpaceShipsOnRespawn = lineSpaceShipsOnRespawn.filterNot { spaceShips ->
+            spaceShips.isCanRespawnFromTime(deltaTime) && respawnCheck(spaceShips)
+        }.toMutableList()
 
         collisionSpaceShips()
     }
@@ -207,7 +202,8 @@ class Level(
         for (n in 0 until (countPlayers - 1))
             for (k in (n + 1) until countPlayers)
                 if (spaceShips[n].inGame && spaceShips[k].inGame
-                        && overlap(spaceShips[n], spaceShips[k]))
+                    && overlap(spaceShips[n], spaceShips[k])
+                )
                     kickback(spaceShips[n], spaceShips[k])
     }
 
@@ -234,7 +230,7 @@ class Level(
             if (spaceShip.inGame)
                 for (bullet in bullets)
                     if (overlap(bullet, spaceShip)
-                            && spaceShips.indexOf(spaceShip) != bullet.player
+                        && spaceShips.indexOf(spaceShip) != bullet.player
                     ) {
                         kickback(spaceShip, bullet)
 
@@ -276,7 +272,7 @@ class Level(
     }
 
     private fun collisionMeteoriteBulletsSpaceShips() {
-        val mapMeteoritesDestroyAndAngle: MutableMap<Meteorite,Double> = mutableMapOf()
+        val mapMeteoritesDestroyAndAngle: MutableMap<Meteorite, Double> = mutableMapOf()
 
         val listBulletDestroy: MutableList<Bullet> = mutableListOf()
         for (meteorite in meteorites)
@@ -297,7 +293,7 @@ class Level(
     }
 
     private fun spaceShipDestroy(
-        mapMeteoritesDestroyAndAngle: MutableMap<Meteorite,Double>
+        mapMeteoritesDestroyAndAngle: MutableMap<Meteorite, Double>
     ) {
         for (spaceShip in spaceShips)
             for (meteorite in meteorites)
@@ -305,7 +301,7 @@ class Level(
                     lifes[spaceShips.indexOf(spaceShip)] -= 1
                     spaceShip.inGame = false
                     if (lifes[spaceShips.indexOf(spaceShip)] > 0)
-                        lineRespawn.add(spaceShip)
+                        lineSpaceShipsOnRespawn.add(spaceShip)
                     mapMeteoritesDestroyAndAngle[meteorite] = spaceShip.angle
 
                     animationSpaceShipDestroys.add(AnimationDestroy(spaceShip))
@@ -313,11 +309,11 @@ class Level(
     }
 
     private fun meteoritesDestroy(
-        mapMeteoritesDestroyAndAngle: MutableMap<Meteorite,Double>
+        mapMeteoritesDestroyAndAngle: MutableMap<Meteorite, Double>
     ) {
         val listMeteoritesFullDestroy: MutableList<Meteorite> = mutableListOf()
 
-        for ((meteoriteDestroy,angleDestroy ) in mapMeteoritesDestroyAndAngle.entries) {
+        for ((meteoriteDestroy, angleDestroy) in mapMeteoritesDestroyAndAngle.entries) {
             listMeteoritesFullDestroy.add(meteoriteDestroy)
             if (meteoriteDestroy.viewSize + 1 > 3)
                 continue
