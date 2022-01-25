@@ -138,11 +138,13 @@ class ListActors(
             for (bullet in bullets)
                 bullet.update(deltaTime, width, height)
 
-            val listBulletDestroy: MutableList<Bullet> = mutableListOf()
-            findCollisionSpaceShipsBulletsAndKickbackAndStartAnimation()
-            listBulletDestroy += getCollisionBulletBullet()
-            for (bullet in listBulletDestroy)
-                bullets.remove(bullet)
+            findCollisionSpaceShipsBulletsAndKickbackAndMarkThem()
+            findCollisionBulletBulletAndMarkThem()
+
+            bullets.filter { !it.inGame }.forEach {
+                listAnimationDestroy.add(BulletAnimationDestroy(it))
+            }
+            bullets = bullets.filter { it.inGame }.toMutableList()
 
             bullets = bullets.filter {
                 it.roadLength <= Bullet.roadLengthMax
@@ -150,12 +152,12 @@ class ListActors(
         }
     }
 
-    private fun findCollisionSpaceShipsBulletsAndKickbackAndStartAnimation() {
+    private fun findCollisionSpaceShipsBulletsAndKickbackAndMarkThem() {
         bullets.filter { bullet ->
             val spaceShipsIsCollisionBullet = getSpaceShipsIsCollision(bullet)
             spaceShipsIsCollisionBullet.forEach { spaceShip ->
                 kickback(spaceShip, bullet)
-                listAnimationDestroy.add(BulletAnimationDestroy(bullet))
+                bullet.inGame = false
             }
 
             spaceShipsIsCollisionBullet.isEmpty()
@@ -168,19 +170,14 @@ class ListActors(
         }
     }
 
-    private fun getCollisionBulletBullet(): MutableList<Bullet> {
-        val result: MutableList<Bullet> = mutableListOf()
-
+    private fun findCollisionBulletBulletAndMarkThem() {
         createCombinations(bullets)
             .filter { overlap(it.first, it.second) }
             .forEach {
-                listAnimationDestroy.add(BulletAnimationDestroy(it.first))
-                listAnimationDestroy.add(BulletAnimationDestroy(it.second))
-                result.add(it.first)
-                result.add(it.second)
+                it.first.inGame = false
+                it.second.inGame = false
             }
 
-        return result
     }
 
     private fun updateMeteorites(deltaTime: Double) {
@@ -188,9 +185,9 @@ class ListActors(
 
         findCombinationsMeteoritesMetioritesOverlapAndKickback()
 
-        val bulletsIsCollisionMeteorite = getBulletsIsCollisionMeteorite()
+        getBulletsIsCollisionMeteorite()
         totalUpdateScores()
-        addAnimationsDestroyBullet(bulletsIsCollisionMeteorite)
+        addAnimationsDestroyBullet()
 
         val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite()
         updateSpaceShipAfterOverlapMeteoriteFor(spaceShipsIsCollisionMeteorite)
@@ -204,7 +201,7 @@ class ListActors(
             meteorites.remove(it.key)
         }
 
-        bullets = bullets.filterNot { bullet -> bulletsIsCollisionMeteorite.contains(bullet) }.toMutableList()
+        bullets = bullets.filter { it.inGame }.toMutableList()
     }
 
 
@@ -214,12 +211,13 @@ class ListActors(
             .forEach { kickback(it.first, it.second) }
     }
 
-    private fun getBulletsIsCollisionMeteorite(): List<Bullet> {
-        val result = mutableListOf<Bullet>()
+    private fun getBulletsIsCollisionMeteorite() {
         meteorites.forEach { meteorite ->
-            result += bullets.filter { bullet -> overlap(bullet, meteorite) }
+            bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
+                meteorite.inGame = false
+                bullet.inGame = false
+            }
         }
-        return result
     }
 
     private fun totalUpdateScores() {
@@ -238,8 +236,8 @@ class ListActors(
         }
     }
 
-    private fun addAnimationsDestroyBullet(bulletsIsCollisionMeteorite: List<Bullet>) {
-        bulletsIsCollisionMeteorite.forEach { bullet ->
+    private fun addAnimationsDestroyBullet() {
+        bullets.filter { !it.inGame }.forEach { bullet ->
             listAnimationDestroy.add(BulletAnimationDestroy(bullet))
         }
     }
