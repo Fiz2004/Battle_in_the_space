@@ -1,24 +1,28 @@
 package com.fiz.android.battleinthespace.actor
 
+import android.graphics.Bitmap
+import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
 
 interface Drawable {
     var center: Vec
     var angle: Double
     var size: Double
+
+    fun getBitmap(display: Display): Bitmap
 }
 
 abstract class Actor(
-    _center: Vec,
-    _angle: Double,
-    override var size: Double) : Drawable {
+    center: Vec,
+    angle: Double,
+    var size: Double) {
 
     val halfSize
         get() = size / 2
 
-    override var center: Vec = _center.copy()
+    var center: Vec = center.copy()
 
-    override var angle: Double = _angle
+    var angle: Double = angle
         set(value) {
             field = value
             if (value > 360)

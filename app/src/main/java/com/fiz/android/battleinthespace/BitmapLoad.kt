@@ -13,14 +13,14 @@ private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
 
 open class BitmapLoad(private val context: Context) {
-    protected val bmpBackground: Array<Bitmap> by lazy(::initBmpBackground)
-    protected val bmpBullet: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
-    protected val bmpBulletDestroy: Array<Bitmap> by lazy(::initBmpBulletDestroy)
-    protected val bmpMeteorites: Array<Array<Bitmap>> by lazy(::initBmpMeteorite)
-    protected val bmpSpaceship: Array<Bitmap> by lazy(::initBmpSpaceship)
-    protected val bmpSpaceshipFly: Array<Bitmap> by lazy(::initBmpSpaceshipFly)
-    protected val bmpSpaceshipDestroy: Array<Bitmap> by lazy(::initBmpSpaceshipDestroy)
-    protected val bmpSpaceshipLife: Array<Bitmap> by lazy(::initBmpSpaceshipLife)
+    val bmpBackground: Array<Bitmap> by lazy(::initBmpBackground)
+    val bmpBullet: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
+    val bmpBulletDestroy: Array<Bitmap> by lazy(::initBmpBulletDestroy)
+    val bmpMeteorites: Array<Array<Bitmap>> by lazy(::initBmpMeteorite)
+    val bmpSpaceship: Array<Bitmap> by lazy(::initBmpSpaceship)
+    val bmpSpaceshipFly: Array<Bitmap> by lazy(::initBmpSpaceshipFly)
+    val bmpSpaceshipDestroy: Array<Bitmap> by lazy(::initBmpSpaceshipDestroy)
+    val bmpSpaceshipLife: Array<Bitmap> by lazy(::initBmpSpaceshipLife)
     private fun initBmpBackground(): Array<Bitmap> {
         var result: Array<Bitmap> = emptyArray()
         for (i in 1..NUMBER_BITMAP_BACKGROUND)

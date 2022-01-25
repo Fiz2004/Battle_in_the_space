@@ -1,5 +1,7 @@
 package com.fiz.android.battleinthespace.actor
 
+import android.graphics.Bitmap
+import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.NUMBER_BITMAP_METEORITE_OPTION
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.engine.times
@@ -64,5 +66,9 @@ class Meteorite(
                 "size = $size\n" +
                 "viewSize = $viewSize\n" +
                 "view = $view"
+    }
+
+    override fun getBitmap(display: Display): Bitmap {
+        return display.bmpMeteorites[view][viewSize]
     }
 }

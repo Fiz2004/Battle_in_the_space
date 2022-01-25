@@ -3,7 +3,8 @@ package com.fiz.android.battleinthespace
 import android.content.Context
 import android.graphics.*
 import android.view.SurfaceView
-import com.fiz.android.battleinthespace.actor.*
+import com.fiz.android.battleinthespace.actor.Actor
+import com.fiz.android.battleinthespace.actor.SpaceShip
 import com.fiz.android.battleinthespace.engine.Physics
 import kotlin.math.*
 
@@ -86,27 +87,7 @@ class Display(
             if (actor is SpaceShip)
                 if (!actor.inGame)
                     continue
-            drawActor(actor, getbmp(actor))
-        }
-    }
-
-    private fun getbmp(actor: MoveableActor): Bitmap {
-        return when (actor) {
-            is SpaceShip -> {
-                if (actor.isFly)
-                    bmpSpaceshipFly[state.level.listActors.spaceShips.indexOf(state.level.listActors.spaceShips.find { it === actor })]
-                else
-                    bmpSpaceship[state.level.listActors.spaceShips.indexOf(state.level.listActors.spaceShips.find { it === actor })]
-            }
-            is Bullet -> {
-                bmpBullet
-            }
-            is Meteorite -> {
-                bmpMeteorites[actor.view][actor.viewSize]
-            }
-            else -> {
-                throw Error("No Moveable actor")
-            }
+            drawActor(actor, actor.getBitmap(this))
         }
     }
 
@@ -144,12 +125,8 @@ class Display(
     private fun drawAnimationDestroys() {
         for (animationDestroy in state.level.listActors.listAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
-            val frame = NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-
-            if (animationDestroy is BulletAnimationDestroy)
-                drawActor(animationDestroy as Actor, bmpBulletDestroy[frame])
-            else
-                drawActor(animationDestroy as Actor, bmpSpaceshipDestroy[frame])
+            animationDestroy.frame = NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
+            drawActor(animationDestroy as Actor, animationDestroy.getBitmap(this))
         }
     }
 

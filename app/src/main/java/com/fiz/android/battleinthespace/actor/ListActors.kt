@@ -46,7 +46,7 @@ class ListActors(
 
     fun createSpaceShips(countPlayers: Int) {
         for (n in 0 until countPlayers)
-            spaceShips += SpaceShip(respawns[n])
+            spaceShips += SpaceShip(respawns[n], player = n)
     }
 
     fun createMeteorites(countMeteorites: Int) {
@@ -107,7 +107,7 @@ class ListActors(
         if (players[numberPlayer].life > 0) {
             val respawn = respawns.find(::findFreeRespawn)
             if (respawn != null) {
-                spaceShips[numberPlayer] = SpaceShip(respawn)
+                spaceShips[numberPlayer] = SpaceShip(respawn, player = numberPlayer)
                 return true
             }
         }

@@ -1,6 +1,8 @@
 package com.fiz.android.battleinthespace.actor
 
+import android.graphics.Bitmap
 import com.fiz.android.battleinthespace.Controller
+import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
 import kotlin.math.cos
@@ -21,11 +23,12 @@ class SpaceShip(
     size: Double = 1.0,
 
     var inGame: Boolean = true,
-    var isFly: Boolean = false
+    var isFly: Boolean = false,
+    val player: Int = 0
 ) : MoveableActor(
     center, speed, angle, size, SPEED_MAX
 ) {
-    constructor (respawn: Respawn) : this(Vec(respawn.center), angle = respawn.angle)
+    constructor (respawn: Respawn, player: Int) : this(Vec(respawn.center), player = player, angle = respawn.angle)
 
     private var timeRespawn: Double = TIME_RESPAWN_MIN
 
@@ -75,6 +78,14 @@ class SpaceShip(
         val step = INCREASE_SPEED_PER_SECOND * deltaTime * controller.power
 
         speed += Vec(step * cos(angleToRadians), step * sin(angleToRadians))
+    }
+
+    override fun getBitmap(display: Display): Bitmap {
+        return if (isFly)
+            display.bmpSpaceshipFly[player]
+        else
+            display.bmpSpaceship[player]
+
     }
 
 }

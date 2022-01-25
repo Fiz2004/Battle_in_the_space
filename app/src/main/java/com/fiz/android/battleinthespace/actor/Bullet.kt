@@ -1,26 +1,28 @@
 package com.fiz.android.battleinthespace.actor
 
+import android.graphics.Bitmap
+import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-private const val SPEED_MAX:Double = 4.0
+private const val SPEED_MAX: Double = 4.0
 
 class Bullet(
     center: Vec,
 
-    speed:Vec,
+    speed: Vec,
 
     angle: Double,
 
-    size:Double=0.1,
+    size: Double = 0.1,
 
     var roadLength: Double,
 
     var player: Int,
 ) : MoveableActor(
-    center, speed, angle,size, SPEED_MAX
+    center, speed, angle, size, SPEED_MAX
 ) {
     companion object {
         val roadLengthMax = 6
@@ -43,6 +45,10 @@ class Bullet(
 
     override fun update(deltaTime: Double, width: Double, height: Double) {
         super.update(deltaTime, width, height)
-        roadLength += sqrt(speed.sumPow2())*deltaTime
+        roadLength += sqrt(speed.sumPow2()) * deltaTime
+    }
+
+    override fun getBitmap(display: Display): Bitmap {
+        return display.bmpBullet
     }
 }
