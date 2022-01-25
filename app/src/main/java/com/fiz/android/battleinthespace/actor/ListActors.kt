@@ -86,7 +86,6 @@ class ListActors(
         updateMeteorites(deltaTime)
     }
 
-
     private fun updateSpaceShips(deltaTime: Double) {
         for (spaceShip in spaceShips.filter { it.inGame })
             spaceShip.update(deltaTime, width, height)
@@ -159,7 +158,6 @@ class ListActors(
                 kickback(spaceShip, bullet)
                 bullet.inGame = false
             }
-
             spaceShipsIsCollisionBullet.isEmpty()
         }
     }
@@ -204,7 +202,6 @@ class ListActors(
         bullets = bullets.filter { it.inGame }.toMutableList()
     }
 
-
     private fun findCombinationsMeteoritesMetioritesOverlapAndKickback() {
         createCombinations(meteorites)
             .filter { overlap(it.first, it.second) }
@@ -226,13 +223,12 @@ class ListActors(
         }
     }
 
-
     private fun updateScoresFor(
         meteorite: Meteorite,
         meteoriteViewSize: Int
     ) {
         bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
-            players[bullet.player].score += players[bullet.player].score + meteoriteViewSize
+            players[bullet.player].score += meteoriteViewSize
         }
     }
 
@@ -331,7 +327,6 @@ class ListActors(
             actor2.center, actor2.size
         )
     }
-
 
     private fun kickback(moveableActor1: MoveableActor, moveableActor2: MoveableActor) {
         val manifold = Collision(moveableActor1, moveableActor2)
