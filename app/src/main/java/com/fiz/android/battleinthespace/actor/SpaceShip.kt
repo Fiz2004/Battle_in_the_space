@@ -46,25 +46,25 @@ class SpaceShip(
             return
         }
 
-        angle += getSignStepRotate(controller,step)
+        angle += getSignStepRotate(controller, step)
     }
 
-    private fun getSignStepRotate(controller: Controller, step:Double):Double{
-        return if (abs(angle - controller.angle)  > 180)
-            getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller,step)
+    private fun getSignStepRotate(controller: Controller, step: Double): Double {
+        return if (abs(angle - controller.angle) > 180)
+            getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller, step)
         else
-            getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller,step)
+            getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller, step)
     }
 
 
-    private fun getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller: Controller, step:Double):Double{
+    private fun getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller: Controller, step: Double): Double {
         return if (angle > controller.angle)
             step
         else
             -step
     }
 
-    private fun getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller: Controller, step:Double):Double{
+    private fun getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller: Controller, step: Double): Double {
         return if (angle < controller.angle)
             step
         else

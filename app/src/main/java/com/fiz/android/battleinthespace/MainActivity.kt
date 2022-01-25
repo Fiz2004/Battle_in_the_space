@@ -4,46 +4,26 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
-
 
 class MainActivity : AppCompatActivity() {
     private lateinit var newGameButton: Button
     private lateinit var optionsButton: Button
     private lateinit var exitButton: Button
 
-    private class Options {
-        var countPlayers = 4
-        var name: Array<String> = Array(4) {i-> "Player ${i+1}" }
-        var playerControllerPlayer: Array<Boolean> = arrayOf(true,false,false,false)
-    }
+    private lateinit var options: Options
 
-    private val options = Options()
-
-    var mStartForResult = registerForActivityResult(
+    private var mStartForResult = registerForActivityResult(
         StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        options = if (result.resultCode == Activity.RESULT_OK) {
             val intent: Intent? = result.data
-            val countPlayer: Int = intent?.getIntExtra("countPlayers", 1) ?: 1
-            options.countPlayers = countPlayer
-
-            for (n in 0..3)
-                if (countPlayer >= n + 1)
-                    options.name[n] = intent?.getStringExtra("namePlayer${n + 1}").toString()
-
-            for (n in 0..3)
-                if (countPlayer >= n + 1)
-                    options.playerControllerPlayer[n] = intent?.getBooleanExtra("controller${n + 1}", false) ?: false
-
+            intent?.getSerializableExtra(Options::class.java.simpleName) as Options
         } else {
-            options.countPlayers = 1
-            for (n in 0..3)
-                options.playerControllerPlayer[n] = false
+            Options(applicationContext)
         }
     }
 
@@ -55,11 +35,13 @@ class MainActivity : AppCompatActivity() {
         optionsButton = findViewById(R.id.options_main_button)
         exitButton = findViewById(R.id.exit_main_button)
 
-        newGameButton.setOnClickListener { view: View ->
+        options = Options(applicationContext)
+
+        newGameButton.setOnClickListener {
             startActivity(getIntent(this, GameActivity::class.java))
         }
 
-        optionsButton.setOnClickListener { view: View ->
+        optionsButton.setOnClickListener {
             mStartForResult.launch(getIntent(this, OptionsActivity::class.java))
         }
 
@@ -68,14 +50,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putSerializable(Options::class.java.simpleName, options)
+        super.onSaveInstanceState(outState)
+    }
 
-    private fun getIntent(context: Context,classes:Class<*>):Intent {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        options = savedInstanceState.getSerializable(Options::class.java.simpleName) as Options
+    }
+
+
+    private fun getIntent(context: Context, classes: Class<*>): Intent {
         val result = Intent(context, classes)
-        result.putExtra("countPlayers", options.countPlayers)
-        for (n in 0..3)
-            result.putExtra("namePlayer${n + 1}", options.name[n])
-        for (n in 0..3)
-            result.putExtra("controller${n + 1}", options.playerControllerPlayer[n])
+        result.putExtra(Options::class.java.simpleName, options)
         return result
     }
 }

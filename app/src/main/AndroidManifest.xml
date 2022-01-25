@@ -8,19 +8,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:theme="@style/Theme.BattleInTheSpace">
         <activity
             android:name=".OptionsActivity"
-            android:exported="false"
-            android:screenOrientation="landscape"/>
+            android:exported="false" />
         <activity
             android:name=".GameActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:screenOrientation="landscape">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

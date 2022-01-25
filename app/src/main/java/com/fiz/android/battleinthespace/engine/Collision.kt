@@ -5,7 +5,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class Collision(var actor1: MoveableActor, var actor2: MoveableActor) {
+class Collision(private var actor1: MoveableActor, private var actor2: MoveableActor) {
     // Вычислить вектор поступательного движения, который является нормальным
     private val normalVec: Vec = actor2.center - actor1.center
     private val distSqr: Double = normalVec.sumPow2()
@@ -13,13 +13,13 @@ class Collision(var actor1: MoveableActor, var actor2: MoveableActor) {
     private val distance: Double = sqrt(distSqr)
 
     // Глубина проникновения от столкновения
-    var penetration: Double = radius - distance
+    private var penetration: Double = radius - distance
 
     // Из A в B
-    var normal: Vec = normalVec / distance
+    private var normal: Vec = normalVec / distance
 
     // Точки соприкосновения во время столкновения
-    var contact: Vec = normal * actor1.halfSize + actor1.center
+    private var contact: Vec = normal * actor1.halfSize + actor1.center
 
     // Смешанная реституция
     // Рассчитать среднюю реституцию

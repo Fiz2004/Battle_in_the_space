@@ -2,17 +2,23 @@ package com.fiz.android.battleinthespace.actor
 
 import com.fiz.android.battleinthespace.engine.Vec
 
-open class Actor(
+interface Drawable {
+    var center: Vec
+    var angle: Double
+    var size: Double
+}
+
+abstract class Actor(
     _center: Vec,
     _angle: Double,
-    var size: Double) {
+    override var size: Double) : Drawable {
 
     val halfSize
         get() = size / 2
 
-    var center: Vec = _center.copy()
+    override var center: Vec = _center.copy()
 
-    var angle: Double = _angle
+    override var angle: Double = _angle
         set(value) {
             field = value
             if (value > 360)

@@ -1,6 +1,6 @@
 package com.fiz.android.battleinthespace
 
-import android.content.res.Resources
+import android.content.Context
 import android.view.MotionEvent
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
@@ -11,11 +11,28 @@ class Controller(
     _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F,
     var power: Float = 0F,
-    resources: Resources
+    context: Context
 ) {
-    var press: Vec = Vec(0.0, 0.0)
+    class Side {
+        var point: Vec = Vec(0.0, 0.0)
+        var touch: Boolean = false
+        var ID: Int = 0
+    }
 
-    val widthJoystick = 50F * resources.displayMetrics.scaledDensity
+    val leftSide = Side()
+    val rightSide = Side()
+
+    val widthJoystick = 50F * context.resources.displayMetrics.scaledDensity
+
+    var angle: Float = _angle
+        set(value) {
+            field = value
+            if (value > 360)
+                field = value - 360
+            if (value < 0)
+                field = value + 360
+        }
+
     private val sensivity: Vec = Vec(0.0, 0.0)
 
     private var timeBetweenFireMin = _timeBetweenFireMin
@@ -31,24 +48,6 @@ class Controller(
             timeLastFire = 0.0
         return false
     }
-
-    var angle: Float = _angle
-        set(value) {
-            field = value
-            if (value > 360)
-                field = value - 360
-            if (value < 0)
-                field = value + 360
-        }
-
-    class Side {
-        var point: Vec = Vec(0.0, 0.0)
-        var touch: Boolean = false
-        var ID: Int = 0
-    }
-
-    val leftSide = Side()
-    val rightSide = Side()
 
     fun ACTION_DOWN(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
         if (touchLeftSide) {
@@ -79,7 +78,6 @@ class Controller(
         power = 0F
 
         rightSide.touch = false
-        fire = false
     }
 
     fun ACTION_POINTER_UP(event: MotionEvent) {
@@ -90,10 +88,8 @@ class Controller(
             leftSide.touch = false
             power = 0F
         }
-        if (isRightSide) {
+        if (isRightSide)
             rightSide.touch = false
-            fire = false
-        }
     }
 
     fun ACTION_MOVE(event: MotionEvent) {
@@ -108,7 +104,7 @@ class Controller(
                 if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0
             )
 
-            val tempPower = delta.length() / (widthJoystick*3)
+            val tempPower = delta.length() / (widthJoystick * 3)
             power = (if (tempPower > 1) 1.0 else tempPower).toFloat()
 
             angle = (atan2(delta.y, delta.x) * 180 / Math.PI).toFloat()

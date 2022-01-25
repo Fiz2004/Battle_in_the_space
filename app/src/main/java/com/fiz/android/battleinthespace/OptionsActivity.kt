@@ -5,19 +5,22 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatActivity
 
 
 class OptionsActivity : AppCompatActivity() {
-    private var name: Array<String> = Array(4) { "" }
-    private var playerControllerPlayer: Array<Boolean> = arrayOf(true,false,false,false)
 
     private var playersEditTexts: MutableList<EditText> = mutableListOf()
     private var playersRadioButtons: MutableList<RadioButton> = mutableListOf()
     private var playersToggleButtons: MutableList<ToggleButton> = mutableListOf()
 
     private lateinit var exitButton: Button
+
+    private lateinit var options: Options
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,50 +52,57 @@ class OptionsActivity : AppCompatActivity() {
         val extras = intent.extras
 
         if (extras != null) {
-            playersRadioButtons[extras.getInt("countPlayers") - 1].isChecked = true
+            options = extras.getSerializable(Options::class.java.simpleName) as Options
+            playersRadioButtons[options.countPlayers - 1].isChecked = true
 
             for (n in 0..3)
-                name[n] = extras.getString("namePlayer${n + 1}").toString()
+                playersEditTexts[n].setText(options.name[n])
 
             for (n in 0..3)
-                playersEditTexts[n].setText(name[n])
-
-            for (n in 0..3)
-                playerControllerPlayer[n] = extras.getBoolean("controller${n + 1}")
-
-            for (n in 0..3)
-                playersToggleButtons[n].isChecked = playerControllerPlayer[n]
+                playersToggleButtons[n].isChecked = options.playerControllerPlayer[n]
+        } else {
+            options = Options(applicationContext)
         }
 
         for (n in 0..3)
             playersEditTexts[n].addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable) {}
+                override fun afterTextChanged(s: Editable) { /* for lint */
+                }
+
                 override fun beforeTextChanged(
                     s: CharSequence, start: Int,
                     count: Int, after: Int
-                ) {
+                ) { /* for lint */
                 }
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    name[n] = s.toString()
+                    options.name[n] = s.toString()
                 }
             })
 
         exitButton.setOnClickListener {
             val data = Intent()
-            for (n in 0..3)
-                data.putExtra("namePlayer${n + 1}", name[n])
-
-            for (n in 0..3)
-                if (playersRadioButtons[n].isChecked)
-                    data.putExtra("countPlayers", n + 1)
-
-            for (n in 0..3)
-                data.putExtra("controller${n + 1}", playerControllerPlayer[n])
-
+            data.putExtra(Options::class.java.simpleName, options)
             setResult(RESULT_OK, data)
             finish()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putSerializable(Options::class.java.simpleName, options)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        options = savedInstanceState.getSerializable(Options::class.java.simpleName) as Options
+        playersRadioButtons[options.countPlayers - 1].isChecked = true
+
+        for (n in 0..3)
+            playersEditTexts[n].setText(options.name[n])
+
+        for (n in 0..3)
+            playersToggleButtons[n].isChecked = options.playerControllerPlayer[n]
     }
 
     private fun onRadioClick(): (View) -> Unit = {
@@ -106,7 +116,7 @@ class OptionsActivity : AppCompatActivity() {
     private fun onToggleClick(): (View) -> Unit = {
         for (n in 0..3)
             when {
-                (it == playersToggleButtons[n]) -> playerControllerPlayer[n] = playersToggleButtons[n].isChecked
+                (it == playersToggleButtons[n]) -> options.playerControllerPlayer[n] = playersToggleButtons[n].isChecked
             }
     }
 }

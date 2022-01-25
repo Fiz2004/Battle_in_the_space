@@ -1,15 +1,13 @@
 package com.fiz.android.battleinthespace
 
-class State(
-    var countPlayers: Int = 4,
-    var namePlayers: List<String> = listOf("Player 1", "Player 2", "Player 3", "Player 4"),
-) {
+import com.fiz.android.battleinthespace.actor.Player
+import java.io.Serializable
+
+class State(var options: Options) : Serializable {
     lateinit var level: Level
     var round: Int = 1
     var status: String = "playing"
-    var mainPlayer: Int = 0
-
-    var scores: MutableList<Int> = mutableListOf()
+    var players: MutableList<Player> = MutableList(options.countPlayers) { Player() }
 
     init {
         newGame()
@@ -19,26 +17,22 @@ class State(
         round = 0
         newRound()
 
-        scores.clear()
-        for (n in 0 until countPlayers)
-            scores.add(0)
+        for (player in players)
+            player.newGame()
+        players[0].main = true
     }
 
     private fun newRound() {
         round += 1
 
-        level = Level(20.0, 20.0,countPlayers, round)
+        level = Level(10.0, 10.0, options.countPlayers, round, players)
     }
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
-        if (!level.update(controller,deltaTime))
-            newRound()
+        val levelStatus = level.update(controller, deltaTime)
 
-        if (scores.isNotEmpty()) {
-            val tempScores = level.getScoresForUpdate()
-            for (n in scores.indices)
-                scores[n] += tempScores[n]
-        }
+        if (!levelStatus)
+            newRound()
 
         if (round == 11)
             return false

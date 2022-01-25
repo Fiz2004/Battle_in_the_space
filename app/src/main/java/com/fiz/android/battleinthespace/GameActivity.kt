@@ -9,7 +9,7 @@ import android.view.Window
 import android.widget.Button
 import com.fiz.android.battleinthespace.engine.Vec
 
-class GameActivity : Activity() {
+class GameActivity : Activity(), Display.Companion.Listener {
     private var gameThread: GameThread? = null
 
     private lateinit var newGameButton: Button
@@ -19,13 +19,7 @@ class GameActivity : Activity() {
     private lateinit var gameSurfaceView: SurfaceView
     private lateinit var informationSurfaceView: SurfaceView
 
-    class Options {
-        var countPlayers = 4
-        var name: MutableList<String> = MutableList(4) { i -> "Player ${i + 1}" }
-        var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true,false,false,false)
-    }
-
-    private val options = Options()
+    private lateinit var options: Options
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,24 +35,16 @@ class GameActivity : Activity() {
 
         val extras = intent.extras
 
-        if (extras != null)
-            options.countPlayers = extras.getInt("countPlayers")
-
-        for (n in 0 until options.countPlayers)
-            options.name[n] = extras?.getString("namePlayer${n + 1}") ?: "Player ${n + 1}"
-
-        for (n in 0 until options.countPlayers)
-            options.playerControllerPlayer[n] = extras?.getBoolean("controller${n + 1}") ?: false
+        options = if (extras != null)
+            extras.getSerializable(Options::class.java.simpleName) as Options
+        else
+            Options(applicationContext)
 
         gameThread = GameThread(
             gameSurfaceView,
             informationSurfaceView,
-            resources,
-            applicationContext,
-            pauseButton,
-            options.countPlayers,
-            options.name.toList(),
-            options.playerControllerPlayer.toList()
+            options,
+            this
         )
 
         gameThread?.running = true
@@ -130,9 +116,28 @@ class GameActivity : Activity() {
             try {
                 gameThread?.join()
                 retry = false
-            } catch (e: InterruptedException) {
+            } catch (e: InterruptedException) { /* for Lint */
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putSerializable(Options::class.java.simpleName, options)
+        outState.putSerializable(State::class.java.simpleName, gameThread?.state)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        options = savedInstanceState.getSerializable(Options::class.java.simpleName) as Options
+        gameThread?.state = savedInstanceState.getSerializable(State::class.java.simpleName) as State
+    }
+
+    override fun pauseButtonClick(status: String) {
+        if (status == "pause")
+            pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
+        else
+            pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
     }
 
 }

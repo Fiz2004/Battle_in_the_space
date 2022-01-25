@@ -23,14 +23,18 @@ class Bullet(
     center, speed, angle,size, SPEED_MAX
 ) {
     companion object {
+        val roadLengthMax = 6
+
         fun create(spaceShips: MutableList<SpaceShip>, player: Int): Bullet {
-            val spaceship=spaceShips[player]
+            val spaceship = spaceShips[player]
             val center = Vec(
                 spaceship.center.x + (spaceship.halfSize) * cos(spaceship.angleToRadians),
-                spaceship.center.y + (spaceship.halfSize) * sin(spaceship.angleToRadians))
+                spaceship.center.y + (spaceship.halfSize) * sin(spaceship.angleToRadians)
+            )
             val speed = Vec(
                 SPEED_MAX * cos(spaceship.angleToRadians),
-                SPEED_MAX * sin(spaceship.angleToRadians))
+                SPEED_MAX * sin(spaceship.angleToRadians)
+            )
             val angle = spaceship.angle
             val roadLength = 0.0
             return Bullet(center, speed, angle, 0.1, roadLength, player)

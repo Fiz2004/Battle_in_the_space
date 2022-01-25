@@ -1,13 +1,11 @@
 package com.fiz.android.battleinthespace.engine
 
-import kotlin.math.abs
 import kotlin.math.pow
-import kotlin.math.sign
 
 object Physics {
 
-    var width: Double = 0.0
-    var height: Double = 0.0
+    private var width: Double = 0.0
+    private var height: Double = 0.0
 
     fun createWorld(width: Double, height: Double) {
         Physics.width = width
@@ -53,11 +51,15 @@ object Physics {
         val radius2 = (size2 / 2)
         var radius = radius1 + radius2
         radius = radius.pow(2)
-        val globalcenter1 = Vec(if (center1.x - radius1 < 0) center1.x+ width else center1.x,
-            if (center1.y - radius1 < 0) center1.y + height else center1.y)
-        val globalcenter2 = Vec(if (center2.x - radius2 < 0) center2.x + width else center2.x,
-            if (center2.y - radius2 < 0) center2.y + height else center2.y)
-        return radius > (globalcenter1.x - globalcenter2.x).pow(2) + (globalcenter1.y - globalcenter2.y).pow(2)
+        val globalCenter1 = Vec(
+            if (center1.x - radius1 < 0) center1.x + width else center1.x,
+            if (center1.y - radius1 < 0) center1.y + height else center1.y
+        )
+        val globalCenter2 = Vec(
+            if (center2.x - radius2 < 0) center2.x + width else center2.x,
+            if (center2.y - radius2 < 0) center2.y + height else center2.y
+        )
+        return radius > (globalCenter1.x - globalCenter2.x).pow(2) + (globalCenter1.y - globalCenter2.y).pow(2)
     }
 
     fun overlapRectangle(
@@ -96,7 +98,7 @@ object Physics {
     ): List<Double> {
         return when {
             (centerY1 < 0.0) || (centerY2 < 0.0) -> listOf(
-                centerY1+ height,
+                centerY1 + height,
                 centerY2 + height
             )
             else -> listOf(centerY1, centerY2)
@@ -120,7 +122,7 @@ object Physics {
     fun changeXifBorderTop(centerX: Double): Double {
         return when {
             (centerX < 0.0) -> centerX + width
-            (centerX >=width) -> centerX - width
+            (centerX >= width) -> centerX - width
             else -> centerX
         }
     }
@@ -128,7 +130,7 @@ object Physics {
     fun changeYifBorderTop(centerY: Double): Double {
         return when {
             (centerY < 0.0) -> centerY + height
-            (centerY >=height) -> centerY - height
+            (centerY >= height) -> centerY - height
             else -> centerY
         }
     }

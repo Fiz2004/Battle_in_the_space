@@ -8,6 +8,7 @@
     <string name="two_players_options_radiobutton">2 Players</string>
     <string name="three_players_options_radiobutton">3 Players</string>
     <string name="four_players_options_radiobutton">4 Players</string>
+    <string name="player">Player</string>
     <string-array name="players_options_radiobutton">
         <item>1 Player</item>
         <item>2 Players</item>

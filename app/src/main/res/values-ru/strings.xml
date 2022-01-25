@@ -24,4 +24,5 @@
     <string name="pause_game_button">Пауза</string>
     <string name="resume_game_button">Продолжить</string>
     <string name="exit_game_button">Выход</string>
+    <string name="player">Игрок</string>
 </resources>

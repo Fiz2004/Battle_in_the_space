@@ -1,33 +1,25 @@
 package com.fiz.android.battleinthespace
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Canvas
 import android.view.SurfaceView
-import android.widget.Button
 import kotlin.math.min
 
 class GameThread(
     private val surface: SurfaceView,
     private val informationSurface: SurfaceView,
-    resources: Resources,
+    private val options: Options,
     context: Context,
-    pauseButton: Button,
-    val countPlayers:Int,
-    val name:List<String>,
-    val playerControllerPlayer: List<Boolean>
 ) : Thread() {
-    var state = State(countPlayers,name)
-    val controller: Array<Controller> = Array(4) { Controller(resources=resources) }
+    var state = State(options)
+    val controller: Array<Controller> = Array(4) { Controller(context = context) }
 
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
 
     private val display = Display(
-        resources,
-        context,
-        pauseButton,
-        surface
+        surface,
+        context
     )
 
     var running = false
@@ -50,7 +42,7 @@ class GameThread(
             canvas = surface.holder.lockCanvas()
             if (canvas == null) return
             synchronized(surface.holder) {
-                display.render(state, controller[0],canvas)
+                display.render(state, controller[0], canvas)
             }
 
             informationCanvas = informationSurface.holder.lockCanvas()
@@ -69,7 +61,7 @@ class GameThread(
 
     private fun stateUpdate() {
         val now = System.currentTimeMillis()
-        val deltaTime = min(now - prevTime, 100).toInt()/1000.0
+        val deltaTime = min(now - prevTime, 100).toInt() / 1000.0
 
         if (state.status != "pause") {
             var status = true
@@ -81,7 +73,7 @@ class GameThread(
         }
 
         if (ending < 0 || state.status == "new game") {
-            state = State(countPlayers,name)
+            state = State(options)
             ending = 1.0
         }
 
