@@ -6,6 +6,7 @@ import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.sign
 import kotlin.math.sin
 
 private const val SPEED_ANGLE_PER_SECOND: Double = 200.0
@@ -41,41 +42,36 @@ class SpaceShip(
         return false
     }
 
-    fun moveRotate(deltaTime: Double, controller: Controller) {
+    fun moveRotate(deltaTime: Double, needAngle: Double) {
         val step = SPEED_ANGLE_PER_SECOND * deltaTime
 
-        if (abs(angle - controller.angle) < step) {
-            angle = controller.angle.toDouble()
+        if (abs(angle - needAngle) < step || abs(angle - needAngle) > 360 - step) {
+            angle = needAngle
             return
         }
 
-        angle += getSignStepRotate(controller, step)
+        angle += getSignStepRotate(needAngle) * step
     }
 
-    private fun getSignStepRotate(controller: Controller, step: Double): Double {
-        return if (abs(angle - controller.angle) > 180)
-            getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller, step)
+    private fun getSignStepRotate(needAngle: Double): Double {
+        return if (abs(angle - needAngle) > 180)
+            getSignIfCounterClockwise(needAngle)
         else
-            getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller, step)
+            getSignIfClockwise(needAngle)
     }
 
 
-    private fun getStepRotateIfAbsAngleMinusControllerAngleCompareTo180(controller: Controller, step: Double): Double {
-        return if (angle > controller.angle)
-            step
-        else
-            -step
+    private fun getSignIfCounterClockwise(needAngle: Double): Double {
+        return sign(angle - needAngle)
     }
 
-    private fun getStepRotateIf180CompareToAbsAngleMinusControllerAngle(controller: Controller, step: Double): Double {
-        return if (angle < controller.angle)
-            step
-        else
-            -step
+    private fun getSignIfClockwise(needAngle: Double): Double {
+        return sign(needAngle - angle)
     }
 
     fun moveForward(deltaTime: Double, controller: Controller) {
         val step = INCREASE_SPEED_PER_SECOND * deltaTime * controller.power
+        isFly = controller.power != 0F
 
         speed += Vec(step * cos(angleToRadians), step * sin(angleToRadians))
     }

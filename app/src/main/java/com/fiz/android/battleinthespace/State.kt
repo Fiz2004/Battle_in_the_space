@@ -25,7 +25,7 @@ class State(var options: Options) : Serializable {
     private fun newRound() {
         round += 1
 
-        level = Level(10.0, 10.0, options.countPlayers, round, players)
+        level = Level(20.0, 20.0, options.countPlayers, round, players)
     }
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {

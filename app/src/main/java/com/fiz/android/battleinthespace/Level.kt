@@ -47,19 +47,13 @@ class Level(
     }
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
-        for (player in 0 until countPlayers) {
-            if (controller[player].power != 0F) {
-                listActors.spaceShips[player].isFly = true
-                updateMoveRotate(player, deltaTime, controller[player])
-                updateMoveForward(player, deltaTime, controller[player])
-            } else {
-                listActors.spaceShips[player].isFly = false
-            }
-            if (controller[player].fire && controller[player].isCanFire(deltaTime)) {
-                updatePressFire(player, deltaTime)
-                // Сделано чтобы хотя бы один раз был выстрел, надо перенести это в контроллер
-                if (!controller[player].rightSide.touch)
-                    controller[player].fire = false
+        for (spaceShip in listActors.spaceShips) {
+            spaceShip.moveRotate(deltaTime, controller[spaceShip.player].angle.toDouble())
+            spaceShip.moveForward(deltaTime, controller[spaceShip.player])
+
+            if (controller[spaceShip.player].isCanFire(deltaTime)) {
+                if (spaceShip.inGame)
+                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.player)
             }
         }
 
@@ -78,16 +72,4 @@ class Level(
         return true
     }
 
-    private fun updateMoveRotate(numberPlayer: Int, deltaTime: Double, controller: Controller) {
-        listActors.spaceShips[numberPlayer].moveRotate(deltaTime, controller)
-    }
-
-    private fun updateMoveForward(numberPlayer: Int, deltaTime: Double, controller: Controller) {
-        listActors.spaceShips[numberPlayer].moveForward(deltaTime, controller)
-    }
-
-    private fun updatePressFire(numberPlayer: Int, deltaTime: Double) {
-        if (listActors.spaceShips[numberPlayer].inGame)
-            listActors.bullets += Bullet.create(listActors.spaceShips, numberPlayer)
-    }
 }

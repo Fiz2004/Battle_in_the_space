@@ -8,10 +8,10 @@ import kotlin.math.atan2
 
 class Controller(
     var fire: Boolean = false,
-    _timeBetweenFireMin: Double = 0.250,
-    _angle: Float = 0F,
     var power: Float = 0F,
-    context: Context
+    context: Context,
+    _timeBetweenFireMin: Double = 0.250,
+    _angle: Float = 0F
 ) {
     class Side {
         var point: Vec = Vec(0.0, 0.0)
@@ -27,7 +27,7 @@ class Controller(
     var angle: Float = _angle
         set(value) {
             field = value
-            if (value > 360)
+            if (value >= 360)
                 field = value - 360
             if (value < 0)
                 field = value + 360
@@ -39,8 +39,12 @@ class Controller(
     private var timeLastFire: Double = 0.0
 
     fun isCanFire(deltaTime: Double): Boolean {
+        if (!fire) return false
+
         if (timeLastFire == 0.0) {
             timeLastFire = timeBetweenFireMin
+            if (!rightSide.touch)
+                fire = false
             return true
         }
         timeLastFire -= deltaTime
@@ -49,7 +53,7 @@ class Controller(
         return false
     }
 
-    fun ACTION_DOWN(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
+    fun down(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
         if (touchLeftSide) {
             leftSide.point = point.copy()
             leftSide.touch = true
@@ -60,7 +64,7 @@ class Controller(
         }
     }
 
-    fun ACTION_POINTER_DOWN(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
+    fun pointerDown(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
         if (!leftSide.touch && touchLeftSide) {
             leftSide.point = point.copy()
             leftSide.touch = true
@@ -73,14 +77,14 @@ class Controller(
         }
     }
 
-    fun ACTION_UP() {
+    fun up() {
         leftSide.touch = false
         power = 0F
 
         rightSide.touch = false
     }
 
-    fun ACTION_POINTER_UP(event: MotionEvent) {
+    fun powerUp(event: MotionEvent) {
         val pointerIndex = event.actionIndex
         val isLeftSide = event.findPointerIndex(pointerIndex) == leftSide.ID
         val isRightSide = event.findPointerIndex(pointerIndex) == rightSide.ID
@@ -92,7 +96,7 @@ class Controller(
             rightSide.touch = false
     }
 
-    fun ACTION_MOVE(event: MotionEvent) {
+    fun move(event: MotionEvent) {
         if (leftSide.touch) {
             val point = Vec(
                 event.getX(event.findPointerIndex(leftSide.ID)).toDouble(),

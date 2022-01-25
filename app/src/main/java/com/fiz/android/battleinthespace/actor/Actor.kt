@@ -25,7 +25,7 @@ abstract class Actor(
     var angle: Double = angle
         set(value) {
             field = value
-            if (value > 360)
+            if (value >= 360)
                 field = value - 360
             if (value < 0)
                 field = value + 360

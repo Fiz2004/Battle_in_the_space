@@ -89,16 +89,16 @@ class GameActivity : Activity(), Display.Companion.Listener {
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> gameThread?.controller?.get(0)?.ACTION_DOWN(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_DOWN -> gameThread?.controller?.get(0)?.down(touchLeftSide, point, pointerId)
             // последующие касания
             MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controller?.get(0)
-                ?.ACTION_POINTER_DOWN(touchLeftSide, point, pointerId)
+                ?.pointerDown(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> gameThread?.controller?.get(0)?.ACTION_UP()
+            MotionEvent.ACTION_UP -> gameThread?.controller?.get(0)?.up()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> gameThread?.controller?.get(0)?.ACTION_POINTER_UP(event)
+            MotionEvent.ACTION_POINTER_UP -> gameThread?.controller?.get(0)?.powerUp(event)
             // движение
-            MotionEvent.ACTION_MOVE -> gameThread?.controller?.get(0)?.ACTION_MOVE(event)
+            MotionEvent.ACTION_MOVE -> gameThread?.controller?.get(0)?.move(event)
         }
 
         return super.onTouchEvent(event)
