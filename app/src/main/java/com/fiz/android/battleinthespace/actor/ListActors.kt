@@ -189,7 +189,7 @@ class ListActors(
         findCombinationsMeteoritesMetioritesOverlapAndKickback()
 
         val bulletsIsCollisionMeteorite = getBulletsIsCollisionMeteorite()
-        totalUpdateScores(bulletsIsCollisionMeteorite)
+        totalUpdateScores()
         addAnimationsDestroyBullet(bulletsIsCollisionMeteorite)
 
         val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite()
@@ -222,9 +222,9 @@ class ListActors(
         return result
     }
 
-    private fun totalUpdateScores(bulletsIsCollisionMeteorite: List<Bullet>) {
+    private fun totalUpdateScores() {
         meteorites.forEach { meteorite ->
-            updateScoresFor(meteorite, meteorite.viewSize)
+            updateScoresFor(meteorite, meteorite.viewSize + 1)
         }
     }
 

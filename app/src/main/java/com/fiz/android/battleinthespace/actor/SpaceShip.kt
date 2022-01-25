@@ -23,11 +23,11 @@ class SpaceShip(
 
     size: Double = 1.0,
 
-    var inGame: Boolean = true,
+    inGame: Boolean = true,
     var isFly: Boolean = false,
     val player: Int = 0
 ) : MoveableActor(
-    center, speed, angle, size, SPEED_MAX
+    center, speed, angle, size, inGame, SPEED_MAX
 ) {
     constructor (respawn: Respawn, player: Int) : this(Vec(respawn.center), player = player, angle = respawn.angle)
 

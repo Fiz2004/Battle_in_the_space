@@ -13,8 +13,9 @@ class State(var options: Options) : Serializable {
         newGame()
     }
 
-    private fun newGame() {
+    fun newGame() {
         round = 0
+        status = "playing"
         newRound()
 
         for (player in players)

@@ -12,6 +12,7 @@ abstract class MoveableActor(
     _speed: Vec,
     angle: Double,
     size: Double,
+    var inGame: Boolean = true,
     private var speedMax: Double
 ) : Actor(center, angle, size), Drawable {
     var angleSpeed: Double = 0.0

@@ -8,11 +8,24 @@ import kotlin.math.min
 class GameThread(
     private val surface: SurfaceView,
     private val informationSurface: SurfaceView,
-    private val options: Options,
+    options: Options,
     context: Context,
 ) : Thread() {
-    var state = State(options)
-    val controller: Array<Controller> = Array(4) { Controller(context = context) }
+    lateinit var state: com.fiz.android.battleinthespace.State
+
+    init {
+        createState(State(options))
+    }
+
+    val controllers: Array<Controller> = Array(options.countPlayers) { Controller(context = context) }
+
+    var ai: Array<AI> = Array(options.countPlayers) { AI(state) }
+
+    init {
+        for (n in 0 until options.countPlayers)
+            if (!options.playerControllerPlayer[n])
+                ai += AI(state)
+    }
 
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
@@ -28,8 +41,17 @@ class GameThread(
     override fun run() {
         while (running) {
             if (!pause) {
+                AIUpdate()
                 stateUpdate()
                 displayUpdate()
+            }
+        }
+    }
+
+    private fun AIUpdate() {
+        for ((index, player) in state.players.withIndex()) {
+            if (!player.main) {
+                ai[index].update(controllers[index])
             }
         }
     }
@@ -42,7 +64,7 @@ class GameThread(
             canvas = surface.holder.lockCanvas()
             if (canvas == null) return
             synchronized(surface.holder) {
-                display.render(state, controller[0], canvas)
+                display.render(state, controllers[0], canvas)
             }
 
             informationCanvas = informationSurface.holder.lockCanvas()
@@ -66,17 +88,21 @@ class GameThread(
         if (state.status != "pause") {
             var status = true
             if (ending == 1.0)
-                status = state.update(controller, deltaTime)
+                status = state.update(controllers, deltaTime)
 
             if (!status || ending != 1.0)
                 ending -= deltaTime
         }
 
         if (ending < 0 || state.status == "new game") {
-            state = State(options)
+            state.newGame()
             ending = 1.0
         }
 
         prevTime = now
+    }
+
+    fun createState(state: com.fiz.android.battleinthespace.State) {
+        this.state = state
     }
 }

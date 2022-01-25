@@ -19,12 +19,12 @@ class Meteorite(
     angle: Double,
 
     size: Double,
-
+    inGame: Boolean = true,
     var viewSize: Int,
 
     var view: Int
 ) : MoveableActor(
-    center, speed, angle, size, SPEED_MAX
+    center, speed, angle, size, inGame, SPEED_MAX
 ) {
 
     fun createMeteorite(angleDestroy: Double, angleCreate: Double): Meteorite {

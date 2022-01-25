@@ -17,12 +17,12 @@ class Bullet(
     angle: Double,
 
     size: Double = 0.1,
-
+    inGame: Boolean = true,
     var roadLength: Double,
 
     var player: Int,
 ) : MoveableActor(
-    center, speed, angle, size, SPEED_MAX
+    center, speed, angle, size, inGame, SPEED_MAX
 ) {
     companion object {
         val roadLengthMax = 6
@@ -39,7 +39,7 @@ class Bullet(
             )
             val angle = spaceship.angle
             val roadLength = 0.0
-            return Bullet(center, speed, angle, 0.1, roadLength, player)
+            return Bullet(center, speed, angle, 0.1, true, roadLength, player)
         }
     }
 

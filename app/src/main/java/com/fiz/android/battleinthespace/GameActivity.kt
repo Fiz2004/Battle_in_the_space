@@ -89,16 +89,16 @@ class GameActivity : Activity(), Display.Companion.Listener {
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> gameThread?.controller?.get(0)?.down(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_DOWN -> gameThread?.controllers?.get(0)?.down(touchLeftSide, point, pointerId)
             // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controller?.get(0)
+            MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controllers?.get(0)
                 ?.pointerDown(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> gameThread?.controller?.get(0)?.up()
+            MotionEvent.ACTION_UP -> gameThread?.controllers?.get(0)?.up()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> gameThread?.controller?.get(0)?.powerUp(event)
+            MotionEvent.ACTION_POINTER_UP -> gameThread?.controllers?.get(0)?.powerUp(event)
             // движение
-            MotionEvent.ACTION_MOVE -> gameThread?.controller?.get(0)?.move(event)
+            MotionEvent.ACTION_MOVE -> gameThread?.controllers?.get(0)?.move(event)
         }
 
         return super.onTouchEvent(event)
@@ -130,7 +130,7 @@ class GameActivity : Activity(), Display.Companion.Listener {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         options = savedInstanceState.getSerializable(Options::class.java.simpleName) as Options
-        gameThread?.state = savedInstanceState.getSerializable(State::class.java.simpleName) as State
+        gameThread?.createState(savedInstanceState.getSerializable(State::class.java.simpleName) as State)
     }
 
     override fun pauseButtonClick(status: String) {
