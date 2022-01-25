@@ -140,14 +140,7 @@ class ListActors(
             findCollisionSpaceShipsBulletsAndKickbackAndMarkThem()
             findCollisionBulletBulletAndMarkThem()
 
-            bullets.filter { !it.inGame }.forEach {
-                listAnimationDestroy.add(BulletAnimationDestroy(it))
-            }
-            bullets = bullets.filter { it.inGame }.toMutableList()
-
-            bullets = bullets.filter {
-                it.roadLength <= Bullet.roadLengthMax
-            }.toMutableList()
+            destroyBullets()
         }
     }
 
@@ -183,12 +176,7 @@ class ListActors(
 
         findCombinationsMeteoritesMetioritesOverlapAndKickback()
 
-        getBulletsIsCollisionMeteorite()
-        totalUpdateScores()
-        addAnimationsDestroyBullet()
-
         val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite()
-        updateSpaceShipAfterOverlapMeteoriteFor(spaceShipsIsCollisionMeteorite)
         addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite)
 
         val mapMeteoritesDestroyAndAngle: MutableMap<Meteorite, Double> =
@@ -199,7 +187,7 @@ class ListActors(
             meteorites.remove(it.key)
         }
 
-        bullets = bullets.filter { it.inGame }.toMutableList()
+        destroyBullets()
     }
 
     private fun findCombinationsMeteoritesMetioritesOverlapAndKickback() {
@@ -208,34 +196,14 @@ class ListActors(
             .forEach { kickback(it.first, it.second) }
     }
 
-    private fun getBulletsIsCollisionMeteorite() {
-        meteorites.forEach { meteorite ->
-            bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
-                meteorite.inGame = false
-                bullet.inGame = false
-            }
-        }
-    }
-
-    private fun totalUpdateScores() {
-        meteorites.forEach { meteorite ->
-            updateScoresFor(meteorite, meteorite.viewSize + 1)
-        }
-    }
-
-    private fun updateScoresFor(
-        meteorite: Meteorite,
-        meteoriteViewSize: Int
-    ) {
-        bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
-            players[bullet.player].score += meteoriteViewSize
-        }
-    }
-
-    private fun addAnimationsDestroyBullet() {
+    private fun destroyBullets() {
         bullets.filter { !it.inGame }.forEach { bullet ->
             listAnimationDestroy.add(BulletAnimationDestroy(bullet))
         }
+        bullets = bullets.filter { it.inGame }.toMutableList()
+        bullets = bullets.filter {
+            it.roadLength <= Bullet.roadLengthMax
+        }.toMutableList()
     }
 
     private fun getSpaceShipsIsCollisionMeteorite(): List<SpaceShip> {
@@ -247,17 +215,12 @@ class ListActors(
         return result
     }
 
-    private fun updateSpaceShipAfterOverlapMeteoriteFor(spaceShipsIsCollisionMeteorite: List<SpaceShip>) {
+    private fun addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite: List<SpaceShip>) {
         spaceShipsIsCollisionMeteorite.forEach { spaceShip ->
             players[spaceShips.indexOf(spaceShip)].life -= 1
             spaceShip.inGame = false
             if (players[spaceShips.indexOf(spaceShip)].life > 0)
                 lineSpaceShipsOnRespawn.add(spaceShip)
-        }
-    }
-
-    private fun addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite: List<SpaceShip>) {
-        spaceShipsIsCollisionMeteorite.forEach { spaceShip ->
             listAnimationDestroy.add(SpaceShipAnimationDestroy(spaceShip))
         }
     }
@@ -287,6 +250,9 @@ class ListActors(
         val result = mutableMapOf<Meteorite, Double>()
 
         bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
+            meteorite.inGame = false
+            bullet.inGame = false
+            players[bullet.player].score += meteorite.viewSize + 1
             result[meteorite] = bullet.angle
         }
         return result
