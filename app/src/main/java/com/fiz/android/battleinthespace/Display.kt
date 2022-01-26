@@ -65,8 +65,8 @@ class Display(
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
-                val x = Physics.changeXifBorderTop(n.toDouble())
-                val y = Physics.changeYifBorderTop(k.toDouble())
+                val x = Physics.changeCoorIfBorderTop(n.toDouble(), Physics.width)
+                val y = Physics.changeCoorIfBorderTop(k.toDouble(), Physics.height)
                 val background = state.level.backgrounds[x.toInt()][y.toInt()]
 
                 val xStartDst = (n - viewport.left).toFloat() * sizeUnit

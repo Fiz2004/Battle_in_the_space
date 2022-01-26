@@ -1,11 +1,11 @@
 package com.fiz.android.battleinthespace.engine
 
-import kotlin.math.pow
+import kotlin.math.*
 
 object Physics {
 
-    private var width: Double = 0.0
-    private var height: Double = 0.0
+    var width: Double = 0.0
+    var height: Double = 0.0
 
     fun createWorld(width: Double, height: Double) {
         Physics.width = width
@@ -20,14 +20,14 @@ object Physics {
     ): Boolean {
         val halfSize1 = (size1 / 2)
         val halfSize2 = (size2 / 2)
-        val l1 = changeXifBorder(center1.x - halfSize1)
-        val l2 = changeXifBorder(center2.x - halfSize2)
-        val r1 = changeXifBorder(center1.x + halfSize1)
-        val r2 = changeXifBorder(center2.x + halfSize2)
-        val u1 = changeYifBorder(center1.y - halfSize1)
-        val u2 = changeYifBorder(center2.y - halfSize2)
-        val d1 = changeYifBorder(center1.y + halfSize1)
-        val d2 = changeYifBorder(center2.y + halfSize2)
+        val l1 = changeCoorIfBorder(center1.x - halfSize1, width)
+        val l2 = changeCoorIfBorder(center2.x - halfSize2, width)
+        val r1 = changeCoorIfBorder(center1.x + halfSize1, width)
+        val r2 = changeCoorIfBorder(center2.x + halfSize2, width)
+        val u1 = changeCoorIfBorder(center1.y - halfSize1, height)
+        val u2 = changeCoorIfBorder(center2.y - halfSize2, height)
+        val d1 = changeCoorIfBorder(center1.y + halfSize1, height)
+        val d2 = changeCoorIfBorder(center2.y + halfSize2, height)
         val lu1 = l1 in l2..r2 && u1 in u2..d2
         val ru1 = r1 in l2..r2 && u1 in u2..d2
         val ld1 = l1 in l2..r2 && d1 in u2..d2
@@ -70,68 +70,88 @@ object Physics {
     ): Boolean {
         val halfSize1 = (size1 / 2)
         val halfSize2 = (size2 / 2)
-        val (l1, r1) = changeXifDoubleBorder(center1.x - halfSize1, center1.x + halfSize1)
-        val (l2, r2) = changeXifDoubleBorder(center2.x - halfSize2, center2.x + halfSize2)
-        val (u1, d1) = changeYifDoubleBorder(center1.y - halfSize1, center1.y + halfSize1)
-        val (u2, d2) = changeYifDoubleBorder(center2.y - halfSize2, center2.y + halfSize2)
+        val (l1, r1) = changeCoorIfDoubleBorder(center1.x - halfSize1, center1.x + halfSize1, width)
+        val (l2, r2) = changeCoorIfDoubleBorder(center2.x - halfSize2, center2.x + halfSize2, width)
+        val (u1, d1) = changeCoorIfDoubleBorder(center1.y - halfSize1, center1.y + halfSize1, height)
+        val (u2, d2) = changeCoorIfDoubleBorder(center2.y - halfSize2, center2.y + halfSize2, height)
         if ((r1 < l2) || (l1 > r2)) return false
         if ((d1 < u2) || (u1 > d2)) return false
         return true
     }
 
-    private fun changeXifDoubleBorder(
-        centerX1: Double,
-        centerX2: Double
+    private fun changeCoorIfDoubleBorder(
+        center1: Double,
+        center2: Double, border: Double
     ): List<Double> {
         return when {
-            (centerX1 < 0.0) || (centerX2 < 0.0) -> listOf(
-                centerX1 + width,
-                centerX2 + width
+            (center1 < 0.0) || (center2 < 0.0) -> listOf(
+                center1 + border,
+                center2 + border
             )
-            else -> listOf(centerX1, centerX2)
+            else -> listOf(center1, center2)
         }
     }
 
-    private fun changeYifDoubleBorder(
-        centerY1: Double,
-        centerY2: Double
-    ): List<Double> {
+    private fun changeCoorIfBorder(center: Double, border: Double): Double {
         return when {
-            (centerY1 < 0.0) || (centerY2 < 0.0) -> listOf(
-                centerY1 + height,
-                centerY2 + height
-            )
-            else -> listOf(centerY1, centerY2)
+            (center < 0.0) -> center + border
+            else -> center
         }
     }
 
-    private fun changeXifBorder(centerX: Double): Double {
+    fun changeCoorIfBorderTop(center: Double, border: Double): Double {
         return when {
-            (centerX < 0.0) -> centerX + width
-            else -> centerX
+            (center < 0.0) -> center + border
+            (center >= border) -> center - border
+            else -> center
         }
     }
 
-    private fun changeYifBorder(centerY: Double): Double {
-        return when {
-            (centerY < 0.0) -> centerY + height
-            else -> centerY
-        }
+    fun findDistance(center1: Vec, center2: Vec): Double {
+        val distanceX = getMinDistance(center1.x, center2.x, width)
+        val distanceY = getMinDistance(center1.y, center2.y, height)
+        return sqrt(distanceX * distanceX + distanceY * distanceY)
     }
 
-    fun changeXifBorderTop(centerX: Double): Double {
-        return when {
-            (centerX < 0.0) -> centerX + width
-            (centerX >= width) -> centerX - width
-            else -> centerX
-        }
+    private fun getMinDistance(coor1: Double, coor2: Double, border: Double): Double {
+        val base = abs(coor2 - coor1)
+        val reverse1 = abs((border - coor2) - (0 - coor1))
+        val reverse2 = abs((border - coor1) - (0 - coor2))
+        return min(base, min(reverse1, reverse2))
     }
 
-    fun changeYifBorderTop(centerY: Double): Double {
-        return when {
-            (centerY < 0.0) -> centerY + height
-            (centerY >= height) -> centerY - height
-            else -> centerY
+    fun findAngle(center1: Vec, center2: Vec): Double {
+        val baseX = abs(center2.x - center1.x)
+        val reverseX1 = abs((width - center2.x) - (0 - center1.x))
+        val reverseX2 = abs((width - center1.x) - (0 - center2.x))
+        val baseY = abs(center2.y - center1.y)
+        val reverseY1 = abs((height - center2.y) - (0 - center1.y))
+        val reverseY2 = abs((height - center1.y) - (0 - center2.y))
+
+        val cx2 = when {
+            (baseX < reverseX1) && (baseX < reverseX2) -> {
+                center2.x
+            }
+            (reverseX1 < baseX) && (reverseX1 < reverseX2) -> {
+                center2.x - width
+            }
+            else -> {
+                width + center2.x
+            }
         }
+        val cy2 = when {
+            (baseY < reverseY1) && (baseY < reverseY2) -> {
+                center2.y
+            }
+            (reverseY1 < baseY) && (reverseY1 < reverseY2) -> {
+                center2.y - height
+            }
+            else -> {
+                height + center2.y
+            }
+        }
+
+        val direction = Vec(cx2, cy2) - center1
+        return atan2(direction.y, direction.x) * 180 / Math.PI
     }
 }

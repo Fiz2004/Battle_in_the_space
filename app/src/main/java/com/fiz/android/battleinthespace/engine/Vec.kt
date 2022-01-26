@@ -1,6 +1,8 @@
 package com.fiz.android.battleinthespace.engine
 
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 const val EPSILON: Double = 0.0001
 
@@ -21,6 +23,10 @@ class Vec(var x: Double, var y: Double) {
 
     operator fun times(factor: Double): Vec {
         return Vec(x * factor, y * factor)
+    }
+
+    operator fun times(vec: Vec): Double {
+        return x * vec.x + y * vec.y
     }
 
     operator fun unaryMinus(): Vec {
