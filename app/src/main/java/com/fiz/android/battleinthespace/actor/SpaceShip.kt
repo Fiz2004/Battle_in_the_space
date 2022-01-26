@@ -33,6 +33,14 @@ class SpaceShip(
 
     private var timeRespawn: Double = TIME_RESPAWN_MIN
 
+    fun respawn(respawn: Respawn) {
+        center = respawn.center.copy()
+        speed = Vec(0.0, 0.0)
+        angle = respawn.angle
+        inGame = true
+        isFly = false
+    }
+
     fun isCanRespawnFromTime(deltaTime: Double): Boolean {
         timeRespawn -= deltaTime
         if (timeRespawn < 0) {

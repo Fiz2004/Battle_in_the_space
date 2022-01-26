@@ -106,7 +106,7 @@ class ListActors(
         if (players[numberPlayer].life > 0) {
             val respawn = respawns.find(::findFreeRespawn)
             if (respawn != null) {
-                spaceShips[numberPlayer] = SpaceShip(respawn, player = numberPlayer)
+                spaceShips[numberPlayer].respawn(respawn)
                 return true
             }
         }
