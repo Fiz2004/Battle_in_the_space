@@ -6,6 +6,7 @@ import android.view.SurfaceView
 import com.fiz.android.battleinthespace.actor.Actor
 import com.fiz.android.battleinthespace.actor.SpaceShip
 import com.fiz.android.battleinthespace.engine.Physics
+import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.*
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
@@ -170,9 +171,55 @@ class Display(
 
     //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
     private fun drawHelper() {
-        //        state.level.spaceShips.filter{it.inGame&&it!=state.level.spaceShips[state.mainPlayer]}.forEach {
-        //
-        //        }
+        val mainSpaceship = state.level.listActors.spaceShips.filter { it.player.main }
+        if (mainSpaceship.isNotEmpty()) {
+            state.level.listActors.spaceShips.filter { it.inGame && !it.player.main }.forEach {
+                if (viewport.getAllPoints(it).size == 0) {
+                    val paintFont = Paint()
+                    paintFont.color = getColor(it.player.number)
+                    paintFont.style = Paint.Style.FILL
+                    paintFont.alpha = 80
+                    paintFont.strokeWidth = 30F
+
+                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
+                    val angleToRadians = angle / 180.0 * Math.PI
+                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+                    val cx =
+                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
+                    val cy =
+                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
+                    canvas.drawCircle(
+                        cx,
+                        cy,
+                        30F,
+                        paintFont
+                    )
+                }
+            }
+
+            if (state.level.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
+                state.level.listActors.meteorites.forEach {
+                    val paintFont = Paint()
+                    paintFont.color = Color.RED
+                    paintFont.style = Paint.Style.FILL
+                    paintFont.alpha = 160
+                    paintFont.strokeWidth = 20F
+
+                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
+                    val angleToRadians = angle / 180.0 * Math.PI
+                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+                    val cx =
+                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 40F
+                    val cy =
+                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 40F
+                    canvas.drawCircle(
+                        cx,
+                        cy,
+                        30F,
+                        paintFont
+                    )
+                }
+        }
     }
 
     fun renderInfo(state: State, canvasInfo: Canvas) {
@@ -210,14 +257,7 @@ class Display(
         for (n in 0 until state.options.countPlayers) {
             paintFont.textSize = textSize
             paintFont.textAlign = Paint.Align.LEFT
-            paintFont.color = when (n) {
-                0 -> Color.GREEN
-                1 -> Color.CYAN
-                // Color = pink
-                2 -> Color.rgb(255, 192, 203)
-                3 -> Color.YELLOW
-                else -> Color.WHITE
-            }
+            paintFont.color = getColor(n)
             canvasInfo.drawText(
                 state.options.name[n],
                 0F,
@@ -245,6 +285,15 @@ class Display(
             )
         }
 
+    }
+
+    private fun getColor(n: Int) = when (n) {
+        0 -> Color.GREEN
+        1 -> Color.CYAN
+        // Color = pink
+        2 -> Color.rgb(255, 192, 203)
+        3 -> Color.YELLOW
+        else -> Color.WHITE
     }
 
     private fun getMaxTextWidth(paintFont: Paint): Int {
