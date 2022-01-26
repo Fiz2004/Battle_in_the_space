@@ -3,11 +3,11 @@ package com.fiz.android.battleinthespace
 import com.fiz.android.battleinthespace.actor.Player
 import java.io.Serializable
 
-class State(var options: Options) : Serializable {
+class State(var options: Options, controllers: Array<Controller>) : Serializable {
     lateinit var level: Level
     var round: Int = 1
     var status: String = "playing"
-    var players: MutableList<Player> = MutableList(options.countPlayers) { Player() }
+    var players: MutableList<Player> = MutableList(options.countPlayers) { index -> Player(index, controllers[index]) }
 
     init {
         newGame()

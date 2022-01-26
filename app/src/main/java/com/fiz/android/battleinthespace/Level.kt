@@ -48,12 +48,12 @@ class Level(
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
         for (spaceShip in listActors.spaceShips) {
-            spaceShip.moveRotate(deltaTime, controller[spaceShip.player].angle.toDouble())
-            spaceShip.moveForward(deltaTime, controller[spaceShip.player])
+            spaceShip.moveRotate(deltaTime, spaceShip.player.controller.angle.toDouble())
+            spaceShip.moveForward(deltaTime, spaceShip.player.controller)
 
-            if (controller[spaceShip.player].isCanFire(deltaTime)) {
+            if (spaceShip.player.controller.isCanFire(deltaTime)) {
                 if (spaceShip.inGame)
-                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.player)
+                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.player.number)
             }
         }
 

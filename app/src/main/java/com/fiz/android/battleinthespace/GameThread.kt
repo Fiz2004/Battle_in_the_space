@@ -12,12 +12,11 @@ class GameThread(
     context: Context,
 ) : Thread() {
     lateinit var state: com.fiz.android.battleinthespace.State
+    val controllers: Array<Controller> = Array(options.countPlayers) { Controller(context = context) }
 
     init {
-        createState(State(options))
+        createState(State(options, controllers))
     }
-
-    val controllers: Array<Controller> = Array(options.countPlayers) { Controller(context = context) }
 
     var ai: Array<AI> = Array(options.countPlayers) { AI(state) }
 

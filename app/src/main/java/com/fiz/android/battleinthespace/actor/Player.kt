@@ -1,6 +1,8 @@
 package com.fiz.android.battleinthespace.actor
 
-class Player {
+import com.fiz.android.battleinthespace.Controller
+
+class Player(var number: Int, val controller: Controller) {
     var score: Int = 0
     var main: Boolean = false
     var life: Int = 3

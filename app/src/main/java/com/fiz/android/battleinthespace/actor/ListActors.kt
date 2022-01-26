@@ -46,7 +46,7 @@ class ListActors(
 
     fun createSpaceShips(countPlayers: Int) {
         for (n in 0 until countPlayers)
-            spaceShips += SpaceShip(respawns[n], player = n)
+            spaceShips += SpaceShip(respawns[n], player = players[n])
     }
 
     fun createMeteorites(countMeteorites: Int) {
