@@ -5,55 +5,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SpaceStationFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SpaceStationFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_space_station, container, false)
+        savedInstanceState: Bundle?
+    ): View? {
+
+        val station = inflater.inflate(
+            R.layout.fragment_space_station, container, false
+        )
+
+        val stationRecycler = station.findViewById<RecyclerView>(R.id.station_recycler)
+
+        val names = listOf<String>("Оружие", "Скорость полета", "Скорость поворота", "Скорость стрельбы", "Вес")
+        val images = listOf<Int>(
+            R.drawable.meteorite11,
+            R.drawable.meteorite21,
+            R.drawable.meteorite31,
+            R.drawable.meteorite41,
+            R.drawable.meteorite12
+        )
+        val cost = listOf<Int>(0, 0, 0, 0, 0)
+
+        val adapter = ImagesCaptionCaptionAdapter(names, cost, images)
+        stationRecycler.adapter = adapter
+        val layoutManager = GridLayoutManager(activity, 2)
+        stationRecycler.layoutManager = layoutManager
+        return station
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SpaceStationFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SpaceStationFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }
