@@ -40,10 +40,10 @@ class OptionsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val extras = arguments
 
-        if (extras != null) {
-            options = extras.getSerializable(Options::class.java.simpleName) as Options
+        options = if (extras != null) {
+            extras.getSerializable(Options::class.java.simpleName) as Options
         } else {
-            options = Options(requireContext())
+            Options(requireContext())
         }
         return inflater.inflate(R.layout.fragment_options, container, false)
     }

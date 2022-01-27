@@ -4,5 +4,5 @@ import android.content.Context
 import java.io.Serializable
 
 class Mission(context: Context) : Serializable {
-    val mission: Int = 0
+    var mission: Int = 0
 }

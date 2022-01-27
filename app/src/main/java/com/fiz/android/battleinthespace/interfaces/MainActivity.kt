@@ -16,7 +16,8 @@ import com.fiz.android.battleinthespace.options.Station
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener {
+class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
+    MissionSelectedFragment.Companion.Listener {
     private lateinit var options: Options
     private lateinit var mission: Mission
     private lateinit var station: Station
@@ -102,11 +103,20 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener {
             }
 
             val bundle = Bundle()
-            bundle.putSerializable(Options::class.java.simpleName, options)
+            when (position) {
+                0 -> bundle.putSerializable(Mission::class.java.simpleName, mission)
+                1 -> bundle.putSerializable(Station::class.java.simpleName, station)
+                2 -> bundle.putSerializable(Records::class.java.simpleName, records)
+                else -> bundle.putSerializable(Options::class.java.simpleName, options)
+            }
             fragment.arguments = bundle
 
             return fragment
         }
+    }
+
+    override fun changeFragment(id: Int) {
+        mission.mission = id
     }
 }
 
