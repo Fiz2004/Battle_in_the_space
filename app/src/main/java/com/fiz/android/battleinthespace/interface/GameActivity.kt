@@ -11,8 +11,8 @@ import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
-import com.fiz.android.battleinthespace.game.Options
 import com.fiz.android.battleinthespace.game.State
+import com.fiz.android.battleinthespace.options.Options
 
 class GameActivity : Activity(), Display.Companion.Listener {
     private var gameThread: GameThread? = null

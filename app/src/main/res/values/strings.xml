@@ -67,4 +67,7 @@
         improve your spaceship and take a leading position in your universe.</string>
     <string name="fly">fly</string>
 
+    <string name="mission_destroy_meteorites">Destroy meteorites</string>
+    <string name="mission_destroy_spaceships">Destroy spaceships</string>
+
 </resources>

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.game
+package com.fiz.android.battleinthespace.options
 
 import android.content.Context
 import com.fiz.android.battleinthespace.R

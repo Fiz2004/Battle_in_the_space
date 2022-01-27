@@ -1,6 +1,7 @@
 package com.fiz.android.battleinthespace.game
 
 import com.fiz.android.battleinthespace.actor.Player
+import com.fiz.android.battleinthespace.options.Options
 import java.io.Serializable
 
 class State(var options: Options, controllers: Array<Controller>) : Serializable {

@@ -41,4 +41,6 @@
         их с метиоритами. За уничтожение конкурентов вы получите деньги на которые сможете
         улучшить свой космический корабль и занять лидирующие позиции в вашей вселенной.</string>
     <string name="fly">Полетели</string>
+    <string name="mission_destroy_meteorites">Уничтожь метеориты</string>
+    <string name="mission_destroy_spaceships">Уничтожь корабли</string>
 </resources>

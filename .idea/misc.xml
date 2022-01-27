@@ -6,6 +6,8 @@
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_game.xml" value="0.24380530973451328" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_options.xml" value="0.2869791666666667" />
+        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_mission_destroy_meteorite.xml" value="0.13044579533941236" />
+        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_mission_destroy_space_ships.xml" value="0.1" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_mission_selected.xml" value="0.23541666666666666" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_options.xml" value="0.25677083333333334" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_space_station.xml" value="0.2682291666666667" />

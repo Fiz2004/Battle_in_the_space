@@ -5,31 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import androidx.viewpager2.widget.ViewPager2
+import com.fiz.android.battleinthespace.MissionDestroyMeteoriteFragment
+import com.fiz.android.battleinthespace.MissionDestroySpaceShipsFragment
 import com.fiz.android.battleinthespace.R
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MissionSelectedFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MissionSelectedFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -37,23 +22,39 @@ class MissionSelectedFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_mission_selected, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MissionSelectedFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MissionSelectedFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onStart() {
+        super.onStart()
+        val localView = view ?: return
+        val pagerAdapter = SectionsPagerAdapter(parentFragmentManager, lifecycle)
+        val viewPager = localView.findViewById<ViewPager2>(R.id.viewpager_mission)
+        viewPager.adapter = pagerAdapter
+
+        val tabLayout = localView.findViewById<TabLayout>(R.id.tabs_mission)
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            tab.text = getTitle(position)
+        }.attach()
+    }
+
+    private fun getTitle(position: Int): CharSequence {
+        return when (position) {
+            0 -> resources.getText(R.string.mission_destroy_meteorites)
+            else -> resources.getText(R.string.mission_destroy_spaceships)
+        }
+    }
+
+    private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
+        androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
+        override fun getItemCount(): Int {
+            return 2
+        }
+
+        override fun createFragment(position: Int): Fragment {
+            val fragment = when (position) {
+                0 -> MissionDestroyMeteoriteFragment()
+                else -> MissionDestroySpaceShipsFragment()
             }
+
+            return fragment
+        }
     }
 }

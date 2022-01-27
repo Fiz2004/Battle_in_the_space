@@ -12,7 +12,7 @@ import android.widget.RadioButton
 import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.game.Options
+import com.fiz.android.battleinthespace.options.Options
 
 
 class OptionsFragment : Fragment() {
