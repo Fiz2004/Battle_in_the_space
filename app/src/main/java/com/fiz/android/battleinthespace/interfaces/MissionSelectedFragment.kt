@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.`interface`
+package com.fiz.android.battleinthespace.interfaces
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.android.battleinthespace.MissionDestroyMeteoriteFragment
-import com.fiz.android.battleinthespace.MissionDestroySpaceShipsFragment
 import com.fiz.android.battleinthespace.R
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -17,7 +15,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 class MissionSelectedFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mission_selected, container, false)
     }

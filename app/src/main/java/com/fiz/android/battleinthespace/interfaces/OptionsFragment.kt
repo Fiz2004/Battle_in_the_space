@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.`interface`
+package com.fiz.android.battleinthespace.interfaces
 
 import android.content.Context
 import android.os.Bundle

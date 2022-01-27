@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    tools:context=".interface.MainActivity">
+    tools:context=".interfaces.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -32,8 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:contentDescription="@string/fly"
         android:onClick="onClickDone"
+        android:contentDescription="@string/fly"
         android:src="@drawable/fly" />
 
 

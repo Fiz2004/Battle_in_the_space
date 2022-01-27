@@ -11,11 +11,11 @@
         android:fullBackupContent="@xml/backup_descriptor"
         android:theme="@style/Theme.BattleInTheSpace">
         <activity
-            android:name=".interface.GameActivity"
+            android:name=".interfaces.GameActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".interface.MainActivity"
+            android:name=".interfaces.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

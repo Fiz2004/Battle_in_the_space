@@ -1,7 +1,8 @@
-package com.fiz.android.battleinthespace.`interface`
+package com.fiz.android.battleinthespace.interfaces
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -65,8 +66,7 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener {
         records = savedInstanceState.getSerializable(Records::class.java.simpleName) as Records
     }
 
-
-    fun onClickDone() {
+    fun onClickDone(view: View) {
         val intent = Intent(this, GameActivity::class.java)
         intent.putExtra(Options::class.java.simpleName, options)
         intent.putExtra(Mission::class.java.simpleName, mission)
