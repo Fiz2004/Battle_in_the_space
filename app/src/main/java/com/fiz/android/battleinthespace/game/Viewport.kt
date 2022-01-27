@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.game
 
 import android.view.SurfaceView
 import com.fiz.android.battleinthespace.actor.Actor

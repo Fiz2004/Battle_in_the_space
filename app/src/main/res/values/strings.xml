@@ -26,7 +26,7 @@
     <string name="name2_options_edittext">Player 2</string>
     <string name="name3_options_edittext">Player 3</string>
     <string name="name4_options_edittext">Player 4</string>
-    
+
     <string-array name="name_options_edittext">
         <item>Player 1</item>
         <item>Player 2</item>
@@ -40,4 +40,31 @@
     <string name="pause_game_button">Pause</string>
     <string name="resume_game_button">Resume</string>
     <string name="exit_game_button">Exit</string>
+
+    <string-array name="title">
+        <item>Mission selection</item>
+        <item>Space station</item>
+        <item>Statistics</item>
+        <item>Options</item>
+    </string-array>
+
+    <string name="title_mission_selection">Mission selection</string>
+    <string name="title_space_station">Space station</string>
+    <string name="title_statistics">Statistics</string>
+    <string name="title_options">Options</string>
+
+    <string name="mission_selection_text_meteorites_hunter">Your main task is to destroy
+        as many meteorites as possible and do it ahead of the rest.
+        Do not stop at anything to fulfill the main goal.
+        For the destruction of meteorites, you will receive money
+        for which you can improve your spaceship and take a leading
+        position in your universe.</string>
+
+    <string name="mission_selection_text_spaceShip_hunter">Your main task is to destroy as many of your
+        competitors as possible. Technologies have reached such a level that weapons do not harm
+        spaceships and for destruction it is necessary to collide them with meteorites.
+        For the destruction of competitors, you will receive money for which you can
+        improve your spaceship and take a leading position in your universe.</string>
+    <string name="fly">fly</string>
+
 </resources>

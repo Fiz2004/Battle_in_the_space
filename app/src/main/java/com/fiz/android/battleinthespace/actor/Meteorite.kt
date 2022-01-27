@@ -1,10 +1,10 @@
 package com.fiz.android.battleinthespace.actor
 
 import android.graphics.Bitmap
-import com.fiz.android.battleinthespace.Display
-import com.fiz.android.battleinthespace.NUMBER_BITMAP_METEORITE_OPTION
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.engine.times
+import com.fiz.android.battleinthespace.game.Display
+import com.fiz.android.battleinthespace.game.NUMBER_BITMAP_METEORITE_OPTION
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin

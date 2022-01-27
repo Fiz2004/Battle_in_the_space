@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.`interface`
 
 import android.app.Activity
 import android.graphics.Rect
@@ -7,7 +7,12 @@ import android.view.MotionEvent
 import android.view.SurfaceView
 import android.view.Window
 import android.widget.Button
+import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.engine.Vec
+import com.fiz.android.battleinthespace.game.Display
+import com.fiz.android.battleinthespace.game.GameThread
+import com.fiz.android.battleinthespace.game.Options
+import com.fiz.android.battleinthespace.game.State
 
 class GameActivity : Activity(), Display.Companion.Listener {
     private var gameThread: GameThread? = null

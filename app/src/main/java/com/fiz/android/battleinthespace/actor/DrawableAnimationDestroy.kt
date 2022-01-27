@@ -1,8 +1,8 @@
 package com.fiz.android.battleinthespace.actor
 
 import android.graphics.Bitmap
-import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
+import com.fiz.android.battleinthespace.game.Display
 
 interface DrawableAnimationDestroy : Drawable {
     var timeShowMax: Double

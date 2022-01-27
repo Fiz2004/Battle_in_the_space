@@ -1,6 +1,7 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.game
 
 import android.content.Context
+import com.fiz.android.battleinthespace.R
 import java.io.Serializable
 
 class Options(context: Context) : Serializable {

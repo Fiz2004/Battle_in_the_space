@@ -25,4 +25,20 @@
     <string name="resume_game_button">Продолжить</string>
     <string name="exit_game_button">Выход</string>
     <string name="player">Игрок</string>
+    <string name="title_mission_selection">Выбор миссии</string>
+    <string name="title_space_station">Космическая станция</string>
+    <string name="title_statistics">Статистика</string>
+    <string name="title_options">Настройки</string>
+    <string name="mission_selection_text_meteorites_hunter">Ваша главная задача уничтожить
+        как можно больше метеоритов и сделать это вперед остальных.
+        Не останавливайтесь ни перед чем для выполнения главной цели.
+        За уничтожение метеоритов вы получите деньги на которые сможете улучшить
+        свой космический корабль и
+        занять лидирующие позиции в вашей вселенной.</string>
+    <string name="mission_selection_text_spaceShip_hunter">Ваша главная задача уничтожить
+        как можно больше ваших конкурентов. Технологии достигли такого уровня, что
+        оружие не причиняет вреда космическим кораблям и для уничтожения необходимо столкнуть
+        их с метиоритами. За уничтожение конкурентов вы получите деньги на которые сможете
+        улучшить свой космический корабль и занять лидирующие позиции в вашей вселенной.</string>
+    <string name="fly">Полетели</string>
 </resources>

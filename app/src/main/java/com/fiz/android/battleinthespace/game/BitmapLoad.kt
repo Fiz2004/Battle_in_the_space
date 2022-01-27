@@ -1,8 +1,9 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.game
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.fiz.android.battleinthespace.R
 
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
 private const val NUMBER_BITMAP_SPACESHIP = 4

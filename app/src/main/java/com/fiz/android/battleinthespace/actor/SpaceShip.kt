@@ -1,9 +1,9 @@
 package com.fiz.android.battleinthespace.actor
 
 import android.graphics.Bitmap
-import com.fiz.android.battleinthespace.Controller
-import com.fiz.android.battleinthespace.Display
 import com.fiz.android.battleinthespace.engine.Vec
+import com.fiz.android.battleinthespace.game.Controller
+import com.fiz.android.battleinthespace.game.Display
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sign

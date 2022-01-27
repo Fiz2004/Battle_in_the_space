@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace
+package com.fiz.android.battleinthespace.game
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,7 +11,7 @@ class GameThread(
     options: Options,
     context: Context,
 ) : Thread() {
-    lateinit var state: com.fiz.android.battleinthespace.State
+    lateinit var state: com.fiz.android.battleinthespace.game.State
     val controllers: Array<Controller> = Array(options.countPlayers) { Controller(context = context) }
 
     init {
@@ -101,7 +101,7 @@ class GameThread(
         prevTime = now
     }
 
-    fun createState(state: com.fiz.android.battleinthespace.State) {
+    fun createState(state: com.fiz.android.battleinthespace.game.State) {
         this.state = state
     }
 }
