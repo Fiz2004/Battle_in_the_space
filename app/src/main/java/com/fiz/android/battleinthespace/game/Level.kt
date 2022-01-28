@@ -4,6 +4,7 @@ import com.fiz.android.battleinthespace.actor.Bullet
 import com.fiz.android.battleinthespace.actor.ListActors
 import com.fiz.android.battleinthespace.actor.Player
 import com.fiz.android.battleinthespace.engine.Physics
+import java.io.Serializable
 
 class Level(
     val width: Double,
@@ -11,7 +12,7 @@ class Level(
     private var countPlayers: Int = 4,
     private var countMeteorites: Int,
     var players: MutableList<Player>
-) {
+) : Serializable {
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
 
     var listActors = ListActors(width, height, players)

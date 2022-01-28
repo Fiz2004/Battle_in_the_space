@@ -86,7 +86,8 @@ class GameActivity : Activity(), Display.Companion.Listener {
         val point = Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
 
         var touchLeftSide = false
-        if (point.x < gameSurfaceView.width)
+        if (point.x > gameSurfaceView.left && point.x < gameSurfaceView.left + gameSurfaceView.width
+                && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height)
             touchLeftSide = true
 
         val rect = Rect()

@@ -12,8 +12,7 @@
         android:theme="@style/Theme.BattleInTheSpace">
         <activity
             android:name=".interfaces.GameActivity"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="false" />
         <activity
             android:name=".interfaces.MainActivity"
             android:exported="true">
