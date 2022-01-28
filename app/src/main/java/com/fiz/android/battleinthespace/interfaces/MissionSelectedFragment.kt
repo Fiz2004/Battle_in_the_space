@@ -46,22 +46,20 @@ class MissionSelectedFragment : Fragment() {
             mission = Mission(requireContext())
         }
 
-        return inflater.inflate(R.layout.fragment_mission_selected, container, false)
-    }
+        val missionView = inflater.inflate(R.layout.fragment_mission_selected, container, false)
 
-    override fun onStart() {
-        super.onStart()
-        val localView = view ?: return
         val pagerAdapter = SectionsPagerAdapter(childFragmentManager, lifecycle)
-        val viewPager = localView.findViewById<ViewPager2>(R.id.viewpager_mission)
+        val viewPager = missionView.findViewById<ViewPager2>(R.id.viewpager_mission)
         viewPager.adapter = pagerAdapter
 
-        val tabLayout = localView.findViewById<TabLayout>(R.id.tabs_mission)
+        val tabLayout = missionView.findViewById<TabLayout>(R.id.tabs_mission)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTitle(position)
         }.attach()
 
         viewPager.currentItem = mission.mission
+
+        return missionView
     }
 
     private fun getTitle(position: Int): CharSequence {
