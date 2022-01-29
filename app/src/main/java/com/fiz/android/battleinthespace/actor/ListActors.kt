@@ -1,5 +1,7 @@
 package com.fiz.android.battleinthespace.actor
 
+import android.media.SoundPool
+import android.util.SparseIntArray
 import com.fiz.android.battleinthespace.engine.Collision
 import com.fiz.android.battleinthespace.engine.Physics
 import com.fiz.android.battleinthespace.engine.Vec
@@ -44,6 +46,9 @@ class ListActors(
         )
     )
 
+    private lateinit var soundMap: SparseIntArray
+    private lateinit var soundPool: SoundPool
+
     fun createSpaceShips(countPlayers: Int) {
         for (n in 0 until countPlayers)
             spaceShips += SpaceShip(respawns[n], player = players[n])
@@ -80,7 +85,9 @@ class ListActors(
         return true
     }
 
-    fun update(deltaTime: Double) {
+    fun update(deltaTime: Double, soundMap: SparseIntArray, soundPool: SoundPool) {
+        this.soundMap = soundMap
+        this.soundPool = soundPool
         updateSpaceShips(deltaTime)
         updateBullets(deltaTime)
         updateMeteorites(deltaTime)
@@ -288,10 +295,13 @@ class ListActors(
     }
 
     private fun overlap(actor1: Actor, actor2: Actor): Boolean {
-        return Physics.overlapCircle(
+        val result = Physics.overlapCircle(
             actor1.center, actor1.size,
             actor2.center, actor2.size
         )
+        if (result)
+            soundPool.play(soundMap.get(0), 1F, 1F, 1, 0, 1F)
+        return result
     }
 
     private fun kickback(moveableActor1: MoveableActor, moveableActor2: MoveableActor) {

@@ -34,7 +34,6 @@ class Display(
     private lateinit var state: State
     private lateinit var listener: Listener
 
-    // Определить почему в самом начале загрузки класса width=0
     private var sizeUnit: Float = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
 
     private val viewport = Viewport()
@@ -43,7 +42,6 @@ class Display(
         this.state = state
         this.canvas = canvas
 
-        sizeUnit = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
         viewport.update(surface, state, sizeUnit)
         drawBackground()
         drawActors()

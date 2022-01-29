@@ -1,10 +1,17 @@
 package com.fiz.android.battleinthespace.game
 
+import android.media.SoundPool
+import android.util.SparseIntArray
 import com.fiz.android.battleinthespace.actor.Player
 import com.fiz.android.battleinthespace.options.Options
 import java.io.Serializable
 
-class State(var options: Options, controllers: Array<Controller>) : Serializable {
+class State(
+    var options: Options,
+    controllers: Array<Controller>,
+    val soundMap: SparseIntArray,
+    val soundPool: SoundPool,
+) : Serializable {
     lateinit var level: Level
     var round: Int = 1
     var status: String = "playing"
@@ -31,7 +38,7 @@ class State(var options: Options, controllers: Array<Controller>) : Serializable
     }
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
-        val levelStatus = level.update(controller, deltaTime)
+        val levelStatus = level.update(controller, deltaTime, soundMap, soundPool)
 
         if (!levelStatus)
             newRound()

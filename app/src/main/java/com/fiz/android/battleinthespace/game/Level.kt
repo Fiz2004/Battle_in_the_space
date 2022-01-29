@@ -1,5 +1,7 @@
 package com.fiz.android.battleinthespace.game
 
+import android.media.SoundPool
+import android.util.SparseIntArray
 import com.fiz.android.battleinthespace.actor.Bullet
 import com.fiz.android.battleinthespace.actor.ListActors
 import com.fiz.android.battleinthespace.actor.Player
@@ -47,18 +49,25 @@ class Level(
             player.newRound()
     }
 
-    fun update(controller: Array<Controller>, deltaTime: Double): Boolean {
+    fun update(
+        controller: Array<Controller>,
+        deltaTime: Double,
+        soundMap: SparseIntArray,
+        soundPool: SoundPool
+    ): Boolean {
         for (spaceShip in listActors.spaceShips) {
             spaceShip.moveRotate(deltaTime, spaceShip.player.controller.angle.toDouble())
             spaceShip.moveForward(deltaTime, spaceShip.player.controller)
 
             if (spaceShip.player.controller.isCanFire(deltaTime)) {
-                if (spaceShip.inGame)
+                if (spaceShip.inGame) {
                     listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.player.number)
+                    soundPool.play(soundMap.get(1), 1F, 1F, 1, 0, 1F)
+                }
             }
         }
 
-        listActors.update(deltaTime)
+        listActors.update(deltaTime, soundMap, soundPool)
 
         listActors.listAnimationDestroy.forEach {
             it.timeShow -= deltaTime

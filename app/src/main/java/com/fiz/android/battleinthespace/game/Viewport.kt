@@ -16,7 +16,6 @@ class Viewport {
     private var heightAllViewportsOnScreen = 0.0
 
     fun update(surface: SurfaceView, state: State, sizeUnit: Float) {
-        // Определить почему в самом начале загрузки класса width=0
         width = (surface.width / sizeUnit).toDouble()
         height = (surface.height / sizeUnit).toDouble()
 

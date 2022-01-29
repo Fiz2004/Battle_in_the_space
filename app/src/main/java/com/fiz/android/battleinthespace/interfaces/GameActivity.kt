@@ -2,8 +2,11 @@ package com.fiz.android.battleinthespace.interfaces
 
 import android.app.Activity
 import android.graphics.Rect
+import android.media.SoundPool
 import android.os.Bundle
+import android.util.SparseIntArray
 import android.view.MotionEvent
+import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.Window
 import android.widget.Button
@@ -14,7 +17,7 @@ import com.fiz.android.battleinthespace.game.GameThread
 import com.fiz.android.battleinthespace.game.State
 import com.fiz.android.battleinthespace.options.Options
 
-class GameActivity : Activity(), Display.Companion.Listener {
+class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callback {
     private var gameThread: GameThread? = null
 
     private lateinit var newGameButton: Button
@@ -25,6 +28,8 @@ class GameActivity : Activity(), Display.Companion.Listener {
     private lateinit var informationSurfaceView: SurfaceView
 
     private lateinit var options: Options
+    private lateinit var soundMap: SparseIntArray
+    private lateinit var soundPool: SoundPool
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,16 +50,6 @@ class GameActivity : Activity(), Display.Companion.Listener {
         else
             Options(applicationContext)
 
-        gameThread = GameThread(
-            gameSurfaceView,
-            informationSurfaceView,
-            options,
-            this
-        )
-
-        gameThread?.running = true
-        gameThread?.start()
-
         newGameButton.setOnClickListener {
             gameThread?.state?.status = "new game"
         }
@@ -64,6 +59,24 @@ class GameActivity : Activity(), Display.Companion.Listener {
         exitButton.setOnClickListener {
             finish()
         }
+
+        soundPool = SoundPool.Builder().build()
+
+        soundMap = SparseIntArray(2)
+
+        soundMap.put(
+            0,
+            soundPool.load(applicationContext, R.raw.fire, 1)
+        )
+
+        soundMap.put(
+            1,
+            soundPool.load(applicationContext, R.raw.collision, 1)
+        )
+
+
+        gameSurfaceView.holder.addCallback(this)
+
     }
 
     override fun onResume() {
@@ -87,7 +100,8 @@ class GameActivity : Activity(), Display.Companion.Listener {
 
         var touchLeftSide = false
         if (point.x > gameSurfaceView.left && point.x < gameSurfaceView.left + gameSurfaceView.width
-                && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height)
+            && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height
+        )
             touchLeftSide = true
 
         val rect = Rect()
@@ -112,6 +126,7 @@ class GameActivity : Activity(), Display.Companion.Listener {
 
     override fun onDestroy() {
         super.onDestroy()
+        soundPool.release()
         gameThreadStop()
     }
 
@@ -144,6 +159,26 @@ class GameActivity : Activity(), Display.Companion.Listener {
             pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
         else
             pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
+    }
+
+    override fun surfaceCreated(p0: SurfaceHolder) {
+        gameThread = GameThread(
+            gameSurfaceView,
+            informationSurfaceView,
+            options,
+            this, soundMap, soundPool
+        )
+
+        gameThread?.running = true
+        gameThread?.start()
+    }
+
+    override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+
+    }
+
+    override fun surfaceDestroyed(p0: SurfaceHolder) {
+
     }
 
 }

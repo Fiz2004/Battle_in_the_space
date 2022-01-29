@@ -2,6 +2,8 @@ package com.fiz.android.battleinthespace.game
 
 import android.content.Context
 import android.graphics.Canvas
+import android.media.SoundPool
+import android.util.SparseIntArray
 import android.view.SurfaceView
 import com.fiz.android.battleinthespace.options.Options
 import kotlin.math.min
@@ -11,12 +13,14 @@ class GameThread(
     private val informationSurface: SurfaceView,
     options: Options,
     context: Context,
+    val soundMap: SparseIntArray,
+    val soundPool: SoundPool,
 ) : Thread() {
     lateinit var state: com.fiz.android.battleinthespace.game.State
     val controllers: Array<Controller> = Array(options.countPlayers) { Controller(context = context) }
 
     init {
-        createState(State(options, controllers))
+        createState(State(options, controllers, soundMap, soundPool))
     }
 
     var ai: Array<AI> = Array(options.countPlayers) { AI(state) }
