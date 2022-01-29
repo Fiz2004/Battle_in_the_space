@@ -7,10 +7,8 @@ import android.os.Bundle
 import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.Window
-import android.widget.Button
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.databinding.ActivityGameBinding
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
@@ -20,28 +18,16 @@ import com.fiz.android.battleinthespace.options.Options
 class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callback {
     private var gameThread: GameThread? = null
 
-    private lateinit var newGameButton: Button
-    private lateinit var pauseButton: Button
-    private lateinit var exitButton: Button
-
-    private lateinit var gameSurfaceView: SurfaceView
-    private lateinit var informationSurfaceView: SurfaceView
-
     private lateinit var options: Options
     private lateinit var soundMap: SparseIntArray
     private lateinit var soundPool: SoundPool
 
+    private lateinit var binding: ActivityGameBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.activity_game)
-
-        newGameButton = findViewById(R.id.new_game_game_button)
-        pauseButton = findViewById(R.id.pause_game_button)
-        exitButton = findViewById(R.id.exit_game_button)
-
-        gameSurfaceView = findViewById(R.id.game_game_surfaceview)
-        informationSurfaceView = findViewById(R.id.information_game_surfaceview)
+        binding = ActivityGameBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val extras = intent.extras
 
@@ -50,13 +36,13 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
         else
             Options(applicationContext)
 
-        newGameButton.setOnClickListener {
+        binding.newGameGameButton.setOnClickListener {
             gameThread?.state?.status = "new game"
         }
-        pauseButton.setOnClickListener {
+        binding.pauseGameButton.setOnClickListener {
             gameThread?.state?.clickPause()
         }
-        exitButton.setOnClickListener {
+        binding.exitGameButton.setOnClickListener {
             finish()
         }
 
@@ -75,7 +61,7 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
         )
 
 
-        gameSurfaceView.holder.addCallback(this)
+        binding.gameGameSurfaceview.holder.addCallback(this)
 
     }
 
@@ -99,8 +85,8 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
         val point = Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
 
         var touchLeftSide = false
-        if (point.x > gameSurfaceView.left && point.x < gameSurfaceView.left + gameSurfaceView.width
-            && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height
+        if (point.x > binding.gameGameSurfaceview.left && point.x < binding.gameGameSurfaceview.left + binding.gameGameSurfaceview.width
+            && point.y > binding.gameGameSurfaceview.top && point.y < binding.gameGameSurfaceview.top + binding.gameGameSurfaceview.height
         )
             touchLeftSide = true
 
@@ -156,15 +142,19 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
 
     override fun pauseButtonClick(status: String) {
         if (status == "pause")
-            pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
+            binding.pauseGameButton.post {
+                binding.pauseGameButton.text = resources.getString(R.string.resume_game_button)
+            }
         else
-            pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
+            binding.pauseGameButton.post {
+                binding.pauseGameButton.text = resources.getString(R.string.pause_game_button)
+            }
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
         gameThread = GameThread(
-            gameSurfaceView,
-            informationSurfaceView,
+            binding.gameGameSurfaceview,
+            binding.informationGameSurfaceview,
             options,
             this, soundMap, soundPool
         )
