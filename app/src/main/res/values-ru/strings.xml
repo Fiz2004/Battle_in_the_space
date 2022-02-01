@@ -43,4 +43,24 @@
     <string name="fly">Полетели</string>
     <string name="mission_destroy_meteorites">Уничтожь метеориты</string>
     <string name="mission_destroy_spaceships">Уничтожь корабли</string>
+    <string name="ok">Принять</string>
+    <string name="undo">Отменить</string>
+    <string name="weapon">Оружие</string>
+    <string name="flight_speed">Скорость полета</string>
+    <string name="turning_speed">Скорость поворота</string>
+    <string name="rate_of_fire">Скорость стрельбы</string>
+    <string name="body">Корпус</string>
+    <string name="bullet">Пуля</string>
+    <string name="double_bullet">Двойная пуля</string>
+    <string name="missile">Ракета</string>
+    <string name="ball">Шар</string>
+    <string name="basic_engine">Базовый двигатель</string>
+    <string name="basic_steering_wheel">Базовый руль</string>
+    <string name="basic_charger">Базовый ускоритель</string>
+    <string name="base_case">Базовый корпус</string>
+    <string name="install">( Установлен)</string>
+    <string name="buying">(Куплен)</string>
+    <string name="buying_question">Купить?</string>
+    <string name="cost">Стоимость</string>
+    <string name="balance">На вашем счету:</string>
 </resources>
