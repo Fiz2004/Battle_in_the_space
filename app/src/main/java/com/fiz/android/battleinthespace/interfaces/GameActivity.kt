@@ -7,27 +7,43 @@ import android.os.Bundle
 import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import android.view.SurfaceView
+import android.view.Window
+import android.widget.Button
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.databinding.ActivityGameBinding
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
 import com.fiz.android.battleinthespace.game.State
 import com.fiz.android.battleinthespace.options.Options
 
-class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callback {
+class GameActivity : Activity(), Display.Companion.Listener {
     private var gameThread: GameThread? = null
+
+    private lateinit var newGameButton: Button
+    private lateinit var pauseButton: Button
+    private lateinit var exitButton: Button
+
+    private lateinit var gameSurfaceView: SurfaceView
+    private lateinit var informationSurfaceView: SurfaceView
+    private var isGameSurfaceViewReady = false
+    private var isInformationSurfaceViewReady = false
 
     private lateinit var options: Options
     private lateinit var soundMap: SparseIntArray
     private lateinit var soundPool: SoundPool
 
-    private lateinit var binding: ActivityGameBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityGameBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContentView(R.layout.activity_game)
+
+        newGameButton = findViewById(R.id.new_game_game_button)
+        pauseButton = findViewById(R.id.pause_game_button)
+        exitButton = findViewById(R.id.exit_game_button)
+
+        gameSurfaceView = findViewById(R.id.game_game_surfaceview)
+        informationSurfaceView = findViewById(R.id.information_game_surfaceview)
 
         val extras = intent.extras
 
@@ -36,13 +52,13 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
         else
             Options(applicationContext)
 
-        binding.newGameGameButton.setOnClickListener {
+        newGameButton.setOnClickListener {
             gameThread?.state?.status = "new game"
         }
-        binding.pauseGameButton.setOnClickListener {
+        pauseButton.setOnClickListener {
             gameThread?.state?.clickPause()
         }
-        binding.exitGameButton.setOnClickListener {
+        exitButton.setOnClickListener {
             finish()
         }
 
@@ -60,9 +76,8 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
             soundPool.load(applicationContext, R.raw.collision, 1)
         )
 
-
-        binding.gameGameSurfaceview.holder.addCallback(this)
-
+        gameSurfaceView.holder.addCallback(GameSurfaceView())
+        informationSurfaceView.holder.addCallback(InformationSurfaceView())
     }
 
     override fun onResume() {
@@ -85,8 +100,8 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
         val point = Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
 
         var touchLeftSide = false
-        if (point.x > binding.gameGameSurfaceview.left && point.x < binding.gameGameSurfaceview.left + binding.gameGameSurfaceview.width
-            && point.y > binding.gameGameSurfaceview.top && point.y < binding.gameGameSurfaceview.top + binding.gameGameSurfaceview.height
+        if (point.x > gameSurfaceView.left && point.x < gameSurfaceView.left + gameSurfaceView.width
+            && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height
         )
             touchLeftSide = true
 
@@ -142,35 +157,54 @@ class GameActivity : Activity(), Display.Companion.Listener, SurfaceHolder.Callb
 
     override fun pauseButtonClick(status: String) {
         if (status == "pause")
-            binding.pauseGameButton.post {
-                binding.pauseGameButton.text = resources.getString(R.string.resume_game_button)
-            }
+            pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
         else
-            binding.pauseGameButton.post {
-                binding.pauseGameButton.text = resources.getString(R.string.pause_game_button)
-            }
+            pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
     }
 
-    override fun surfaceCreated(p0: SurfaceHolder) {
-        gameThread = GameThread(
-            binding.gameGameSurfaceview,
-            binding.informationGameSurfaceview,
-            options,
-            this, soundMap, soundPool
-        )
+    inner class GameSurfaceView : SurfaceHolder.Callback {
+        override fun surfaceCreated(p0: SurfaceHolder) {
+            isGameSurfaceViewReady = true
+            gameThreadStart()
+        }
 
-        gameThread?.running = true
-        gameThread?.start()
+        override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun surfaceDestroyed(p0: SurfaceHolder) {
+
+        }
     }
 
-    override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+    inner class InformationSurfaceView : SurfaceHolder.Callback {
+        override fun surfaceCreated(p0: SurfaceHolder) {
+            isInformationSurfaceViewReady = true
+            gameThreadStart()
+        }
 
+        override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
+
+        }
+
+        override fun surfaceDestroyed(p0: SurfaceHolder) {
+
+        }
     }
 
-    override fun surfaceDestroyed(p0: SurfaceHolder) {
+    fun gameThreadStart() {
+        if (isGameSurfaceViewReady && !isInformationSurfaceViewReady) {
+            gameThread = GameThread(
+                gameSurfaceView,
+                informationSurfaceView,
+                options,
+                this, soundMap, soundPool
+            )
 
+            gameThread?.running = true
+            gameThread?.start()
+        }
     }
-
 }
 
 
