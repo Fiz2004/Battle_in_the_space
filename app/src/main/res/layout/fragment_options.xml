@@ -1,138 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
     tools:context=".interfaces.OptionsFragment">
 
+    <RadioButton
+        android:id="@+id/onePlayers_RadioButton"
+        style="@style/RadioButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/one_players_options_radiobutton"
+        app:layout_constraintEnd_toEndOf="@+id/twoPlayers_RadioButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <RadioButton
+        android:id="@+id/twoPlayers_RadioButton"
+        style="@style/RadioButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/two_players_options_radiobutton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/onePlayers_RadioButton" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+    <RadioButton
+        android:id="@+id/threePlayers_RadioButton"
+        style="@style/RadioButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/three_players_options_radiobutton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/twoPlayers_RadioButton" />
 
-            <RadioButton
-                android:id="@+id/one_players_options_radiobutton"
-                style="@style/RadioButtonStyle"
-                android:text="@string/one_players_options_radiobutton" />
-
-            <TextView
-                android:id="@+id/one_players_options_textview"
-                style="@style/TextViewStyle"
-                android:text="@string/name_options_textview" />
-
-            <EditText
-                android:id="@+id/one_players_options_edittext"
-                style="@style/EditTextStyle"
-                android:text="@string/name1_options_edittext"
-                android:hint="@string/name_options_edittext" />
-
-            <ToggleButton
-                android:id="@+id/one_players_options_togglebutton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textOn="@string/controller_options_togglebutton_on"
-                android:textOff="@string/controller_options_togglebutton_off"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/two_players_options_radiobutton"
-                style="@style/RadioButtonStyle"
-                android:text="@string/two_players_options_radiobutton" />
-
-            <TextView
-                android:id="@+id/two_players_options_textview"
-                style="@style/TextViewStyle"
-                android:text="@string/name_options_textview" />
-
-            <EditText
-                android:id="@+id/two_players_options_edittext"
-                style="@style/EditTextStyle"
-                android:text="@string/name2_options_edittext"
-                android:hint="@string/name_options_edittext" />
-
-            <ToggleButton
-                android:id="@+id/two_players_options_togglebutton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textOn="@string/controller_options_togglebutton_on"
-                android:textOff="@string/controller_options_togglebutton_off"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/three_players_options_radiobutton"
-                style="@style/RadioButtonStyle"
-                android:text="@string/three_players_options_radiobutton" />
-
-            <TextView
-                android:id="@+id/three_players_options_textview"
-                style="@style/TextViewStyle"
-                android:text="@string/name_options_textview" />
-
-            <EditText
-                android:id="@+id/three_players_options_edittext"
-                style="@style/EditTextStyle"
-                android:text="@string/name3_options_edittext"
-                android:hint="@string/name_options_edittext" />
-
-            <ToggleButton
-                android:id="@+id/three_players_options_togglebutton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textOn="@string/controller_options_togglebutton_on"
-                android:textOff="@string/controller_options_togglebutton_off"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/four_players_options_radiobutton"
-                style="@style/RadioButtonStyle"
-                android:text="@string/four_players_options_radiobutton" />
-
-            <TextView
-                android:id="@+id/four_players_options_textview"
-                style="@style/TextViewStyle"
-                android:text="@string/name_options_textview" />
-
-            <EditText
-                android:id="@+id/four_players_options_edittext"
-                style="@style/EditTextStyle"
-                android:text="@string/name4_options_edittext"
-                android:hint="@string/name_options_edittext" />
-
-            <ToggleButton
-                android:id="@+id/four_players_options_togglebutton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textOn="@string/controller_options_togglebutton_on"
-                android:textOff="@string/controller_options_togglebutton_off"/>
-
-        </LinearLayout>
+    <RadioButton
+        android:id="@+id/fourPlayers_RadioButton"
+        style="@style/RadioButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/four_players_options_radiobutton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/threePlayers_RadioButton" />
 
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/fourPlayers_TextView"
+        style="@style/TextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_options_textview"
+        app:layout_constraintBottom_toTopOf="@+id/fourPlayers_RadioButton"
+        app:layout_constraintStart_toEndOf="@+id/fourPlayers_RadioButton"
+        app:layout_constraintTop_toBottomOf="@+id/twoPlayers_RadioButton" />
+
+    <TextView
+        android:id="@+id/onePlayers_TextView"
+        style="@style/TextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_options_textview"
+        app:layout_constraintBottom_toBottomOf="@+id/fourPlayers_RadioButton"
+        app:layout_constraintStart_toEndOf="@+id/onePlayers_RadioButton"
+        app:layout_constraintTop_toTopOf="@+id/fourPlayers_RadioButton" />
+
+
+    <TextView
+        android:id="@+id/twoPlayers_TextView"
+        style="@style/TextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_options_textview"
+        app:layout_constraintBottom_toTopOf="@+id/twoPlayers_RadioButton"
+        app:layout_constraintStart_toEndOf="@+id/twoPlayers_RadioButton"
+        app:layout_constraintTop_toTopOf="@+id/onePlayers_RadioButton" />
+
+    <TextView
+        android:id="@+id/threePlayers_TextView"
+        style="@style/TextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_options_textview"
+        app:layout_constraintBottom_toBottomOf="@+id/twoPlayers_RadioButton"
+        app:layout_constraintStart_toEndOf="@+id/threePlayers_RadioButton"
+        app:layout_constraintTop_toTopOf="@+id/twoPlayers_RadioButton" />
+
+
+    <EditText
+        android:id="@+id/onePlayers_EditText"
+        style="@style/EditTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_options_edittext"
+        android:text="@string/name1_options_edittext"
+        app:layout_constraintEnd_toStartOf="@+id/onePlayers_ToggleButton"
+        app:layout_constraintStart_toEndOf="@+id/twoPlayers_TextView"
+        app:layout_constraintTop_toTopOf="@+id/onePlayers_RadioButton" />
+
+    <EditText
+        android:id="@+id/twoPlayers_EditText"
+        style="@style/EditTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_options_edittext"
+        android:text="@string/name2_options_edittext"
+        app:layout_constraintEnd_toStartOf="@+id/twoPlayers_ToggleButton"
+        app:layout_constraintStart_toEndOf="@+id/threePlayers_TextView"
+        app:layout_constraintTop_toBottomOf="@+id/onePlayers_RadioButton" />
+
+    <EditText
+        android:id="@+id/threePlayers_EditText"
+        style="@style/EditTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_options_edittext"
+        android:text="@string/name3_options_edittext"
+        app:layout_constraintEnd_toStartOf="@+id/threePlayers_ToggleButton"
+        app:layout_constraintStart_toEndOf="@+id/fourPlayers_TextView"
+        app:layout_constraintTop_toBottomOf="@+id/twoPlayers_RadioButton" />
+
+    <EditText
+        android:id="@+id/fourPlayers_EditText"
+        style="@style/EditTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_options_edittext"
+        android:text="@string/name4_options_edittext"
+        app:layout_constraintEnd_toStartOf="@+id/fourPlayers_ToggleButton"
+        app:layout_constraintStart_toEndOf="@+id/onePlayers_TextView"
+        app:layout_constraintTop_toTopOf="@+id/fourPlayers_RadioButton" />
+
+
+    <ToggleButton
+        android:id="@+id/onePlayers_ToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textOff="@string/controller_options_togglebutton_off"
+        android:textOn="@string/controller_options_togglebutton_on"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/onePlayers_RadioButton" />
+
+    <ToggleButton
+        android:id="@+id/twoPlayers_ToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="@string/controller_options_togglebutton_off"
+        android:textOn="@string/controller_options_togglebutton_on"
+        app:layout_constraintStart_toStartOf="@+id/onePlayers_ToggleButton"
+        app:layout_constraintTop_toBottomOf="@+id/onePlayers_RadioButton" />
+
+    <ToggleButton
+        android:id="@+id/threePlayers_ToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="@string/controller_options_togglebutton_off"
+        android:textOn="@string/controller_options_togglebutton_on"
+        app:layout_constraintStart_toStartOf="@+id/twoPlayers_ToggleButton"
+        app:layout_constraintTop_toBottomOf="@+id/twoPlayers_RadioButton" />
+
+    <ToggleButton
+        android:id="@+id/fourPlayers_ToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOff="@string/controller_options_togglebutton_off"
+        android:textOn="@string/controller_options_togglebutton_on"
+        app:layout_constraintStart_toStartOf="@+id/threePlayers_ToggleButton"
+        app:layout_constraintTop_toTopOf="@+id/fourPlayers_RadioButton" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

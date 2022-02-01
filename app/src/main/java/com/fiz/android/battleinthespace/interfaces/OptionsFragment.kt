@@ -52,20 +52,20 @@ class OptionsFragment : Fragment() {
         super.onStart()
         val localView = view ?: return
 
-        playersEditTexts.add(localView.findViewById(R.id.one_players_options_edittext))
-        playersEditTexts.add(localView.findViewById(R.id.two_players_options_edittext))
-        playersEditTexts.add(localView.findViewById(R.id.three_players_options_edittext))
-        playersEditTexts.add(localView.findViewById(R.id.four_players_options_edittext))
+        playersEditTexts.add(localView.findViewById(R.id.onePlayers_EditText))
+        playersEditTexts.add(localView.findViewById(R.id.twoPlayers_EditText))
+        playersEditTexts.add(localView.findViewById(R.id.threePlayers_EditText))
+        playersEditTexts.add(localView.findViewById(R.id.fourPlayers_EditText))
 
-        playersRadioButtons.add(localView.findViewById(R.id.one_players_options_radiobutton))
-        playersRadioButtons.add(localView.findViewById(R.id.two_players_options_radiobutton))
-        playersRadioButtons.add(localView.findViewById(R.id.three_players_options_radiobutton))
-        playersRadioButtons.add(localView.findViewById(R.id.four_players_options_radiobutton))
+        playersRadioButtons.add(localView.findViewById(R.id.onePlayers_RadioButton))
+        playersRadioButtons.add(localView.findViewById(R.id.twoPlayers_RadioButton))
+        playersRadioButtons.add(localView.findViewById(R.id.threePlayers_RadioButton))
+        playersRadioButtons.add(localView.findViewById(R.id.fourPlayers_RadioButton))
 
-        playersToggleButtons.add(localView.findViewById(R.id.one_players_options_togglebutton))
-        playersToggleButtons.add(localView.findViewById(R.id.two_players_options_togglebutton))
-        playersToggleButtons.add(localView.findViewById(R.id.three_players_options_togglebutton))
-        playersToggleButtons.add(localView.findViewById(R.id.four_players_options_togglebutton))
+        playersToggleButtons.add(localView.findViewById(R.id.onePlayers_ToggleButton))
+        playersToggleButtons.add(localView.findViewById(R.id.twoPlayers_ToggleButton))
+        playersToggleButtons.add(localView.findViewById(R.id.threePlayers_ToggleButton))
+        playersToggleButtons.add(localView.findViewById(R.id.fourPlayers_ToggleButton))
 
         for (playersRadioButton in playersRadioButtons)
             playersRadioButton.setOnClickListener(onRadioClick())
