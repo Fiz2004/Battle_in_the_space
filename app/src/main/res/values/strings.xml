@@ -70,4 +70,29 @@
     <string name="mission_destroy_meteorites">Destroy meteorites</string>
     <string name="mission_destroy_spaceships">Destroy spaceships</string>
 
+    <string name="ok">Ok</string>
+    <string name="undo">Undo</string>
+
+    <string name="weapon">Weapon</string>
+    <string name="flight_speed">Flight speed</string>
+    <string name="turning_speed">Turning speed</string>
+    <string name="rate_of_fire">Rate of fire</string>
+    <string name="body">Body</string>
+
+    <string name="bullet">Bullet</string>
+    <string name="double_bullet">Double bullet</string>
+    <string name="missile">Missile</string>
+    <string name="ball">Ball</string>
+
+    <string name="basic_engine">Basic engine</string>
+    <string name="basic_steering_wheel">basic steering wheel</string>
+    <string name="basic_charger">Basic charger</string>
+    <string name="base_case">Base case</string>
+
+    <string name="install"> (Install)</string>
+    <string name="buying"> (Buying)</string>
+    <string name="buying_question"> Buying?</string>
+    Buying?
+    <string name="cost">Cost: </string>
+    <string name="balance">Your account balance: </string>
 </resources>

@@ -13,25 +13,51 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/info_image"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.0"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerInside" />
 
         <TextView
             android:id="@+id/info_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:layout_marginBottom="4dp" />
 
         <TextView
             android:id="@+id/cost_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:id="@+id/buttons_Layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/undo_Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:text="@string/undo"
+                android:layout_marginBottom="4dp" />
+
+            <Button
+                android:id="@+id/ok_Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="3"
+                android:text="@string/ok" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

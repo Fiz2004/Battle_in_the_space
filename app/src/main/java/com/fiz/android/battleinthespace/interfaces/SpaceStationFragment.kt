@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.interfaces
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,17 @@ class SpaceStationFragment : Fragment() {
 
     private lateinit var station: Station
     private lateinit var moneyTextView: TextView
+    private lateinit var stationRecycler: RecyclerView
+    private lateinit var captionImageAdapter: CaptionImageAdapter
+    private lateinit var imagesCaptionCaptionAdapter: ImagesCaptionCaptionAdapter
     private var type: Int = 0
+
+    private lateinit var parentContext: Context
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        parentContext = context
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,71 +39,66 @@ class SpaceStationFragment : Fragment() {
             station = Station(requireContext())
         }
 
-        val stationView = inflater.inflate(
+        return inflater.inflate(
             R.layout.fragment_space_station, container, false
         )
-
-        val stationRecycler = stationView.findViewById<RecyclerView>(R.id.station_recycler)
-        if (type == 0)
-            configureCaptionImageAdapter(stationRecycler)
-        else
-            configureImagesCaptionCaptionAdapter(stationRecycler)
-
-        moneyTextView = stationView.findViewById(R.id.money)
-        moneyTextView.text = station.money.toString()
-
-        return stationView
     }
 
-    private fun configureCaptionImageAdapter(stationRecycler: RecyclerView) {
+    override fun onStart() {
+        super.onStart()
+        val localView: View = view ?: return
+
+        stationRecycler = localView.findViewById(R.id.station_recycler)
+        val layoutManager = GridLayoutManager(activity, 2)
+        stationRecycler.layoutManager = layoutManager
+
+        moneyTextView = localView.findViewById(R.id.money)
+
+        updateUI()
+    }
+
+    private fun updateUI() {
+        moneyTextView.text = resources.getString(R.string.balance) + station.money.toString() + "$"
+        stationRecycler.adapter = if (type == 0) {
+            configureCaptionImageAdapter()
+            captionImageAdapter
+        } else {
+            configureImagesCaptionCaptionAdapter()
+            imagesCaptionCaptionAdapter
+        }
+    }
+
+    private fun configureCaptionImageAdapter() {
         val names = mutableListOf<String>()
         val images = mutableListOf<Int>()
         for (type in Station.types) {
-            names += type.names
+            names += parentContext.resources.getString(type.names)
             images += type.imageIds
         }
-        val adapter = CaptionImageAdapter(names, images)
-        stationRecycler.adapter = adapter
-        val layoutManager = GridLayoutManager(activity, 2)
-        stationRecycler.layoutManager = layoutManager
+        captionImageAdapter = CaptionImageAdapter(names, images)
 
-        adapter.setListener { position: Int ->
+        captionImageAdapter.setListener { position: Int ->
             type = position + 1
-            configureImagesCaptionCaptionAdapter(stationRecycler)
+            updateUI()
         }
     }
 
-    private fun configureImagesCaptionCaptionAdapter(stationRecycler: RecyclerView) {
-        val adapter = createImagesCaptionCaptionAdapter()
-        stationRecycler.adapter = adapter
-        val layoutManager = GridLayoutManager(activity, 2)
-        stationRecycler.layoutManager = layoutManager
-
-        setListenerAdapter(adapter, stationRecycler)
-    }
-
-    fun createImagesCaptionCaptionAdapter(): ImagesCaptionCaptionAdapter {
-        val names = mutableListOf<String>("Назад")
-        val images = mutableListOf<Int>(R.drawable.weapon_1)
-        val costs = mutableListOf<Int>(0)
-        val states = mutableListOf<stateProduct>(stateProduct.NONE)
+    private fun configureImagesCaptionCaptionAdapter() {
+        val names = mutableListOf("Назад")
+        val images = mutableListOf(R.drawable.weapon_1)
+        val costs = mutableListOf(0)
+        val states = mutableListOf(stateProduct.NONE)
         for (type in Station.types[type - 1].products) {
-            names += type.name
+            names += parentContext.resources.getString(type.name)
             images += type.imageId
             costs += type.cost
             states += type.state
         }
-        return ImagesCaptionCaptionAdapter(names, costs, images, states)
-    }
+        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(names, costs, images, states)
 
-    private fun setListenerAdapter(
-        adapter: ImagesCaptionCaptionAdapter,
-        stationRecycler: RecyclerView,
-    ) {
-        var adapter1 = adapter
-        adapter1.setListener { position: Int ->
+        imagesCaptionCaptionAdapter.setListener { position: Int ->
             if (position == 0) {
-                configureCaptionImageAdapter(stationRecycler)
+                type = 0
             } else {
                 val localtype = type - 1
                 if (Station.types[localtype].products[position - 1].state == stateProduct.BUY) {
@@ -103,13 +109,11 @@ class SpaceStationFragment : Fragment() {
                 } else
                     if (station.money - Station.types[localtype].products[position - 1].cost >= 0) {
                         station.money -= Station.types[localtype].products[position - 1].cost
-                        moneyTextView.text = station.money.toString()
+                        moneyTextView.text = resources.getString(R.string.balance) + station.money.toString() + "$"
                         Station.types[localtype].products[position - 1].state = stateProduct.BUY
                     }
-                adapter1 = createImagesCaptionCaptionAdapter()
-                setListenerAdapter(adapter1, stationRecycler)
-                stationRecycler.adapter = adapter1
             }
+            updateUI()
         }
     }
 

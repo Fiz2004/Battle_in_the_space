@@ -26,7 +26,7 @@ class MissionSelectedFragment : Fragment() {
         }
     }
 
-    private lateinit var parentContext: Listener
+    private var parentContext: Listener? = null
     private lateinit var mission: Mission
 
     override fun onAttach(context: Context) {
@@ -40,26 +40,29 @@ class MissionSelectedFragment : Fragment() {
     ): View? {
         val extras = arguments
 
-        if (extras != null) {
-            mission = extras.getSerializable(Mission::class.java.simpleName) as Mission
+        mission = if (extras != null) {
+            extras.getSerializable(Mission::class.java.simpleName) as Mission
         } else {
-            mission = Mission(requireContext())
+            Mission(requireContext())
         }
 
-        val missionView = inflater.inflate(R.layout.fragment_mission_selected, container, false)
+        return inflater.inflate(R.layout.fragment_mission_selected, container, false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val localView: View = view ?: return
 
         val pagerAdapter = SectionsPagerAdapter(childFragmentManager, lifecycle)
-        val viewPager = missionView.findViewById<ViewPager2>(R.id.viewpager_mission)
+        val viewPager = localView.findViewById<ViewPager2>(R.id.viewpager_mission)
         viewPager.adapter = pagerAdapter
 
-        val tabLayout = missionView.findViewById<TabLayout>(R.id.tabs_mission)
+        val tabLayout = localView.findViewById<TabLayout>(R.id.tabs_mission)
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTitle(position)
         }.attach()
 
         viewPager.currentItem = mission.mission
-
-        return missionView
     }
 
     private fun getTitle(position: Int): CharSequence {
@@ -89,9 +92,14 @@ class MissionSelectedFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
-            parentContext.changeFragment(position)
+            parentContext?.changeFragment(position)
             super.onBindViewHolder(holder, position, payloads)
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        parentContext = null
     }
 }
 
