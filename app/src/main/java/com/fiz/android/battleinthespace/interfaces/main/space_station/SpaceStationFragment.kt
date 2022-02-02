@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces
+package com.fiz.android.battleinthespace.interfaces.main.space_station
 
 import android.content.Context
 import android.os.Bundle
@@ -36,7 +36,7 @@ class SpaceStationFragment : Fragment() {
             station = savedInstanceState.getSerializable(Station::class.java.simpleName) as Station
             type = savedInstanceState.getInt("Type")
         } else {
-            station = Station(requireContext())
+            station = Station()
         }
 
         return inflater.inflate(

@@ -3,11 +3,11 @@ package com.fiz.android.battleinthespace.game
 import android.media.SoundPool
 import android.util.SparseIntArray
 import com.fiz.android.battleinthespace.actor.Player
-import com.fiz.android.battleinthespace.options.Options
 import java.io.Serializable
 
 class State(
-    var options: Options,
+    var countPlayers: Int,
+    var name: MutableList<String>,
     controllers: Array<Controller>,
     val soundMap: SparseIntArray,
     val soundPool: SoundPool,
@@ -15,7 +15,7 @@ class State(
     lateinit var level: Level
     var round: Int = 1
     var status: String = "playing"
-    var players: MutableList<Player> = MutableList(options.countPlayers) { index -> Player(index, controllers[index]) }
+    var players: MutableList<Player> = MutableList(countPlayers) { index -> Player(index, controllers[index]) }
 
     init {
         newGame()
@@ -34,7 +34,7 @@ class State(
     private fun newRound() {
         round += 1
 
-        level = Level(20.0, 20.0, options.countPlayers, round, players)
+        level = Level(20.0, 20.0, countPlayers, round, players)
     }
 
     fun update(controller: Array<Controller>, deltaTime: Double): Boolean {

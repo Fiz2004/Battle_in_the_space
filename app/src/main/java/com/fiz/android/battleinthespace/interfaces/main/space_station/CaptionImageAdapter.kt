@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces
+package com.fiz.android.battleinthespace.interfaces.main.space_station
 
 import android.view.LayoutInflater
 import android.view.View

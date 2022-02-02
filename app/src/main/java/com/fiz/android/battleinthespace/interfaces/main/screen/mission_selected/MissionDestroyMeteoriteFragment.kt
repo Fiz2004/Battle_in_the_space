@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces
+package com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,10 +14,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [MissionDestroySpaceShipsFragment.newInstance] factory method to
+ * Use the [MissionDestroyMeteoriteFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MissionDestroySpaceShipsFragment : Fragment() {
+class MissionDestroyMeteoriteFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -32,9 +32,10 @@ class MissionDestroySpaceShipsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mission_destroy_space_ships, container, false)
+        return inflater.inflate(R.layout.fragment_mission_destroy_meteorite, container, false)
     }
 
     companion object {
@@ -44,12 +45,12 @@ class MissionDestroySpaceShipsFragment : Fragment() {
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment MissionDestroySpaceShipsFragment.
+         * @return A new instance of fragment MissionDestroyMeteoriteFragment.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            MissionDestroySpaceShipsFragment().apply {
+            MissionDestroyMeteoriteFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

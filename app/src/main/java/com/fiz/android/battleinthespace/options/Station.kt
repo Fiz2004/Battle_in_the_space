@@ -1,15 +1,13 @@
 package com.fiz.android.battleinthespace.options
 
-import android.content.Context
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.interfaces.stateProduct
+import com.fiz.android.battleinthespace.interfaces.main.space_station.stateProduct
 import java.io.Serializable
 
-data class Product(val name: Int, val imageId: Int, val cost: Int, var state: stateProduct)
-data class Type(val names: Int, val imageIds: Int, val products: List<Product>)
+data class Product(val name: Int, val imageId: Int, val cost: Int, var state: stateProduct) : Serializable
+data class Type(val names: Int, val imageIds: Int, val products: List<Product>) : Serializable
 
-class Station(context: Context) : Serializable {
-
+class Station : Serializable {
     var money = 1000
 
     companion object {

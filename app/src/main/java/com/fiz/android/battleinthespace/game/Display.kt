@@ -252,12 +252,12 @@ class Display(
 
         val maxTextWidth = getMaxTextWidth(paintFont)
 
-        for (n in 0 until state.options.countPlayers) {
+        for (n in 0 until state.countPlayers) {
             paintFont.textSize = textSize
             paintFont.textAlign = Paint.Align.LEFT
             paintFont.color = getColor(n)
             canvasInfo.drawText(
-                state.options.name[n],
+                state.name[n],
                 0F,
                 baseTextSize + (textSize * (n + 1)),
                 paintFont
@@ -296,7 +296,7 @@ class Display(
 
     private fun getMaxTextWidth(paintFont: Paint): Int {
         var result = 0
-        for (namePlayer in state.options.name) {
+        for (namePlayer in state.name) {
             val mTextBoundRect = Rect(0, 0, 0, 0)
             paintFont.getTextBounds(namePlayer, 0, namePlayer.length, mTextBoundRect)
             val textWidth = mTextBoundRect.width()

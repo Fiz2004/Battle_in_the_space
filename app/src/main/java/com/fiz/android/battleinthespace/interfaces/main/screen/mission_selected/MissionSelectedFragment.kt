@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces
+package com.fiz.android.battleinthespace.interfaces.main
 
 import android.content.Context
 import android.os.Bundle
@@ -12,6 +12,9 @@ import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.databinding.FragmentMissionSelectedBinding
+import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroyMeteoriteFragment
+import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroySpaceShipsFragment
 import com.fiz.android.battleinthespace.options.Mission
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -19,6 +22,8 @@ import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 class MissionSelectedFragment : Fragment() {
+    private var _binding: FragmentMissionSelectedBinding? = null
+    private val binding get() = _binding!!
 
     companion object {
         interface Listener {
@@ -43,10 +48,12 @@ class MissionSelectedFragment : Fragment() {
         mission = if (extras != null) {
             extras.getSerializable(Mission::class.java.simpleName) as Mission
         } else {
-            Mission(requireContext())
+            Mission()
         }
 
-        return inflater.inflate(R.layout.fragment_mission_selected, container, false)
+        _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onStart() {
@@ -95,6 +102,11 @@ class MissionSelectedFragment : Fragment() {
             parentContext?.changeFragment(position)
             super.onBindViewHolder(holder, position, payloads)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onDetach() {
