@@ -15,6 +15,7 @@ import com.fiz.android.battleinthespace.options.Records
 import com.fiz.android.battleinthespace.options.Station
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
     MissionSelectedFragment.Companion.Listener {
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
     private lateinit var mission: Mission
     private lateinit var station: Station
     private lateinit var records: Records
+    val mAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
