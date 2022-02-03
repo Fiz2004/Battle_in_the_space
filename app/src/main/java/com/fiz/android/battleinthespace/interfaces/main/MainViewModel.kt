@@ -9,7 +9,10 @@ import androidx.lifecycle.MutableLiveData
 import com.fiz.android.battleinthespace.interfaces.main.options.OptionsFragment
 import com.fiz.android.battleinthespace.interfaces.main.space_station.SpaceStationFragment
 import com.fiz.android.battleinthespace.interfaces.main.statistics.StatisticsFragment
-import com.fiz.android.battleinthespace.options.*
+import com.fiz.android.battleinthespace.options.Mission
+import com.fiz.android.battleinthespace.options.Player
+import com.fiz.android.battleinthespace.options.PlayerRepository
+import com.fiz.android.battleinthespace.options.Records
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val playerRepository = PlayerRepository.get()
@@ -18,7 +21,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var countPlayerLiveData = MutableLiveData<Int>(playerRepository.getCountPlayer())
 
-    var station: Station = Station()
+    var type = MutableLiveData<Int>(0)
+
     var records: Records = Records()
 
     fun setCountPlayers(numberRadioButton: Int) {
@@ -34,7 +38,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 (playerListLiveData.value)?.get(n)?.controllerPlayer ?: false)
             outState.putInt("mission$n", (playerListLiveData.value)?.get(n)?.mission ?: 0)
         }
-        outState.putSerializable(Station::class.java.simpleName, station)
         outState.putSerializable(Records::class.java.simpleName, records)
     }
 
@@ -45,9 +48,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             intent.putExtra("playerControllerPlayer$n", (playerListLiveData.value)?.get(n)?.controllerPlayer)
             intent.putExtra("mission$n", (playerListLiveData.value)?.get(n)?.mission)
         }
-        intent.putExtra(Station::class.java.simpleName, station)
         intent.putExtra(Records::class.java.simpleName, records)
         return intent
+    }
+
+    fun configureMoney(cost: Int) {
+        val newValue = playerListLiveData.value
+        newValue?.get(0)?.money = playerListLiveData.value?.get(0)?.money?.minus(cost) ?: 0
+        playerListLiveData.value = newValue
     }
 
     fun createFragment(position: Int): Fragment {
@@ -61,17 +69,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val bundle = Bundle()
         when (position) {
             0 -> bundle.putSerializable(Mission::class.java.simpleName, (playerListLiveData.value)?.get(0)?.mission)
-            1 -> bundle.putSerializable(Station::class.java.simpleName, station)
+            1 -> {}
             2 -> bundle.putSerializable(Records::class.java.simpleName, records)
             else -> {}
         }
         fragment.arguments = bundle
 
         return fragment
-    }
-
-    fun changeFragment(id: Int) {
-        (playerListLiveData.value)?.get(0)?.mission = id
     }
 
 }

@@ -3,39 +3,14 @@ package com.fiz.android.battleinthespace.interfaces.main.space_station
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.databinding.CardCaptionImageBinding
+import com.fiz.android.battleinthespace.options.Types
 
-class CaptionImageAdapter(val captions: List<String>, val imageIDs: List<Int>) :
+class CaptionImageAdapter(
+    private val items: List<Types>) :
     RecyclerView.Adapter<CaptionImageAdapter.ViewHolder>() {
-
-    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        private var caption: String = ""
-        private var imageID: Int = 0
-
-        val imageView: ImageView = itemView.findViewById(R.id.info_image)
-        val textView: TextView = itemView.findViewById(R.id.info_text)
-
-        init {
-            itemView.setOnClickListener(this)
-        }
-
-        fun bind(caption: String, imageID: Int) {
-            this.caption = caption
-            this.imageID = imageID
-            val drawable = ContextCompat.getDrawable(itemView.context, imageID)
-            imageView.setImageDrawable(drawable)
-            imageView.contentDescription = caption
-            textView.text = caption
-        }
-
-        override fun onClick(p0: View?) {
-            listener.onClick(layoutPosition)
-        }
-    }
 
     fun interface Listener {
         fun onClick(position: Int)
@@ -48,16 +23,36 @@ class CaptionImageAdapter(val captions: List<String>, val imageIDs: List<Int>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.card_caption_image, parent, false)
-        return ViewHolder(view)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = CardCaptionImageBinding.inflate(inflater)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(captions[position], imageIDs[position])
+        holder.bind(items[position])
     }
 
     override fun getItemCount(): Int {
-        return captions.size
+        return items.size
+    }
+
+    inner class ViewHolder(val binding: CardCaptionImageBinding) : RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        fun bind(item: Types) {
+            binding.item = item
+            val drawable = ContextCompat.getDrawable(itemView.context, item.imageIds)
+            binding.infoImage.setImageDrawable(drawable)
+            binding.infoImage.contentDescription = itemView.context.resources.getString(item.names)
+            binding.infoText.text = itemView.context.resources.getString(item.names)
+        }
+
+        override fun onClick(p0: View?) {
+            listener.onClick(layoutPosition)
+        }
     }
 }

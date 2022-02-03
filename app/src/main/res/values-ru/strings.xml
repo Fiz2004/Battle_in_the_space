@@ -58,9 +58,10 @@
     <string name="basic_steering_wheel">Базовый руль</string>
     <string name="basic_charger">Базовый ускоритель</string>
     <string name="base_case">Базовый корпус</string>
-    <string name="install">( Установлен)</string>
-    <string name="buying">(Куплен)</string>
+    <string name="install">%1$s  (Установлен)</string>
+    <string name="buying">%1$s (Куплен)</string>
     <string name="buying_question">Купить?</string>
-    <string name="cost">Стоимость</string>
-    <string name="balance">На вашем счету:</string>
+    <string name="cost">Стоимость: %1$d $</string>
+    <string name="balance">На вашем счету: %1$d $</string>
+    <string name="back">Назад</string>
 </resources>

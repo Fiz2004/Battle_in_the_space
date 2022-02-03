@@ -17,14 +17,16 @@ import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
 import com.fiz.android.battleinthespace.game.State
 import com.fiz.android.battleinthespace.options.Records
-import com.fiz.android.battleinthespace.options.Station
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private lateinit var viewModel: GameViewModel
     private lateinit var viewModelFactory: GameViewModelFactory
-    private lateinit var binding: ActivityGameBinding
 
-    private var gameThread: GameThread? = null
+    private val binding: ActivityGameBinding by lazy {
+        ActivityGameBinding.inflate(layoutInflater)
+    }
+
+    private lateinit var gameThread: GameThread
 
     private lateinit var newGameButton: Button
     private lateinit var pauseButton: Button
@@ -41,7 +43,6 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true, false, false, false)
 
     private var mission = 0
-    private lateinit var station: Station
     private lateinit var records: Records
 
     private lateinit var soundMap: SparseIntArray
@@ -49,9 +50,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityGameBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
 
         newGameButton = findViewById(R.id.new_game_game_button)
         pauseButton = findViewById(R.id.pause_game_button)
@@ -66,7 +65,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
         for (n in 0 until 4) {
             name[n] = extras?.getString("name$n") ?: ""
-            playerControllerPlayer[0] = extras?.getBoolean("playerControllerPlayer$n") ?: true
+            playerControllerPlayer[n] = extras?.getBoolean("playerControllerPlayer$n") ?: true
         }
         mission = extras?.getInt("mission0") ?: 0
 
@@ -75,28 +74,21 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         else
             Records()
 
-        station = if (extras != null)
-            extras.getSerializable(Station::class.java.simpleName) as Station
-        else {
-            Station()
-        }
-
         viewModelFactory = GameViewModelFactory(
             countPlayers,
             name,
             playerControllerPlayer,
             mission,
-            station,
             records
         )
 
         viewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
 
         newGameButton.setOnClickListener {
-            gameThread?.state?.status = "new game"
+            gameThread.state.status = "new game"
         }
         pauseButton.setOnClickListener {
-            gameThread?.state?.clickPause()
+            gameThread.state.clickPause()
         }
         exitButton.setOnClickListener {
             finish()
@@ -122,13 +114,13 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     override fun onResume() {
         super.onResume()
-        if (gameThread?.pause == true)
-            gameThread?.pause = false
+        if (gameThread.pause == true)
+            gameThread.pause = false
     }
 
     override fun onPause() {
         super.onPause()
-        gameThread?.pause = true
+        gameThread.pause = true
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -150,16 +142,16 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> gameThread?.controllers?.get(0)?.down(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_DOWN -> gameThread.controllers.get(0).down(touchLeftSide, point, pointerId)
             // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controllers?.get(0)
-                ?.pointerDown(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_POINTER_DOWN -> gameThread.controllers.get(0)
+                .pointerDown(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> gameThread?.controllers?.get(0)?.up()
+            MotionEvent.ACTION_UP -> gameThread.controllers.get(0).up()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> gameThread?.controllers?.get(0)?.powerUp(event)
+            MotionEvent.ACTION_POINTER_UP -> gameThread.controllers.get(0).powerUp(event)
             // движение
-            MotionEvent.ACTION_MOVE -> gameThread?.controllers?.get(0)?.move(event)
+            MotionEvent.ACTION_MOVE -> gameThread.controllers.get(0).move(event)
         }
 
         return super.onTouchEvent(event)
@@ -173,10 +165,10 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     private fun gameThreadStop() {
         var retry = true
-        gameThread?.running = false
+        gameThread.running = false
         while (retry) {
             try {
-                gameThread?.join()
+                gameThread.join()
                 retry = false
             } catch (e: InterruptedException) { /* for Lint */
             }
@@ -184,7 +176,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(State::class.java.simpleName, gameThread?.state)
+        outState.putSerializable(State::class.java.simpleName, gameThread.state)
         super.onSaveInstanceState(outState)
     }
 
@@ -226,7 +218,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     }
 
     fun gameThreadStart() {
-        if (isGameSurfaceViewReady && !isInformationSurfaceViewReady) {
+        if (isGameSurfaceViewReady && isInformationSurfaceViewReady) {
             gameThread = GameThread(
                 viewModel.countPlayers.value ?: 4,
                 viewModel.name,
@@ -236,8 +228,8 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
                 this, soundMap, soundPool
             )
 
-            gameThread?.running = true
-            gameThread?.start()
+            gameThread.running = true
+            gameThread.start()
         }
     }
 }

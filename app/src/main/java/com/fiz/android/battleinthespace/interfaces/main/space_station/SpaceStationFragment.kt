@@ -1,65 +1,52 @@
 package com.fiz.android.battleinthespace.interfaces.main.space_station
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.options.Station
+import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
+import com.fiz.android.battleinthespace.interfaces.main.MainViewModel
+import com.fiz.android.battleinthespace.options.Item
+import com.fiz.android.battleinthespace.options.StateProduct
+import com.fiz.android.battleinthespace.options.Types
 
 class SpaceStationFragment : Fragment() {
+    private var _binding: FragmentSpaceStationBinding? = null
+    private val binding get() = _binding!!
 
-    private lateinit var station: Station
-    private lateinit var moneyTextView: TextView
-    private lateinit var stationRecycler: RecyclerView
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(requireActivity())[MainViewModel::class.java]
+    }
+
     private lateinit var captionImageAdapter: CaptionImageAdapter
     private lateinit var imagesCaptionCaptionAdapter: ImagesCaptionCaptionAdapter
-    private var type: Int = 0
-
-    private lateinit var parentContext: Context
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        parentContext = context
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        if (savedInstanceState != null) {
-            station = savedInstanceState.getSerializable(Station::class.java.simpleName) as Station
-            type = savedInstanceState.getInt("Type")
-        } else {
-            station = Station()
-        }
+    ): View {
+        _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
 
-        return inflater.inflate(
-            R.layout.fragment_space_station, container, false
-        )
+        binding.mainViewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        val localView: View = view ?: return
 
-        stationRecycler = localView.findViewById(R.id.station_recycler)
         val layoutManager = GridLayoutManager(activity, 2)
-        stationRecycler.layoutManager = layoutManager
-
-        moneyTextView = localView.findViewById(R.id.money)
+        binding.stationRecycler.layoutManager = layoutManager
 
         updateUI()
     }
 
     private fun updateUI() {
-        moneyTextView.text = resources.getString(R.string.balance) + station.money.toString() + "$"
-        stationRecycler.adapter = if (type == 0) {
+        binding.stationRecycler.adapter = if (viewModel.type.value == 0) {
             configureCaptionImageAdapter()
             captionImageAdapter
         } else {
@@ -69,57 +56,42 @@ class SpaceStationFragment : Fragment() {
     }
 
     private fun configureCaptionImageAdapter() {
-        val names = mutableListOf<String>()
-        val images = mutableListOf<Int>()
-        for (type in Station.types) {
-            names += parentContext.resources.getString(type.names)
-            images += type.imageIds
-        }
-        captionImageAdapter = CaptionImageAdapter(names, images)
+        captionImageAdapter = CaptionImageAdapter(Types.createTypes())
 
         captionImageAdapter.setListener { position: Int ->
-            type = position + 1
+            viewModel.type.value = position + 1
             updateUI()
         }
     }
 
     private fun configureImagesCaptionCaptionAdapter() {
-        val names = mutableListOf("Назад")
-        val images = mutableListOf(R.drawable.weapon_1)
-        val costs = mutableListOf(0)
-        val states = mutableListOf(stateProduct.NONE)
-        for (type in Station.types[type - 1].products) {
-            names += parentContext.resources.getString(type.name)
-            images += type.imageId
-            costs += type.cost
-            states += type.state
+        val itemsGroup: MutableMap<Int, List<Item>> = mutableMapOf()
+        viewModel.playerListLiveData.value?.get(0)?.items!!.groupBy { it.type }.values.forEachIndexed { index, list ->
+            itemsGroup[index] = list
         }
-        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(names, costs, images, states)
+
+        val listItems = mutableListOf<Item>(Item())
+        listItems += itemsGroup[viewModel.type.value?.minus(1)]!!
+
+        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listItems)
 
         imagesCaptionCaptionAdapter.setListener { position: Int ->
             if (position == 0) {
-                type = 0
+                viewModel.type.value = 0
             } else {
-                val localtype = type - 1
-                if (Station.types[localtype].products[position - 1].state == stateProduct.BUY) {
-                    Station.types[localtype].products.forEach {
-                        if (it.state == stateProduct.INSTALL) it.state = stateProduct.BUY
+                val localtype = viewModel.type.value?.minus(1) ?: 0
+                if (listItems[position - 1].state == StateProduct.BUY) {
+                    listItems.forEach {
+                        if (it.state == StateProduct.INSTALL) it.state = StateProduct.BUY
                     }
-                    Station.types[localtype].products[position - 1].state = stateProduct.INSTALL
+                    listItems[position - 1].state = StateProduct.INSTALL
                 } else
-                    if (station.money - Station.types[localtype].products[position - 1].cost >= 0) {
-                        station.money -= Station.types[localtype].products[position - 1].cost
-                        moneyTextView.text = resources.getString(R.string.balance) + station.money.toString() + "$"
-                        Station.types[localtype].products[position - 1].state = stateProduct.BUY
+                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listItems[position - 1].cost)!! >= 0) {
+                        viewModel.configureMoney(listItems[position - 1].cost)
+                        listItems[position - 1].state = StateProduct.BUY
                     }
             }
             updateUI()
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(Station::class.java.simpleName, station)
-        outState.putInt("Type", type)
-        super.onSaveInstanceState(outState)
     }
 }

@@ -4,110 +4,16 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.databinding.CardImageCaptionCaptionBinding
+import com.fiz.android.battleinthespace.options.Item
+import com.fiz.android.battleinthespace.options.StateProduct
 
-enum class stateProduct {
-    NONE, BUY, INSTALL,
-}
 
-class ImagesCaptionCaptionAdapter(
-    val captions: List<String>,
-    val costs: List<Int>,
-    val imageIDs: List<Int>,
-    val states: List<stateProduct>
-) :
+class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
     RecyclerView.Adapter<ImagesCaptionCaptionAdapter.ViewHolder>() {
-
-    inner class ViewHolder(val view: CardView) : RecyclerView.ViewHolder(view), View.OnClickListener {
-        private var caption: String = ""
-        private var cost: Int = 0
-        private var imageID: Int = 0
-        private var state: stateProduct = stateProduct.NONE
-
-        val imageView: ImageView = itemView.findViewById(R.id.info_image)
-        val textView: TextView = itemView.findViewById(R.id.info_text)
-        val costView: TextView = itemView.findViewById(R.id.cost_text)
-        val okButton: TextView = itemView.findViewById(R.id.ok_Button)
-        val undoButton: TextView = itemView.findViewById(R.id.undo_Button)
-        val buttonsLayout: LinearLayout = itemView.findViewById(R.id.buttons_Layout)
-        val colorDefault = view.cardBackgroundColor
-
-        init {
-            itemView.setOnClickListener(this)
-        }
-
-        fun bind(caption: String, cost: Int, imageID: Int, state: stateProduct) {
-            this.caption = caption
-            this.cost = cost
-            this.imageID = imageID
-            this.state = state
-            val drawable = ContextCompat.getDrawable(itemView.context, imageID)
-
-            imageView.setImageDrawable(drawable)
-            imageView.contentDescription = caption + cost
-            itemView.isEnabled = state != stateProduct.INSTALL
-            when (state) {
-                stateProduct.INSTALL -> {
-                    view.setCardBackgroundColor(Color.RED)
-                }
-                stateProduct.BUY -> {
-                    view.setCardBackgroundColor(Color.GREEN)
-                }
-                else -> {
-                    view.setCardBackgroundColor(colorDefault)
-                }
-            }
-
-            when (state) {
-                stateProduct.INSTALL -> {
-                    textView.text = caption + view.resources.getString(R.string.install)
-                }
-                stateProduct.BUY -> {
-                    textView.text = caption + view.resources.getString(R.string.buying)
-                }
-                else -> {
-                    textView.text = caption
-                }
-            }
-
-            costView.text = if (cost == 0)
-                ""
-            else
-                view.resources.getString(R.string.cost) + cost.toString() + "$"
-        }
-
-        override fun onClick(v: View) {
-            if (state == stateProduct.NONE && cost != 0) {
-                view.setCardBackgroundColor(Color.YELLOW)
-                textView.text = view.resources.getString(R.string.buying_question)
-                costView.visibility = View.GONE
-                buttonsLayout.visibility = View.VISIBLE
-                okButton.setOnClickListener {
-                    listener.onClick(layoutPosition)
-                }
-                undoButton.setOnClickListener {
-                    buttonsLayout.visibility = View.GONE
-                    costView.visibility = View.VISIBLE
-                    bind(caption, cost, imageID, state)
-                }
-                return
-            }
-            if (costView.visibility == View.GONE) {
-                buttonsLayout.visibility = View.GONE
-                costView.visibility = View.VISIBLE
-                bind(caption, cost, imageID, state)
-                return
-            }
-            listener.onClick(layoutPosition)
-        }
-
-    }
 
     fun interface Listener {
         fun onClick(position: Int)
@@ -120,16 +26,99 @@ class ImagesCaptionCaptionAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.card_image_caption_caption, parent, false) as CardView
-        return ViewHolder(view)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = CardImageCaptionCaptionBinding.inflate(inflater)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(captions[position], costs[position], imageIDs[position], states[position])
+        if (position == 0)
+            holder.bind()
+        else
+            holder.bind(items[position])
     }
 
     override fun getItemCount(): Int {
-        return captions.size
+        return items.size
+    }
+
+    inner class ViewHolder(val binding: CardImageCaptionCaptionBinding) : RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
+        private val colorDefault = binding.cardView.cardBackgroundColor
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        fun bind(item: Item) {
+            binding.item = item
+            val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
+
+            binding.infoImage.setImageDrawable(drawable)
+            binding.infoImage.contentDescription = (item.name + item.cost).toString()
+            itemView.isEnabled = item.state != StateProduct.INSTALL
+            when (item.state) {
+                StateProduct.INSTALL -> {
+                    binding.cardView.setCardBackgroundColor(Color.RED)
+                }
+                StateProduct.BUY -> {
+                    binding.cardView.setCardBackgroundColor(Color.GREEN)
+                }
+                else -> {
+                    binding.cardView.setCardBackgroundColor(colorDefault)
+                }
+            }
+
+            when (item.state) {
+                StateProduct.INSTALL -> {
+                    binding.infoText.text =
+                        binding.root.context.resources.getString(R.string.install, item.name.toString())
+                }
+                StateProduct.BUY -> {
+                    binding.infoText.text =
+                        binding.root.context.resources.getString(R.string.buying, item.name.toString())
+                }
+                else -> {
+                    binding.infoText.text = item.name.toString()
+                }
+            }
+
+            binding.costText.text = binding.root.context.resources.getString(R.string.cost, item.cost)
+        }
+
+        fun bind() {
+            val drawable = ContextCompat.getDrawable(itemView.context, R.drawable.back)
+            binding.infoImage.setImageDrawable(drawable)
+            binding.infoImage.contentDescription = "Back"
+            itemView.isEnabled = true
+            binding.infoText.text = itemView.context.resources.getString(R.string.back)
+            binding.costText.text = ""
+        }
+
+        override fun onClick(v: View) {
+            if (binding.item?.state == StateProduct.NONE && binding.item?.cost != 0) {
+                binding.cardView.setCardBackgroundColor(Color.YELLOW)
+                binding.infoText.text = binding.root.context.resources.getString(R.string.buying_question)
+                binding.costText.visibility = View.GONE
+                binding.buttonsLayout.visibility = View.VISIBLE
+                binding.okButton.setOnClickListener {
+                    listener.onClick(layoutPosition)
+                }
+                binding.undoButton.setOnClickListener {
+                    binding.buttonsLayout.visibility = View.GONE
+                    binding.costText.visibility = View.VISIBLE
+                    bind(binding.item!!)
+                }
+                return
+            }
+            if (binding.costText.visibility == View.GONE) {
+                binding.buttonsLayout.visibility = View.GONE
+                binding.costText.visibility = View.VISIBLE
+                bind(binding.item!!)
+                return
+            }
+            listener.onClick(layoutPosition)
+        }
+
     }
 }

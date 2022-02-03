@@ -24,7 +24,7 @@ class GameThread(
         createState(State(countPlayers, name, controllers, soundMap, soundPool))
     }
 
-    var ai: Array<AI?> = Array(countPlayers) { null }
+    private var ai: Array<AI?> = emptyArray()
 
     init {
         for (n in 0 until countPlayers)

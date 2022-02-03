@@ -33,6 +33,7 @@ class MissionSelectedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
+
         return binding.root
     }
 

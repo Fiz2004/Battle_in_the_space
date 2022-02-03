@@ -79,6 +79,8 @@
     <string name="rate_of_fire">Rate of fire</string>
     <string name="body">Body</string>
 
+    <string name="back">Back</string>
+
     <string name="bullet">Bullet</string>
     <string name="double_bullet">Double bullet</string>
     <string name="missile">Missile</string>
@@ -89,10 +91,10 @@
     <string name="basic_charger">Basic charger</string>
     <string name="base_case">Base case</string>
 
-    <string name="install"> (Install)</string>
-    <string name="buying"> (Buying)</string>
+    <string name="install">%1$s (Install)</string>
+    <string name="buying">%1$s (Buying)</string>
     <string name="buying_question"> Buying?</string>
     Buying?
-    <string name="cost">Cost: </string>
-    <string name="balance">Your account balance: </string>
+    <string name="cost">Cost: %1$d $</string>
+    <string name="balance">Your account balance: %1$d $</string>
 </resources>
