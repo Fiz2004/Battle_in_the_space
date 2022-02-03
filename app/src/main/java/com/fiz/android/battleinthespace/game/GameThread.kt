@@ -54,7 +54,7 @@ class GameThread(
     }
 
     private fun AIUpdate() {
-        for ((index, player) in state.players.withIndex()) {
+        for ((index, player) in state.playerGames.withIndex()) {
             if (!player.main) {
                 ai[index].update(controllers[index])
             }

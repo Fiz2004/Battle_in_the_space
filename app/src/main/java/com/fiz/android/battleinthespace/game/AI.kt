@@ -9,7 +9,7 @@ import kotlin.math.min
 class AI(private var state: State) {
     fun update(controller: Controller) {
         controller.fire = true
-        val spaceship = state.level.listActors.spaceShips[controller.player.number]
+        val spaceship = state.level.listActors.spaceShips[controller.playerGame.number]
         val center = spaceship.center
         if (state.level.listActors.meteorites.isNotEmpty()) {
             var minDistanceMeteorite: Meteorite = state.level.listActors.meteorites.first()

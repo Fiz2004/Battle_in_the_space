@@ -169,12 +169,12 @@ class Display(
 
     //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
     private fun drawHelper() {
-        val mainSpaceship = state.level.listActors.spaceShips.filter { it.player.main }
+        val mainSpaceship = state.level.listActors.spaceShips.filter { it.playerGame.main }
         if (mainSpaceship.isNotEmpty()) {
-            state.level.listActors.spaceShips.filter { it.inGame && !it.player.main }.forEach {
+            state.level.listActors.spaceShips.filter { it.inGame && !it.playerGame.main }.forEach {
                 if (viewport.getAllPoints(it).size == 0) {
                     val paintFont = Paint()
-                    paintFont.color = getColor(it.player.number)
+                    paintFont.color = getColor(it.playerGame.number)
                     paintFont.style = Paint.Style.FILL
                     paintFont.alpha = 80
                     paintFont.strokeWidth = 30F
@@ -263,7 +263,7 @@ class Display(
                 paintFont
             )
 
-            for (k in 0 until state.players[n].life)
+            for (k in 0 until state.playerGames[n].life)
                 canvasInfo.drawBitmap(
                     bmpSpaceshipLife[n], rectSrc,
                     RectF(
@@ -276,7 +276,7 @@ class Display(
                 )
 
             canvasInfo.drawText(
-                state.players[n].score.toString(),
+                state.playerGames[n].score.toString(),
                 (maxTextWidth + bmplife * 2).toFloat(),
                 baseTextSize + textSize * (n + 1),
                 paintFont

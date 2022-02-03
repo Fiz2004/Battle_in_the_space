@@ -38,7 +38,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     private var countPlayers: Int = 4
     var name: MutableList<String> =
-        MutableList(4) { i -> "${application.applicationContext.resources.getString(R.string.player)} ${i + 1}" }
+        MutableList(4) { i -> "" }
     var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true, false, false, false)
 
     private lateinit var mission: Mission

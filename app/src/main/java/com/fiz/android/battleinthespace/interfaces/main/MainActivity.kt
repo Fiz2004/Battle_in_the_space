@@ -16,16 +16,17 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
     MissionSelectedFragment.Companion.Listener {
-    private lateinit var viewModel: MainViewModel
-    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this)[MainViewModel::class.java]
+    }
+
+    private val binding: ActivityMainBinding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        setContentView(binding.root)
 
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
         binding.viewpager.adapter = pagerAdapter
@@ -56,10 +57,6 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
 
     override fun playersEditTexts(id: Int, text: String) {
         viewModel.playersEditTexts(id, text)
-    }
-
-    override fun playersToggleButtonsClicked(id: Int) {
-        viewModel.playersToggleButtonsClicked(id)
     }
 
     private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :

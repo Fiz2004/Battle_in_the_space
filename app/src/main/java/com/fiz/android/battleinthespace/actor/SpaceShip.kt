@@ -25,11 +25,14 @@ class SpaceShip(
 
     inGame: Boolean = true,
     var isFly: Boolean = false,
-    val player: Player
+    val playerGame: PlayerGame
 ) : MoveableActor(
     center, speed, angle, size, inGame, SPEED_MAX
 ) {
-    constructor (respawn: Respawn, player: Player) : this(Vec(respawn.center), player = player, angle = respawn.angle)
+    constructor (respawn: Respawn, playerGame: PlayerGame) : this(
+        Vec(respawn.center),
+        playerGame = playerGame,
+        angle = respawn.angle)
 
     private var timeRespawn: Double = TIME_RESPAWN_MIN
 
@@ -86,9 +89,9 @@ class SpaceShip(
 
     override fun getBitmap(display: Display): Bitmap {
         return if (isFly)
-            display.bmpSpaceshipFly[player.number]
+            display.bmpSpaceshipFly[playerGame.number]
         else
-            display.bmpSpaceship[player.number]
+            display.bmpSpaceship[playerGame.number]
 
     }
 

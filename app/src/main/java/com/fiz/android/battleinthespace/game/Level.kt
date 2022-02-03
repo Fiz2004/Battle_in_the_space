@@ -4,7 +4,7 @@ import android.media.SoundPool
 import android.util.SparseIntArray
 import com.fiz.android.battleinthespace.actor.Bullet
 import com.fiz.android.battleinthespace.actor.ListActors
-import com.fiz.android.battleinthespace.actor.Player
+import com.fiz.android.battleinthespace.actor.PlayerGame
 import com.fiz.android.battleinthespace.engine.Physics
 import java.io.Serializable
 
@@ -13,11 +13,11 @@ class Level(
     val height: Double,
     private var countPlayers: Int = 4,
     private var countMeteorites: Int,
-    var players: MutableList<Player>
+    var playerGames: MutableList<PlayerGame>
 ) : Serializable {
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
 
-    var listActors = ListActors(width, height, players)
+    var listActors = ListActors(width, height, playerGames)
 
     init {
         Physics.createWorld(width, height)
@@ -45,7 +45,7 @@ class Level(
     }
 
     private fun updatePlayers() {
-        for (player in players)
+        for (player in playerGames)
             player.newRound()
     }
 
@@ -56,12 +56,12 @@ class Level(
         soundPool: SoundPool
     ): Boolean {
         for (spaceShip in listActors.spaceShips) {
-            spaceShip.moveRotate(deltaTime, spaceShip.player.controller.angle.toDouble())
-            spaceShip.moveForward(deltaTime, spaceShip.player.controller)
+            spaceShip.moveRotate(deltaTime, spaceShip.playerGame.controller.angle.toDouble())
+            spaceShip.moveForward(deltaTime, spaceShip.playerGame.controller)
 
-            if (spaceShip.player.controller.isCanFire(deltaTime)) {
+            if (spaceShip.playerGame.controller.isCanFire(deltaTime)) {
                 if (spaceShip.inGame) {
-                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.player.number)
+                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.playerGame.number)
                     soundPool.play(soundMap.get(1), 1F, 1F, 1, 0, 1F)
                 }
             }
@@ -76,7 +76,7 @@ class Level(
             it.timeShow > 0
         }.toMutableList()
 
-        if (players.none { it.life > 0 } || listActors.meteorites.isEmpty())
+        if (playerGames.none { it.life > 0 } || listActors.meteorites.isEmpty())
             return false
 
         return true

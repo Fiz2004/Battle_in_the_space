@@ -24,7 +24,7 @@ class Viewport {
 
         val marginX = surface.width / sizeUnit / 2
         val marginY = surface.height / sizeUnit / 2
-        val spaceship = state.level.listActors.spaceShips[state.players.indexOf(state.players.find { it.main })]
+        val spaceship = state.level.listActors.spaceShips[state.playerGames.indexOf(state.playerGames.find { it.main })]
         val center = spaceship.center
 
         val countViewportXOnScreen = ceil(width / levelWidth)

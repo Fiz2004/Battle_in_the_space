@@ -9,7 +9,7 @@ import com.fiz.android.battleinthespace.engine.Vec
 class ListActors(
     val width: Double,
     val height: Double,
-    var players: MutableList<Player>
+    var playerGames: MutableList<PlayerGame>
 ) {
     var actors: MutableList<MoveableActor> = mutableListOf()
         get() {
@@ -51,7 +51,7 @@ class ListActors(
 
     fun createSpaceShips(countPlayers: Int) {
         for (n in 0 until countPlayers)
-            spaceShips += SpaceShip(respawns[n], player = players[n])
+            spaceShips += SpaceShip(respawns[n], playerGame = playerGames[n])
     }
 
     fun createMeteorites(countMeteorites: Int) {
@@ -110,7 +110,7 @@ class ListActors(
 
     private fun isRespawnFree(currentSpaceShip: SpaceShip): Boolean {
         val numberPlayer = spaceShips.indexOf(currentSpaceShip)
-        if (players[numberPlayer].life > 0) {
+        if (playerGames[numberPlayer].life > 0) {
             val respawn = respawns.find(::findFreeRespawn)
             if (respawn != null) {
                 spaceShips[numberPlayer].respawn(respawn)
@@ -224,9 +224,9 @@ class ListActors(
 
     private fun addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite: List<SpaceShip>) {
         spaceShipsIsCollisionMeteorite.forEach { spaceShip ->
-            players[spaceShips.indexOf(spaceShip)].life -= 1
+            playerGames[spaceShips.indexOf(spaceShip)].life -= 1
             spaceShip.inGame = false
-            if (players[spaceShips.indexOf(spaceShip)].life > 0)
+            if (playerGames[spaceShips.indexOf(spaceShip)].life > 0)
                 lineSpaceShipsOnRespawn.add(spaceShip)
             listAnimationDestroy.add(SpaceShipAnimationDestroy(spaceShip))
         }
@@ -259,7 +259,7 @@ class ListActors(
         bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
             meteorite.inGame = false
             bullet.inGame = false
-            players[bullet.player].score += meteorite.viewSize + 1
+            playerGames[bullet.player].score += meteorite.viewSize + 1
             result[meteorite] = bullet.angle
         }
         return result

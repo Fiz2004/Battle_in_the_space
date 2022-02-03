@@ -2,7 +2,7 @@ package com.fiz.android.battleinthespace.game
 
 import android.content.Context
 import android.view.MotionEvent
-import com.fiz.android.battleinthespace.actor.Player
+import com.fiz.android.battleinthespace.actor.PlayerGame
 import com.fiz.android.battleinthespace.engine.Vec
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -38,10 +38,10 @@ class Controller(
 
     private var timeBetweenFireMin = _timeBetweenFireMin
     private var timeLastFire: Double = 0.0
-    lateinit var player: Player
+    lateinit var playerGame: PlayerGame
 
-    fun linkPlayer(player: Player) {
-        this.player = player
+    fun linkPlayer(playerGame: PlayerGame) {
+        this.playerGame = playerGame
     }
 
     fun isCanFire(deltaTime: Double): Boolean {
