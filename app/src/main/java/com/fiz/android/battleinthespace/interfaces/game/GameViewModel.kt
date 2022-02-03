@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.fiz.android.battleinthespace.options.Mission
 import com.fiz.android.battleinthespace.options.Records
 import com.fiz.android.battleinthespace.options.Station
 
@@ -12,7 +11,7 @@ class GameViewModel(
     __countPlayers: Int,
     __name: MutableList<String>,
     __playerControllerPlayer: MutableList<Boolean>,
-    val mission: Mission,
+    val mission: Int,
     val station: Station,
     val records: Records) :
     ViewModel() {
@@ -33,7 +32,7 @@ class GameViewModelFactory(
     private val countPlayers: Int,
     private val name: MutableList<String>,
     private val playerControllerPlayer: MutableList<Boolean>,
-    private val mission: Mission,
+    private val mission: Int,
     private val station: Station,
     private val records: Records) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

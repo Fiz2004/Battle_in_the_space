@@ -16,7 +16,6 @@ import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
 import com.fiz.android.battleinthespace.game.State
-import com.fiz.android.battleinthespace.options.Mission
 import com.fiz.android.battleinthespace.options.Records
 import com.fiz.android.battleinthespace.options.Station
 
@@ -41,7 +40,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         MutableList(4) { i -> "" }
     var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true, false, false, false)
 
-    private lateinit var mission: Mission
+    private var mission = 0
     private lateinit var station: Station
     private lateinit var records: Records
 
@@ -64,19 +63,12 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         val extras = intent.extras
 
         countPlayers = extras?.getInt("countPlayers") ?: 4
-        name[0] = extras?.getString("name1") ?: ""
-        name[1] = extras?.getString("name2") ?: ""
-        name[2] = extras?.getString("name3") ?: ""
-        name[3] = extras?.getString("name4") ?: ""
-        playerControllerPlayer[0] = extras?.getBoolean("playerControllerPlayer1") ?: true
-        playerControllerPlayer[1] = extras?.getBoolean("playerControllerPlayer2") ?: true
-        playerControllerPlayer[2] = extras?.getBoolean("playerControllerPlayer3") ?: true
-        playerControllerPlayer[3] = extras?.getBoolean("playerControllerPlayer4") ?: true
 
-        mission = if (extras != null)
-            extras.getSerializable(Mission::class.java.simpleName) as Mission
-        else
-            Mission()
+        for (n in 0 until 4) {
+            name[n] = extras?.getString("name$n") ?: ""
+            playerControllerPlayer[0] = extras?.getBoolean("playerControllerPlayer$n") ?: true
+        }
+        mission = extras?.getInt("mission0") ?: 0
 
         records = if (extras != null)
             extras.getSerializable(Records::class.java.simpleName) as Records

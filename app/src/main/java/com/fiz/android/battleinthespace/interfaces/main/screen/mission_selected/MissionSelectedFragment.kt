@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
@@ -15,8 +16,6 @@ import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.FragmentMissionSelectedBinding
 import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroyMeteoriteFragment
 import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroySpaceShipsFragment
-import com.fiz.android.battleinthespace.options.Mission
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -25,51 +24,29 @@ class MissionSelectedFragment : Fragment() {
     private var _binding: FragmentMissionSelectedBinding? = null
     private val binding get() = _binding!!
 
-    companion object {
-        interface Listener {
-            fun changeFragment(id: Int)
-        }
-    }
-
-    private var parentContext: Listener? = null
-    private lateinit var mission: Mission
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        parentContext = context as Listener
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(requireActivity())[MainViewModel::class.java]
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val extras = arguments
-
-        mission = if (extras != null) {
-            extras.getSerializable(Mission::class.java.simpleName) as Mission
-        } else {
-            Mission()
-        }
-
+    ): View {
         _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
-        val view = binding.root
-        return view
+        return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        val localView: View = view ?: return
 
         val pagerAdapter = SectionsPagerAdapter(childFragmentManager, lifecycle)
-        val viewPager = localView.findViewById<ViewPager2>(R.id.viewpager_mission)
-        viewPager.adapter = pagerAdapter
+        binding.viewpagerMission.adapter = pagerAdapter
 
-        val tabLayout = localView.findViewById<TabLayout>(R.id.tabs_mission)
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+        TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
             tab.text = getTitle(position)
         }.attach()
 
-        viewPager.currentItem = mission.mission
+        binding.viewpagerMission.currentItem = viewModel.playerListLiveData.value?.get(0)?.mission ?: 0
     }
 
     private fun getTitle(position: Int): CharSequence {
@@ -77,11 +54,6 @@ class MissionSelectedFragment : Fragment() {
             0 -> resources.getText(R.string.mission_destroy_meteorites)
             else -> resources.getText(R.string.mission_destroy_spaceships)
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(Mission::class.java.simpleName, mission)
-        super.onSaveInstanceState(outState)
     }
 
     private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
@@ -99,7 +71,7 @@ class MissionSelectedFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
-            parentContext?.changeFragment(position)
+            viewModel.playerListLiveData.value?.get(0)?.mission = position
             super.onBindViewHolder(holder, position, payloads)
         }
     }
@@ -107,11 +79,6 @@ class MissionSelectedFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        parentContext = null
     }
 }
 

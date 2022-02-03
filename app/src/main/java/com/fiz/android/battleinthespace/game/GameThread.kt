@@ -24,7 +24,7 @@ class GameThread(
         createState(State(countPlayers, name, controllers, soundMap, soundPool))
     }
 
-    var ai: Array<AI> = Array(countPlayers) { AI(state) }
+    var ai: Array<AI?> = Array(countPlayers) { null }
 
     init {
         for (n in 0 until countPlayers)
@@ -55,8 +55,8 @@ class GameThread(
 
     private fun AIUpdate() {
         for ((index, player) in state.playerGames.withIndex()) {
-            if (!player.main) {
-                ai[index].update(controllers[index])
+            if (ai[index] != null && !player.main) {
+                ai[index]?.update(controllers[index])
             }
         }
     }

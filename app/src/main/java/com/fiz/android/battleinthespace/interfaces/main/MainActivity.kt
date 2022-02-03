@@ -11,11 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.android.battleinthespace.interfaces.game.GameActivity
-import com.fiz.android.battleinthespace.interfaces.main.options.OptionsFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
-class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
-    MissionSelectedFragment.Companion.Listener {
+class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this)[MainViewModel::class.java]
     }
@@ -55,10 +53,6 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
         startActivity(viewModel.onClickDone(intent))
     }
 
-    override fun playersEditTexts(id: Int, text: String) {
-        viewModel.playersEditTexts(id, text)
-    }
-
     private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
         androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
         override fun getItemCount(): Int {
@@ -68,10 +62,6 @@ class MainActivity : AppCompatActivity(), OptionsFragment.Companion.Listener,
         override fun createFragment(position: Int): Fragment {
             return viewModel.createFragment(position)
         }
-    }
-
-    override fun changeFragment(id: Int) {
-        viewModel.changeFragment(id)
     }
 }
 

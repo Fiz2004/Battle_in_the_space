@@ -5,5 +5,7 @@ import java.util.*
 data class Player(
     val id: UUID = UUID.randomUUID(),
     var name: String = "Player",
-    var controllerPlayer: Boolean = true
+    var controllerPlayer: Boolean = true,
+
+    var mission: Int = 0
 )
