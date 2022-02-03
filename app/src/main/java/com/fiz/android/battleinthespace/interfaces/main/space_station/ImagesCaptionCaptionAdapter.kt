@@ -69,17 +69,18 @@ class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
                 }
             }
 
+            val names = binding.root.context.resources.getString(item.name)
             when (item.state) {
                 StateProduct.INSTALL -> {
                     binding.infoText.text =
-                        binding.root.context.resources.getString(R.string.install, item.name.toString())
+                        binding.root.context.resources.getString(R.string.install, names)
                 }
                 StateProduct.BUY -> {
                     binding.infoText.text =
-                        binding.root.context.resources.getString(R.string.buying, item.name.toString())
+                        binding.root.context.resources.getString(R.string.buying, names)
                 }
                 else -> {
-                    binding.infoText.text = item.name.toString()
+                    binding.infoText.text = names
                 }
             }
 

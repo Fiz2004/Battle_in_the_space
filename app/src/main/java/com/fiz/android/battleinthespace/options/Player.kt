@@ -29,19 +29,17 @@ data class Types(val names: Int, val imageIds: Int) {
     }
 }
 
-data class Product(val name: Int, val imageId: Int, val cost: Int, var state: StateProduct) :
-    data
+data class Product(val name: Int, val imageId: Int, val cost: Int, var state: StateProduct)
 
-class Type(val names: Int, val imageIds: Int, val products: List<Product>) :
-
-    data
+class Type(val names: Int, val imageIds: Int, val products: List<Product>)
 
 class Item(
     val type: Int = 0,
     val name: Int = 0,
     val imageId: Int = 0,
     val cost: Int = 0,
-    var state: StateProduct = StateProduct.NONE) {
+    var state: StateProduct = StateProduct.NONE
+) {
     companion object {
         fun createItems(): List<Item> {
             return listOf(

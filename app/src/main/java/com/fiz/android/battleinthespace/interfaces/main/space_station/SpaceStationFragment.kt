@@ -73,22 +73,21 @@ class SpaceStationFragment : Fragment() {
         val listItems = mutableListOf<Item>(Item())
         listItems += itemsGroup[viewModel.type.value?.minus(1)]!!
 
-        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listItems)
+        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listItems.toList())
 
         imagesCaptionCaptionAdapter.setListener { position: Int ->
             if (position == 0) {
                 viewModel.type.value = 0
             } else {
-                val localtype = viewModel.type.value?.minus(1) ?: 0
-                if (listItems[position - 1].state == StateProduct.BUY) {
+                if (listItems[position].state == StateProduct.BUY) {
                     listItems.forEach {
                         if (it.state == StateProduct.INSTALL) it.state = StateProduct.BUY
                     }
-                    listItems[position - 1].state = StateProduct.INSTALL
+                    listItems[position].state = StateProduct.INSTALL
                 } else
-                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listItems[position - 1].cost)!! >= 0) {
-                        viewModel.configureMoney(listItems[position - 1].cost)
-                        listItems[position - 1].state = StateProduct.BUY
+                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listItems[position].cost)!! >= 0) {
+                        viewModel.configureMoney(listItems[position].cost)
+                        listItems[position].state = StateProduct.BUY
                     }
             }
             updateUI()
