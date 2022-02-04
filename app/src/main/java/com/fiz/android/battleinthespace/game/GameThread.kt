@@ -24,12 +24,12 @@ class GameThread(
         createState(State(countPlayers, name, controllers, soundMap, soundPool))
     }
 
-    private var ai: Array<AI?> = emptyArray()
+    private var ai: Array<AI?> = Array<AI?>(4) { null }
 
     init {
         for (n in 0 until countPlayers)
             if (!playerControllerPlayer[n])
-                ai += AI(state)
+                ai[n] = AI(state)
     }
 
     private var prevTime = System.currentTimeMillis()

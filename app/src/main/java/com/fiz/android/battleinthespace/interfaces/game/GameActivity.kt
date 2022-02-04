@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.util.SparseIntArray
 import android.view.MotionEvent
 import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
@@ -17,6 +15,7 @@ import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.GameThread
 import com.fiz.android.battleinthespace.game.State
 import com.fiz.android.battleinthespace.options.Records
+import com.fiz.android.battleinthespace.options.StateProduct
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private lateinit var viewModel: GameViewModel
@@ -27,13 +26,8 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     }
 
     private lateinit var gameThread: GameThread
+    var start = false
 
-    private lateinit var newGameButton: Button
-    private lateinit var pauseButton: Button
-    private lateinit var exitButton: Button
-
-    private lateinit var gameSurfaceView: SurfaceView
-    private lateinit var informationSurfaceView: SurfaceView
     private var isGameSurfaceViewReady = false
     private var isInformationSurfaceViewReady = false
 
@@ -43,6 +37,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     var playerControllerPlayer: MutableList<Boolean> = mutableListOf(true, false, false, false)
 
     private var mission = 0
+    var items: HashMap<Int, StateProduct> = hashMapOf()
     private lateinit var records: Records
 
     private lateinit var soundMap: SparseIntArray
@@ -51,13 +46,6 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        newGameButton = findViewById(R.id.new_game_game_button)
-        pauseButton = findViewById(R.id.pause_game_button)
-        exitButton = findViewById(R.id.exit_game_button)
-
-        gameSurfaceView = findViewById(R.id.game_game_surfaceview)
-        informationSurfaceView = findViewById(R.id.information_game_surfaceview)
 
         val extras = intent.extras
 
@@ -68,6 +56,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
             playerControllerPlayer[n] = extras?.getBoolean("playerControllerPlayer$n") ?: true
         }
         mission = extras?.getInt("mission0") ?: 0
+        items = (extras?.getSerializable("items0") ?: hashMapOf<Int, StateProduct>()) as HashMap<Int, StateProduct>
 
         records = if (extras != null)
             extras.getSerializable(Records::class.java.simpleName) as Records
@@ -84,13 +73,13 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
         viewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
 
-        newGameButton.setOnClickListener {
+        binding.newGameGameButton.setOnClickListener {
             gameThread.state.status = "new game"
         }
-        pauseButton.setOnClickListener {
+        binding.pauseGameButton.setOnClickListener {
             gameThread.state.clickPause()
         }
-        exitButton.setOnClickListener {
+        binding.exitGameButton.setOnClickListener {
             finish()
         }
 
@@ -108,19 +97,21 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
             soundPool.load(applicationContext, R.raw.collision, 1)
         )
 
-        gameSurfaceView.holder.addCallback(GameSurfaceView())
-        informationSurfaceView.holder.addCallback(InformationSurfaceView())
+        binding.gameGameSurfaceview.holder.addCallback(GameSurfaceView())
+        binding.informationGameSurfaceview.holder.addCallback(InformationSurfaceView())
     }
 
     override fun onResume() {
         super.onResume()
-        if (gameThread.pause == true)
-            gameThread.pause = false
+        if (start)
+            if (gameThread.pause == true)
+                gameThread.pause = false
     }
 
     override fun onPause() {
         super.onPause()
-        gameThread.pause = true
+        if (start)
+            gameThread.pause = true
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -132,8 +123,8 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         val point = Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
 
         var touchLeftSide = false
-        if (point.x > gameSurfaceView.left && point.x < gameSurfaceView.left + gameSurfaceView.width
-                && point.y > gameSurfaceView.top && point.y < gameSurfaceView.top + gameSurfaceView.height
+        if (point.x > binding.gameGameSurfaceview.left && point.x < binding.gameGameSurfaceview.left + binding.gameGameSurfaceview.width
+                && point.y > binding.gameGameSurfaceview.top && point.y < binding.gameGameSurfaceview.top + binding.gameGameSurfaceview.height
         )
             touchLeftSide = true
 
@@ -160,7 +151,8 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     override fun onDestroy() {
         super.onDestroy()
         soundPool.release()
-        gameThreadStop()
+        if (start)
+            gameThreadStop()
     }
 
     private fun gameThreadStop() {
@@ -182,9 +174,13 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     override fun pauseButtonClick(status: String) {
         if (status == "pause")
-            pauseButton.post { pauseButton.text = resources.getString(R.string.resume_game_button) }
+            binding.pauseGameButton.post {
+                binding.pauseGameButton.text = resources.getString(R.string.resume_game_button)
+            }
         else
-            pauseButton.post { pauseButton.text = resources.getString(R.string.pause_game_button) }
+            binding.pauseGameButton.post {
+                binding.pauseGameButton.text = resources.getString(R.string.pause_game_button)
+            }
     }
 
     inner class GameSurfaceView : SurfaceHolder.Callback {
@@ -223,13 +219,14 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
                 viewModel.countPlayers.value ?: 4,
                 viewModel.name,
                 viewModel.playerControllerPlayer,
-                gameSurfaceView,
-                informationSurfaceView,
+                binding.gameGameSurfaceview,
+                binding.informationGameSurfaceview,
                 this, soundMap, soundPool
             )
 
             gameThread.running = true
             gameThread.start()
+            start = true
         }
     }
 }

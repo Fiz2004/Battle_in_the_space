@@ -12,7 +12,7 @@ data class Player(
 
     var money: Int = 1000,
 
-    var items: MutableMap<Int, StateProduct> = mutableMapOf()
+    var items: HashMap<Int, StateProduct> = hashMapOf()
 ) {
     init {
         for (item in Products.createListProducts()) {

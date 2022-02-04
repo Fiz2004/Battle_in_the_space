@@ -11,6 +11,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.android.battleinthespace.interfaces.game.GameActivity
+import com.fiz.android.battleinthespace.interfaces.main.options.OptionsFragment
+import com.fiz.android.battleinthespace.interfaces.main.space_station.SpaceStationFragment
+import com.fiz.android.battleinthespace.interfaces.main.statistics.StatisticsFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -53,14 +56,19 @@ class MainActivity : AppCompatActivity() {
         startActivity(viewModel.onClickDone(intent))
     }
 
-    private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
+    class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
         androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
         override fun getItemCount(): Int {
             return 4
         }
 
         override fun createFragment(position: Int): Fragment {
-            return viewModel.createFragment(position)
+            return when (position) {
+                0 -> MissionSelectedFragment()
+                1 -> SpaceStationFragment()
+                2 -> StatisticsFragment()
+                else -> OptionsFragment()
+            }
         }
     }
 }
