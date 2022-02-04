@@ -8,11 +8,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.CardImageCaptionCaptionBinding
-import com.fiz.android.battleinthespace.options.Item
+import com.fiz.android.battleinthespace.options.Product
 import com.fiz.android.battleinthespace.options.StateProduct
 
 
-class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
+class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
     RecyclerView.Adapter<ImagesCaptionCaptionAdapter.ViewHolder>() {
 
     fun interface Listener {
@@ -35,11 +35,11 @@ class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
         if (position == 0)
             holder.bind()
         else
-            holder.bind(items[position])
+            holder.bind(products[position])
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return products.size
     }
 
     inner class ViewHolder(val binding: CardImageCaptionCaptionBinding) : RecyclerView.ViewHolder(binding.root),
@@ -50,14 +50,14 @@ class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
             itemView.setOnClickListener(this)
         }
 
-        fun bind(item: Item) {
-            binding.item = item
-            val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
+        fun bind(products: Product) {
+            binding.item = products
+            val drawable = ContextCompat.getDrawable(itemView.context, products.imageId)
 
             binding.infoImage.setImageDrawable(drawable)
-            binding.infoImage.contentDescription = (item.name + item.cost).toString()
-            itemView.isEnabled = item.state != StateProduct.INSTALL
-            when (item.state) {
+            binding.infoImage.contentDescription = (products.name + products.cost).toString()
+            itemView.isEnabled = products.state != StateProduct.INSTALL
+            when (products.state) {
                 StateProduct.INSTALL -> {
                     binding.cardView.setCardBackgroundColor(Color.RED)
                 }
@@ -69,8 +69,8 @@ class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
                 }
             }
 
-            val names = binding.root.context.resources.getString(item.name)
-            when (item.state) {
+            val names = binding.root.context.resources.getString(products.name)
+            when (products.state) {
                 StateProduct.INSTALL -> {
                     binding.infoText.text =
                         binding.root.context.resources.getString(R.string.install, names)
@@ -84,7 +84,7 @@ class ImagesCaptionCaptionAdapter(private val items: List<Item>) :
                 }
             }
 
-            binding.costText.text = binding.root.context.resources.getString(R.string.cost, item.cost)
+            binding.costText.text = binding.root.context.resources.getString(R.string.cost, products.cost)
         }
 
         fun bind() {

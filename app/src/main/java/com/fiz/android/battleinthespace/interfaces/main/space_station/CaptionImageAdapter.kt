@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.databinding.CardCaptionImageBinding
-import com.fiz.android.battleinthespace.options.Types
+import com.fiz.android.battleinthespace.options.ProductTypes
 
 class CaptionImageAdapter(
-    private val items: List<Types>) :
+    private val items: List<ProductTypes>) :
     RecyclerView.Adapter<CaptionImageAdapter.ViewHolder>() {
 
     fun interface Listener {
@@ -43,12 +43,12 @@ class CaptionImageAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(item: Types) {
+        fun bind(item: ProductTypes) {
             binding.item = item
-            val drawable = ContextCompat.getDrawable(itemView.context, item.imageIds)
+            val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
             binding.infoImage.setImageDrawable(drawable)
-            binding.infoImage.contentDescription = itemView.context.resources.getString(item.names)
-            binding.infoText.text = itemView.context.resources.getString(item.names)
+            binding.infoImage.contentDescription = itemView.context.resources.getString(item.name)
+            binding.infoText.text = itemView.context.resources.getString(item.name)
         }
 
         override fun onClick(p0: View?) {

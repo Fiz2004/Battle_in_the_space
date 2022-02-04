@@ -9,9 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 import com.fiz.android.battleinthespace.interfaces.main.MainViewModel
-import com.fiz.android.battleinthespace.options.Item
+import com.fiz.android.battleinthespace.options.Product
+import com.fiz.android.battleinthespace.options.ProductTypes
+import com.fiz.android.battleinthespace.options.Products
 import com.fiz.android.battleinthespace.options.StateProduct
-import com.fiz.android.battleinthespace.options.Types
 
 class SpaceStationFragment : Fragment() {
     private var _binding: FragmentSpaceStationBinding? = null
@@ -56,7 +57,7 @@ class SpaceStationFragment : Fragment() {
     }
 
     private fun configureCaptionImageAdapter() {
-        captionImageAdapter = CaptionImageAdapter(Types.createTypes())
+        captionImageAdapter = CaptionImageAdapter(ProductTypes.createTypes())
 
         captionImageAdapter.setListener { position: Int ->
             viewModel.type.value = position + 1
@@ -65,29 +66,30 @@ class SpaceStationFragment : Fragment() {
     }
 
     private fun configureImagesCaptionCaptionAdapter() {
-        val itemsGroup: MutableMap<Int, List<Item>> = mutableMapOf()
-        viewModel.playerListLiveData.value?.get(0)?.items!!.groupBy { it.type }.values.forEachIndexed { index, list ->
-            itemsGroup[index] = list
-        }
+        val currentType = viewModel.type.value?.minus(1) ?: 0
+        val nameType = ProductTypes.createTypes()[currentType].name
+        val items = viewModel.playerListLiveData.value?.get(0)?.items ?: return
+        val listProduct = Product.getListProduct(nameType, items)
 
-        val listItems = mutableListOf<Item>(Item())
-        listItems += itemsGroup[viewModel.type.value?.minus(1)]!!
-
-        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listItems.toList())
+        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
 
         imagesCaptionCaptionAdapter.setListener { position: Int ->
             if (position == 0) {
                 viewModel.type.value = 0
             } else {
-                if (listItems[position].state == StateProduct.BUY) {
-                    listItems.forEach {
-                        if (it.state == StateProduct.INSTALL) it.state = StateProduct.BUY
+                if (listProduct[position].state == StateProduct.BUY) {
+                    val allProductsType = Products.createListProducts().filter { it.type == nameType }
+                    allProductsType.forEach {
+                        if (items[it.name] == StateProduct.INSTALL)
+                            viewModel.playerListLiveData.value?.get(0)?.items!![it.name] = StateProduct.BUY
                     }
-                    listItems[position].state = StateProduct.INSTALL
+                    val key = listProduct[position].name
+                    viewModel.playerListLiveData.value?.get(0)?.items!![key] = StateProduct.INSTALL
                 } else
-                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listItems[position].cost)!! >= 0) {
-                        viewModel.configureMoney(listItems[position].cost)
-                        listItems[position].state = StateProduct.BUY
+                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listProduct[position].cost)!! >= 0) {
+                        viewModel.configureMoney(listProduct[position].cost)
+                        val key = listProduct[position].name
+                        viewModel.playerListLiveData.value?.get(0)?.items!![key] = StateProduct.BUY
                     }
             }
             updateUI()
