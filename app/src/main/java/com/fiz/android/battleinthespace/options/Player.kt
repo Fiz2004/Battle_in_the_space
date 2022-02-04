@@ -1,17 +1,23 @@
 package com.fiz.android.battleinthespace.options
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.fiz.android.battleinthespace.R
-import java.util.*
 
+@Entity(tableName = "information_player_table")
 data class Player(
-    val id: UUID = UUID.randomUUID(),
+    @PrimaryKey
+    val id: Int = 0,
+    @ColumnInfo(name = "name")
     var name: String = "Player",
+    @ColumnInfo(name = "controllerPlayer")
     var controllerPlayer: Boolean = true,
-
+    @ColumnInfo(name = "mission")
     var mission: Int = 0,
-
+    @ColumnInfo(name = "money")
     var money: Int = 1000,
-
+    @ColumnInfo(name = "items")
     var items: HashMap<Int, StateProduct> = hashMapOf()
 ) {
     init {

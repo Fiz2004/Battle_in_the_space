@@ -11,11 +11,11 @@ import com.fiz.android.battleinthespace.options.PlayerRepository
 class MainViewModel : ViewModel() {
     private val playerRepository = PlayerRepository.get()
 
-    private val _playerListLiveData = MutableLiveData<List<Player>>(playerRepository.getPlayers())
+    private val _playerListLiveData = playerRepository.getPlayers()
     val playerListLiveData: LiveData<List<Player>>
         get() = _playerListLiveData
 
-    private val _countPlayerLiveData = MutableLiveData(playerRepository.getCountPlayer())
+    private val _countPlayerLiveData = MutableLiveData<Int>(4) /*playerRepository.getCountPlayer()*/
     val countPlayerLiveData: LiveData<Int>
         get() = _countPlayerLiveData
 
@@ -29,6 +29,11 @@ class MainViewModel : ViewModel() {
 
     fun setType(value: Int) {
         _type.value = value
+    }
+
+    fun savePlayers() {
+        for (player in playerListLiveData.value!!)
+            playerRepository.updatePlayer(player)
     }
 
     fun onSaveInstanceState(outState: Bundle) {
