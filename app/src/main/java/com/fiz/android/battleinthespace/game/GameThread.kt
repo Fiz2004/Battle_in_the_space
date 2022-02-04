@@ -5,12 +5,11 @@ import android.graphics.Canvas
 import android.media.SoundPool
 import android.util.SparseIntArray
 import android.view.SurfaceView
+import com.fiz.android.battleinthespace.interfaces.game.GameViewModel
 import kotlin.math.min
 
 class GameThread(
-    countPlayers: Int,
-    var name: MutableList<String>,
-    var playerControllerPlayer: MutableList<Boolean>,
+    viewModel: GameViewModel,
     private val surface: SurfaceView,
     private val informationSurface: SurfaceView,
     context: Context,
@@ -18,17 +17,23 @@ class GameThread(
     val soundPool: SoundPool,
 ) : Thread() {
     lateinit var state: com.fiz.android.battleinthespace.game.State
-    val controllers: Array<Controller> = Array(countPlayers) { Controller(context = context) }
+    val controllers: Array<Controller> = Array(viewModel.countPlayers.value ?: 4) { Controller(context = context) }
 
     init {
-        createState(State(countPlayers, name, controllers, soundMap, soundPool))
+        createState(
+            State(
+                viewModel.countPlayers.value ?: 4,
+                viewModel.name.value ?: mutableListOf(),
+                controllers,
+                soundMap,
+                soundPool))
     }
 
     private var ai: Array<AI?> = Array<AI?>(4) { null }
 
     init {
-        for (n in 0 until countPlayers)
-            if (!playerControllerPlayer[n])
+        for (n in 0 until (viewModel.countPlayers.value ?: 4))
+            if (viewModel.playerControllerPlayer.value?.get(n) == false)
                 ai[n] = AI(state)
     }
 

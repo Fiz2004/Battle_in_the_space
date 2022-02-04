@@ -1,27 +1,34 @@
 package com.fiz.android.battleinthespace.interfaces.main
 
-import android.app.Application
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.fiz.android.battleinthespace.options.Player
 import com.fiz.android.battleinthespace.options.PlayerRepository
-import com.fiz.android.battleinthespace.options.Records
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel : ViewModel() {
     private val playerRepository = PlayerRepository.get()
 
-    var playerListLiveData = MutableLiveData<List<Player>>(playerRepository.getPlayers())
+    private val _playerListLiveData = MutableLiveData<List<Player>>(playerRepository.getPlayers())
+    val playerListLiveData: LiveData<List<Player>>
+        get() = _playerListLiveData
 
-    var countPlayerLiveData = MutableLiveData(playerRepository.getCountPlayer())
+    private val _countPlayerLiveData = MutableLiveData(playerRepository.getCountPlayer())
+    val countPlayerLiveData: LiveData<Int>
+        get() = _countPlayerLiveData
 
-    var type = MutableLiveData(0)
-
-    var records: Records = Records()
+    private val _type = MutableLiveData(0)
+    val type: LiveData<Int>
+        get() = _type
 
     fun setCountPlayers(numberRadioButton: Int) {
-        countPlayerLiveData.value = numberRadioButton
+        _countPlayerLiveData.value = numberRadioButton
+    }
+
+    fun setType(value: Int) {
+        _type.value = value
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -34,7 +41,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             outState.putInt("mission$n", value.mission)
             outState.putSerializable("items$n", value.items)
         }
-        outState.putSerializable(Records::class.java.simpleName, records)
     }
 
     fun onClickDone(intent: Intent): Intent {
@@ -47,13 +53,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             intent.putExtra("mission$n", value.mission)
             intent.putExtra("items$n", value.items)
         }
-        intent.putExtra(Records::class.java.simpleName, records)
         return intent
     }
 
     fun configureMoney(cost: Int) {
+        playerListLiveData.value
         val newValue = playerListLiveData.value
         newValue?.get(0)?.money = playerListLiveData.value?.get(0)?.money?.minus(cost) ?: 0
-        playerListLiveData.value = newValue
+        _playerListLiveData.value = newValue
     }
 }

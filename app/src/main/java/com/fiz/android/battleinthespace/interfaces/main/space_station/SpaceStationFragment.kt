@@ -60,7 +60,7 @@ class SpaceStationFragment : Fragment() {
         captionImageAdapter = CaptionImageAdapter(ProductTypes.createTypes())
 
         captionImageAdapter.setListener { position: Int ->
-            viewModel.type.value = position + 1
+            viewModel.setType(position + 1)
             updateUI()
         }
     }
@@ -75,7 +75,7 @@ class SpaceStationFragment : Fragment() {
 
         imagesCaptionCaptionAdapter.setListener { position: Int ->
             if (position == 0) {
-                viewModel.type.value = 0
+                viewModel.setType(0)
             } else {
                 if (listProduct[position].state == StateProduct.BUY) {
                     val allProductsType = Products.createListProducts().filter { it.type == nameType }
