@@ -17,27 +17,44 @@ class PlayerRepository private constructor(context: Context) {
         DATABASE_NAME
     ).build()
 
-    private val playersDAO = DataBaseFake()
+    private val playersDAO = database.playerDao()
 
-    private val playersFromDatabaseDAO = database.playerDao()
+    init {
+        Executors.newSingleThreadExecutor().execute {
+            playersDAO.clear()
+        }
+        if (playersDAO.getCount().value == 0 || playersDAO.getCount().value == null) {
+            val player1 = Player(id = 0, name = "Player 1")
+            val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
+            val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
+            val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+            addPlayer(player1)
+            addPlayer(player2)
+            addPlayer(player3)
+            addPlayer(player4)
+        }
+    }
 
     private val countPlayer = playersDAO.getCount()
 
     fun getCountPlayer() = countPlayer
 
-    fun getPlayers() = MutableLiveData<List<Player>>(playersDAO.getAll())
+    fun getPlayers(): LiveData<List<Player>> {
+        val result = playersDAO.getAll()
+        return result
+    }
 
-    fun getPlayer(number: Int) = playersDAO.get(number)
+    fun getPlayer(id: Int) = playersDAO.get(id)
 
     fun addPlayer(player: Player) {
         Executors.newSingleThreadExecutor().execute {
-            playersFromDatabaseDAO.addPlayer(player)
+            playersDAO.addPlayer(player)
         }
     }
 
     fun updatePlayer(player: Player) {
         Executors.newSingleThreadExecutor().execute {
-            playersFromDatabaseDAO.update(player)
+            playersDAO.update(player)
         }
     }
 
@@ -60,7 +77,8 @@ class DataBaseFake {
         Player(id = 0, name = "Player 1"),
         Player(id = 1, name = "Player 2", controllerPlayer = false),
         Player(id = 2, name = "Player 3", controllerPlayer = false),
-        Player(id = 3, name = "Player 4", controllerPlayer = false))
+        Player(id = 3, name = "Player 4", controllerPlayer = false)
+    )
 
     fun getCount(): Int {
         return databasePlayers.size

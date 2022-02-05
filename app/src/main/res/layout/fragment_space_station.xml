@@ -18,7 +18,7 @@
             android:id="@+id/money"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{@string/balance(mainViewModel.playerListLiveData[0].money)}"
+            android:text="@{@string/balance(mainViewModel.money)}"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView

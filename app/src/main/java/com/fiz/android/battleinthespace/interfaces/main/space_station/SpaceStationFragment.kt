@@ -68,7 +68,7 @@ class SpaceStationFragment : Fragment() {
     private fun configureImagesCaptionCaptionAdapter() {
         val currentType = viewModel.type.value?.minus(1) ?: 0
         val nameType = ProductTypes.createTypes()[currentType].name
-        val items = viewModel.playerListLiveData.value?.get(0)?.items ?: return
+        val items = viewModel.playerLiveData?.value?.items ?: return
         val listProduct = Product.getListProduct(nameType, items)
 
         imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
@@ -81,15 +81,15 @@ class SpaceStationFragment : Fragment() {
                     val allProductsType = Products.createListProducts().filter { it.type == nameType }
                     allProductsType.forEach {
                         if (items[it.name] == StateProduct.INSTALL)
-                            viewModel.playerListLiveData.value?.get(0)?.items!![it.name] = StateProduct.BUY
+                            viewModel.playerLiveData?.value?.items!![it.name] = StateProduct.BUY
                     }
                     val key = listProduct[position].name
-                    viewModel.playerListLiveData.value?.get(0)?.items!![key] = StateProduct.INSTALL
+                    viewModel.playerLiveData?.value?.items!![key] = StateProduct.INSTALL
                 } else
-                    if (viewModel.playerListLiveData.value?.get(0)?.money?.minus(listProduct[position].cost)!! >= 0) {
+                    if (viewModel.playerLiveData?.value?.money?.minus(listProduct[position].cost)!! >= 0) {
                         viewModel.configureMoney(listProduct[position].cost)
                         val key = listProduct[position].name
-                        viewModel.playerListLiveData.value?.get(0)?.items!![key] = StateProduct.BUY
+                        viewModel.playerLiveData?.value?.items!![key] = StateProduct.BUY
                     }
             }
             updateUI()

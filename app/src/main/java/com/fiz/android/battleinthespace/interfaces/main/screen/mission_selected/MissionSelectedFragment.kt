@@ -47,7 +47,7 @@ class MissionSelectedFragment : Fragment() {
             tab.text = getTitle(position)
         }.attach()
 
-        binding.viewpagerMission.currentItem = viewModel.playerListLiveData.value?.get(0)?.mission ?: 0
+        binding.viewpagerMission.currentItem = viewModel.playerLiveData?.value?.mission ?: 0
     }
 
     private fun getTitle(position: Int): CharSequence {
@@ -72,7 +72,7 @@ class MissionSelectedFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
-            viewModel.playerListLiveData.value?.get(0)?.mission = position
+            viewModel.playerLiveData?.value?.mission = position
             super.onBindViewHolder(holder, position, payloads)
         }
     }

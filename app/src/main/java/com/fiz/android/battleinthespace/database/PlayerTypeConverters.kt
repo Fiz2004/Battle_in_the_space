@@ -15,19 +15,26 @@ class PlayerTypeConverters {
     //    }
 
     @TypeConverter
-    fun toItems(items: String?): HashMap<Int, StateProduct>? {
-        val itemSplit = items?.split("=")
-        val first = (itemSplit?.get(0))?.toInt() ?: 0
-        val second = itemSplit?.get(1) ?: 0
-        val productState = when (second) {
-            "0" -> StateProduct.NONE
-            "1" -> StateProduct.BUY
-            "2" -> StateProduct.INSTALL
-            else -> {
-                StateProduct.NONE
+    fun toItems(items: String?): HashMap<Int, StateProduct> {
+        val result = hashMapOf<Int, StateProduct>()
+        val itemsSplit = items?.split(";")
+        if (itemsSplit != null) {
+            for (itemsNoSplit in itemsSplit) {
+                val item = itemsNoSplit.split("=")
+                val first = (item[0]).toInt()
+                val second = item[1]
+                val productState = when (second) {
+                    "0" -> StateProduct.NONE
+                    "1" -> StateProduct.BUY
+                    "2" -> StateProduct.INSTALL
+                    else -> {
+                        StateProduct.NONE
+                    }
+                }
+                result[first] = productState
             }
         }
-        return hashMapOf(Pair<Int, StateProduct>(first, productState))
+        return result
     }
 
     @TypeConverter
@@ -40,7 +47,14 @@ class PlayerTypeConverters {
                 StateProduct.INSTALL -> "2"
             }
         }
-        return "$keys=$values"
+        var result = ""
+        if (keys != null && values != null) {
+            for ((index, key) in keys.withIndex()) {
+                result += "$key=${values[index]}"
+                result += ";"
+            }
+        }
+        return result.substring(0, result.length - 1)
     }
 
 }

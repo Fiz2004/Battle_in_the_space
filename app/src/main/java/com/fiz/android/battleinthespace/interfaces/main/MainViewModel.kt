@@ -15,6 +15,12 @@ class MainViewModel : ViewModel() {
     val playerListLiveData: LiveData<List<Player>>
         get() = _playerListLiveData
 
+    private val _playerLiveData = playerRepository.getPlayer(0)
+    val playerLiveData: LiveData<Player>?
+        get() = _playerLiveData
+
+    val money: MutableLiveData<Int> = MutableLiveData<Int>(playerLiveData?.value?.money)
+
     private val _countPlayerLiveData = MutableLiveData<Int>(4) /*playerRepository.getCountPlayer()*/
     val countPlayerLiveData: LiveData<Int>
         get() = _countPlayerLiveData
@@ -32,8 +38,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun savePlayers() {
-        for (player in playerListLiveData.value!!)
-            playerRepository.updatePlayer(player)
+        playerRepository.updatePlayer(playerLiveData?.value!!)
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -62,9 +67,6 @@ class MainViewModel : ViewModel() {
     }
 
     fun configureMoney(cost: Int) {
-        playerListLiveData.value
-        val newValue = playerListLiveData.value
-        newValue?.get(0)?.money = playerListLiveData.value?.get(0)?.money?.minus(cost) ?: 0
-        _playerListLiveData.value = newValue
+        money.value = money.value?.minus(cost) ?: 0
     }
 }
