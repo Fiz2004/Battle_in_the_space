@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.options
 
+import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,15 +10,15 @@ import com.fiz.android.battleinthespace.R
 data class Player(
     @PrimaryKey
     val id: Int = 0,
-    @ColumnInfo(name = "name")
+    @NonNull @ColumnInfo(name = "name")
     var name: String = "Player",
-    @ColumnInfo(name = "controllerPlayer")
+    @NonNull @ColumnInfo(name = "controllerPlayer")
     var controllerPlayer: Boolean = true,
-    @ColumnInfo(name = "mission")
+    @NonNull @ColumnInfo(name = "mission")
     var mission: Int = 0,
-    @ColumnInfo(name = "money")
+    @NonNull @ColumnInfo(name = "money")
     var money: Int = 1000,
-    @ColumnInfo(name = "items")
+    @NonNull @ColumnInfo(name = "items")
     var items: HashMap<Int, StateProduct> = hashMapOf()
 ) {
     init {

@@ -11,15 +11,16 @@ import com.fiz.android.battleinthespace.options.PlayerRepository
 class MainViewModel : ViewModel() {
     private val playerRepository = PlayerRepository.get()
 
-    private val _playerListLiveData = playerRepository.getPlayers()
+    private val _playerListLiveData = MutableLiveData(playerRepository.getPlayers())
     val playerListLiveData: LiveData<List<Player>>
         get() = _playerListLiveData
 
-    private val _playerLiveData = playerRepository.getPlayer(0)
-    val playerLiveData: LiveData<Player>?
+    private val _playerLiveData =
+        MutableLiveData(playerRepository.getPlayer(0) ?: throw Error("Не могу загрузить данные о игроке"))
+    val playerLiveData: LiveData<Player>
         get() = _playerLiveData
 
-    val money: MutableLiveData<Int> = MutableLiveData<Int>(playerLiveData?.value?.money)
+    val money: MutableLiveData<Int> = MutableLiveData<Int>(_playerLiveData.value?.money)
 
     private val _countPlayerLiveData = MutableLiveData<Int>(4) /*playerRepository.getCountPlayer()*/
     val countPlayerLiveData: LiveData<Int>
@@ -38,7 +39,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun savePlayers() {
-        playerRepository.updatePlayer(playerLiveData?.value!!)
+        val player = playerLiveData.value!!
+        playerRepository.updatePlayer(player)
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -68,5 +70,6 @@ class MainViewModel : ViewModel() {
 
     fun configureMoney(cost: Int) {
         money.value = money.value?.minus(cost) ?: 0
+        playerLiveData.value?.money = money.value!!
     }
 }

@@ -1,15 +1,12 @@
 package com.fiz.android.battleinthespace.interfaces.main
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
@@ -43,13 +40,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         viewModel.savePlayers()
-    }
-
-    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
-        return super.onCreateView(name, context, attrs)
-        viewModel.countPlayerLiveData.observe(this, Observer { count ->
-
-        })
     }
 
     private fun getTitle(position: Int): CharSequence {
