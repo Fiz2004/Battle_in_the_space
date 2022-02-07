@@ -11,16 +11,16 @@ import com.fiz.android.battleinthespace.database.PlayerRepository
 class MainViewModel : ViewModel() {
     private val playerRepository = PlayerRepository.get()
 
-    private val _playerListLiveData = MutableLiveData(playerRepository.getPlayers())
+    private var _playerListLiveData = MutableLiveData(playerRepository.getPlayers())
     val playerListLiveData: LiveData<List<Player>>
         get() = _playerListLiveData
 
-    private val _playerLiveData =
-        MutableLiveData(playerRepository.getPlayer(1) ?: throw Error("Не могу загрузить данные о игроке"))
+    private var _playerLiveData =
+        MutableLiveData(playerListLiveData.value?.find { it.id == 0 })
     val playerLiveData: LiveData<Player>
-        get() = _playerLiveData
+        get() = _playerLiveData as LiveData<Player>
 
-    val money: MutableLiveData<Int> = MutableLiveData<Int>(_playerLiveData.value?.money)
+    var money: MutableLiveData<Int> = MutableLiveData<Int>(_playerLiveData.value?.money)
 
     private val _countPlayerLiveData = MutableLiveData<Int>(4) /*playerRepository.getCountPlayer()*/
     val countPlayerLiveData: LiveData<Int>
@@ -34,6 +34,12 @@ class MainViewModel : ViewModel() {
         _countPlayerLiveData.value = numberRadioButton
     }
 
+    fun countPlayerMore(count: Int): Boolean {
+        if (countPlayerLiveData.value!! >= count)
+            return true
+        return false
+    }
+
     fun setType(value: Int) {
         _type.value = value
     }
@@ -41,6 +47,33 @@ class MainViewModel : ViewModel() {
     fun savePlayers() {
         val player = playerLiveData.value!!
         playerRepository.updatePlayer(player)
+    }
+
+    fun onClickReset(count: Int) {
+        val player1 = Player(id = 0, name = "Player 1")
+        val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
+        val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
+        val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+
+        val player = when (count) {
+            1 -> {
+                player1
+            }
+            2 -> {
+                player2
+            }
+            3 -> {
+                player3
+            }
+            else -> {
+                player4
+            }
+        }
+        _playerListLiveData.value?.get(count - 1)?.reset(player)
+        _playerLiveData =
+            MutableLiveData(playerListLiveData.value?.find { it.id == 0 })
+        money.value = _playerLiveData.value?.money
+        _type.value = 0
     }
 
     fun onSaveInstanceState(outState: Bundle) {

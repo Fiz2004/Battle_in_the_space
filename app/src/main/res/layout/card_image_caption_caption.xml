@@ -13,7 +13,7 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_margin="4dp"
+        android:layout_margin="10dp"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="2dp">
 
@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_weight="1.0"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerInside" />
 
             <TextView
                 android:id="@+id/info_text"

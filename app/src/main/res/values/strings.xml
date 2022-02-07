@@ -1,21 +1,17 @@
 <resources>
     <string name="app_name">Battle in the space</string>
-    <string name="new_game_main_button">New game</string>
-    <string name="options_main_button">Options</string>
-    <string name="exit_main_button">Exit</string>
+    <string name="new_game">New game</string>
+    <string name="options">Options</string>
+    <string name="exit">Exit</string>
 
-    <string name="one_players_options_radiobutton">1 Player </string>
-    <string name="two_players_options_radiobutton">2 Players</string>
-    <string name="three_players_options_radiobutton">3 Players</string>
-    <string name="four_players_options_radiobutton">4 Players</string>
+    <plurals name="count_players">
+        <item quantity="one">%1$d Player </item>
+        <item quantity="few">%1$d Players </item>
+        <item quantity="many">%1$d Players </item>
+        <item quantity="other">%1$d Players </item>
+    </plurals>
+
     <string name="player">Player</string>
-    <string-array name="players_options_radiobutton">
-        <item>1 Player</item>
-        <item>2 Players</item>
-        <item>3 Players</item>
-        <item>4 Players</item>
-    </string-array>
-
 
     <string name="name_options_textview">Name:</string>
     <string name="name_options_edittext">Enter name</string>
@@ -70,7 +66,7 @@
     <string name="mission_destroy_meteorites">Destroy meteorites</string>
     <string name="mission_destroy_spaceships">Destroy spaceships</string>
 
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="undo">Undo</string>
 
     <string name="weapon">Weapon</string>
@@ -97,4 +93,7 @@
     Buying?
     <string name="cost">Cost: %1$d $</string>
     <string name="balance">Your account balance: %1$d $</string>
+    <string name="select_count_players_textview">Select the number of players:</string>
+    <string name="controller">Controller:</string>
+    <string name="reset">RESET</string>
 </resources>

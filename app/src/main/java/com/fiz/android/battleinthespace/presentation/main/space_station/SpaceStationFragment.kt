@@ -42,7 +42,10 @@ class SpaceStationFragment : Fragment() {
 
         val layoutManager = GridLayoutManager(activity, 2)
         binding.stationRecycler.layoutManager = layoutManager
+    }
 
+    override fun onResume() {
+        super.onResume()
         updateUI()
     }
 

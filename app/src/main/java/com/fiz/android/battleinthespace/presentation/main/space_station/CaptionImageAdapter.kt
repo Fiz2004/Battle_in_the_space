@@ -24,7 +24,7 @@ class CaptionImageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = CardCaptionImageBinding.inflate(inflater)
+        val binding = CardCaptionImageBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

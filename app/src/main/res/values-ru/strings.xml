@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">Битва в космосе</string>
-    <string name="new_game_main_button">Новая игра</string>
-    <string name="options_main_button">Настройки</string>
-    <string name="exit_main_button">Выход</string>
+    <string name="new_game">Новая игра</string>
+    <string name="options">Настройки</string>
+    <string name="exit">Выход</string>
 
-    <string name="one_players_options_radiobutton">1 игрок </string>
-    <string name="two_players_options_radiobutton">2 игрока</string>
-    <string name="three_players_options_radiobutton">3 игрока</string>
-    <string name="four_players_options_radiobutton">4 игрока</string>
+    <plurals name="count_players">
+        <item quantity="one">%1$d Игрок </item>
+        <item quantity="few">%1$d Игрока </item>
+        <item quantity="many">%1$d Игроков </item>
+        <item quantity="other">%1$d Игроков </item>
+    </plurals>
+
     <string name="name_options_textview">Имя:</string>
     <string name="name_options_edittext">Введите имя</string>
     <string name="controller_options_togglebutton_off">Компьютер</string>
@@ -64,4 +67,7 @@
     <string name="cost">Стоимость: %1$d $</string>
     <string name="balance">На вашем счету: %1$d $</string>
     <string name="back">Назад</string>
+    <string name="select_count_players_textview">Выберите количество игроков:</string>
+    <string name="controller">Управление:</string>
+    <string name="reset">Сбросить</string>
 </resources>

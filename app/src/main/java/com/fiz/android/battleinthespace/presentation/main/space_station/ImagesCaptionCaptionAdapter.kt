@@ -27,7 +27,7 @@ class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = CardImageCaptionCaptionBinding.inflate(inflater)
+        val binding = CardImageCaptionCaptionBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 

@@ -19,6 +19,13 @@ data class Player(
     var money: Int = 1000,
     @NonNull @ColumnInfo(name = "items")
     var items: HashMap<Int, StateProduct> = Products.itemsDefault()
-)
+) {
+    fun reset(player: Player) {
+        this.name = player.name
+        this.controllerPlayer = player.controllerPlayer
+        this.money = player.money
+        this.items = player.items
+    }
+}
 
 
