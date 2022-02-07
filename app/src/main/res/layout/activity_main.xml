@@ -34,7 +34,6 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
             android:contentDescription="@string/fly"
-            android:onClick="onClickDone"
             android:src="@drawable/fly" />
 
 

@@ -1,8 +1,10 @@
 package com.fiz.android.battleinthespace.presentation.main
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -25,6 +27,11 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    val activityLauncher = registerForActivityResult(GameActivityContract()) { result ->
+        if (result != null)
+            viewModel.money.value = viewModel.money.value?.plus(result)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -35,6 +42,10 @@ class MainActivity : AppCompatActivity() {
         TabLayoutMediator(binding.tabs, binding.viewpager) { tab, position ->
             tab.text = getTitle(position)
         }.attach()
+
+        binding.flyFab.setOnClickListener {
+            activityLauncher.launch("123")
+        }
     }
 
     override fun onStop() {
@@ -56,11 +67,6 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    fun onClickDone(view: View) {
-        val intent = Intent(this, GameActivity::class.java)
-        startActivity(viewModel.onClickDone(intent))
-    }
-
     class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
         androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
         override fun getItemCount(): Int {
@@ -74,6 +80,23 @@ class MainActivity : AppCompatActivity() {
                 2 -> StatisticsFragment()
                 else -> OptionsFragment()
             }
+        }
+    }
+
+    inner class GameActivityContract : ActivityResultContract<String, Int?>() {
+
+        override fun createIntent(context: Context, input: String?): Intent {
+            val intent = Intent(context, GameActivity::class.java)
+            return viewModel.onClickDone(intent)
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Int? = when {
+            resultCode != Activity.RESULT_OK -> null
+            else -> intent?.getIntExtra("score", 0)
+        }
+
+        override fun getSynchronousResult(context: Context, input: String?): SynchronousResult<Int?>? {
+            return if (input.isNullOrEmpty()) SynchronousResult(0) else null
         }
     }
 }

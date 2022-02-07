@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.presentation.game
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -9,6 +10,7 @@ import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.ActivityGameBinding
 import com.fiz.android.battleinthespace.game.Display
 import com.fiz.android.battleinthespace.game.State
+
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private lateinit var viewModel: GameViewModel
@@ -40,6 +42,10 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
             viewModel.clickPauseGameButton()
         }
         binding.exitGameButton.setOnClickListener {
+            val data = Intent()
+            data.putExtra("score", viewModel.gameThread.state.playerGames[0].score)
+            setResult(RESULT_OK, data)
+            viewModel.gameThreadStop()
             finish()
         }
 
@@ -64,10 +70,14 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         super.onDestroy()
         viewModel.destroySound()
 
-        if (start)
+        if (start) {
+            val data = Intent()
+            data.putExtra("score", viewModel.gameThread.state.playerGames[0].score)
+            setResult(RESULT_OK, data)
             viewModel.gameThreadStop()
+            finish()
+        }
     }
-
 
 
     override fun onSaveInstanceState(outState: Bundle) {
