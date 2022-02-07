@@ -1,8 +1,8 @@
-package com.fiz.android.battleinthespace.options
+package com.fiz.android.battleinthespace.database
 
 import android.content.Context
 import androidx.room.Room
-import com.fiz.android.battleinthespace.database.PlayerDatabase
+import com.fiz.android.battleinthespace.data.Player
 import java.util.concurrent.Executors
 
 private const val DATABASE_NAME = "player-database"
@@ -21,10 +21,10 @@ class PlayerRepository private constructor(context: Context) {
     init {
         Executors.newSingleThreadExecutor().execute {
             if (playersDAO.getCount() == 0 || playersDAO.getCount() == null) {
-                val player1 = Player(id = 0, name = "Player 1")
-                val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
-                val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
-                val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+                val player1 = Player(id = 1, name = "Player 1")
+                val player2 = Player(id = 2, name = "Player 2", controllerPlayer = false)
+                val player3 = Player(id = 3, name = "Player 3", controllerPlayer = false)
+                val player4 = Player(id = 4, name = "Player 4", controllerPlayer = false)
                 addPlayer(player1)
                 addPlayer(player2)
                 addPlayer(player3)

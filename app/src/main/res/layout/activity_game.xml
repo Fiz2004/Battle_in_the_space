@@ -6,7 +6,7 @@
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".interfaces.game.GameActivity">
+        tools:context=".presentation.game.GameActivity">
 
 
         <SurfaceView

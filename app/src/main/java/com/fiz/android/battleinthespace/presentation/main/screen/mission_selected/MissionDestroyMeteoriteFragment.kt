@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected
+package com.fiz.android.battleinthespace.presentation.main.screen.mission_selected
 
 import android.os.Bundle
 import android.view.LayoutInflater

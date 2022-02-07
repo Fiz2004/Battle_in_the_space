@@ -1,12 +1,12 @@
-package com.fiz.android.battleinthespace.interfaces.main
+package com.fiz.android.battleinthespace.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fiz.android.battleinthespace.options.Player
-import com.fiz.android.battleinthespace.options.PlayerRepository
+import com.fiz.android.battleinthespace.data.Player
+import com.fiz.android.battleinthespace.database.PlayerRepository
 
 class MainViewModel : ViewModel() {
     private val playerRepository = PlayerRepository.get()
@@ -16,7 +16,7 @@ class MainViewModel : ViewModel() {
         get() = _playerListLiveData
 
     private val _playerLiveData =
-        MutableLiveData(playerRepository.getPlayer(0) ?: throw Error("Не могу загрузить данные о игроке"))
+        MutableLiveData(playerRepository.getPlayer(1) ?: throw Error("Не могу загрузить данные о игроке"))
     val playerLiveData: LiveData<Player>
         get() = _playerLiveData
 

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main
+package com.fiz.android.battleinthespace.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,10 +10,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
-import com.fiz.android.battleinthespace.interfaces.game.GameActivity
-import com.fiz.android.battleinthespace.interfaces.main.options.OptionsFragment
-import com.fiz.android.battleinthespace.interfaces.main.space_station.SpaceStationFragment
-import com.fiz.android.battleinthespace.interfaces.main.statistics.StatisticsFragment
+import com.fiz.android.battleinthespace.presentation.game.GameActivity
+import com.fiz.android.battleinthespace.presentation.main.options.OptionsFragment
+import com.fiz.android.battleinthespace.presentation.main.space_station.SpaceStationFragment
+import com.fiz.android.battleinthespace.presentation.main.statistics.StatisticsFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main.statistics
+package com.fiz.android.battleinthespace.presentation.main.statistics
 
 import android.os.Bundle
 import android.view.LayoutInflater

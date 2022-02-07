@@ -1,7 +1,7 @@
 package com.fiz.android.battleinthespace.database
 
 import androidx.room.TypeConverter
-import com.fiz.android.battleinthespace.options.StateProduct
+import com.fiz.android.battleinthespace.data.StateProduct
 
 class PlayerTypeConverters {
     //    @TypeConverter

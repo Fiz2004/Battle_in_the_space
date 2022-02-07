@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main.space_station
+package com.fiz.android.battleinthespace.presentation.main.space_station
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.fiz.android.battleinthespace.data.Product
+import com.fiz.android.battleinthespace.data.ProductTypes
+import com.fiz.android.battleinthespace.data.Products
+import com.fiz.android.battleinthespace.data.StateProduct
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
-import com.fiz.android.battleinthespace.interfaces.main.MainViewModel
-import com.fiz.android.battleinthespace.options.Product
-import com.fiz.android.battleinthespace.options.ProductTypes
-import com.fiz.android.battleinthespace.options.Products
-import com.fiz.android.battleinthespace.options.StateProduct
+import com.fiz.android.battleinthespace.presentation.main.MainViewModel
 
 class SpaceStationFragment : Fragment() {
     private var _binding: FragmentSpaceStationBinding? = null
@@ -68,7 +68,7 @@ class SpaceStationFragment : Fragment() {
     private fun configureImagesCaptionCaptionAdapter() {
         val currentType = viewModel.type.value?.minus(1) ?: 0
         val nameType = ProductTypes.createTypes()[currentType].name
-        val items = viewModel.playerLiveData?.value?.items ?: return
+        val items = viewModel.playerLiveData.value?.items ?: return
         val listProduct = Product.getListProduct(nameType, items)
 
         imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
@@ -81,15 +81,15 @@ class SpaceStationFragment : Fragment() {
                     val allProductsType = Products.createListProducts().filter { it.type == nameType }
                     allProductsType.forEach {
                         if (items[it.name] == StateProduct.INSTALL)
-                            viewModel.playerLiveData?.value?.items!![it.name] = StateProduct.BUY
+                            viewModel.playerLiveData.value?.items!![it.name] = StateProduct.BUY
                     }
                     val key = listProduct[position].name
-                    viewModel.playerLiveData?.value?.items!![key] = StateProduct.INSTALL
+                    viewModel.playerLiveData.value?.items!![key] = StateProduct.INSTALL
                 } else
-                    if (viewModel.playerLiveData?.value?.money?.minus(listProduct[position].cost)!! >= 0) {
+                    if (viewModel.playerLiveData.value?.money?.minus(listProduct[position].cost)!! >= 0) {
                         viewModel.configureMoney(listProduct[position].cost)
                         val key = listProduct[position].name
-                        viewModel.playerLiveData?.value?.items!![key] = StateProduct.BUY
+                        viewModel.playerLiveData.value?.items!![key] = StateProduct.BUY
                     }
             }
             updateUI()

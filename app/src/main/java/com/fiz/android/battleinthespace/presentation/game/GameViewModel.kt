@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.game
+package com.fiz.android.battleinthespace.presentation.game
 
 import android.content.Context
 import android.media.SoundPool
@@ -11,9 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.data.StateProduct
 import com.fiz.android.battleinthespace.engine.Vec
 import com.fiz.android.battleinthespace.game.GameThread
-import com.fiz.android.battleinthespace.options.StateProduct
 
 class GameViewModel(extras: Bundle) :
     ViewModel() {

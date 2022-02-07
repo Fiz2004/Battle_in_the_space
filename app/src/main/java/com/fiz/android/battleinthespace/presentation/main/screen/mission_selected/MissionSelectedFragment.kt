@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main
+package com.fiz.android.battleinthespace.presentation.main
 
 import android.content.Context
 import android.os.Bundle
@@ -6,16 +6,15 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.databinding.FragmentMissionSelectedBinding
-import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroyMeteoriteFragment
-import com.fiz.android.battleinthespace.interfaces.main.screen.mission_selected.MissionDestroySpaceShipsFragment
+import com.fiz.android.battleinthespace.presentation.main.screen.mission_selected.MissionDestroyMeteoriteFragment
+import com.fiz.android.battleinthespace.presentation.main.screen.mission_selected.MissionDestroySpaceShipsFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlin.math.absoluteValue
 import kotlin.math.sign
@@ -37,17 +36,17 @@ class MissionSelectedFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val pagerAdapter = SectionsPagerAdapter(childFragmentManager, lifecycle)
+        val pagerAdapter = SectionsPagerAdapter(this)
         binding.viewpagerMission.adapter = pagerAdapter
 
         TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
             tab.text = getTitle(position)
         }.attach()
 
-        binding.viewpagerMission.currentItem = viewModel.playerLiveData?.value?.mission ?: 0
+        binding.viewpagerMission.currentItem = viewModel.playerLiveData.value?.mission ?: 0
     }
 
     private fun getTitle(position: Int): CharSequence {
@@ -57,8 +56,7 @@ class MissionSelectedFragment : Fragment() {
         }
     }
 
-    private inner class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
-        androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
+    private inner class SectionsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
         override fun getItemCount(): Int {
             return 2
         }
@@ -72,8 +70,8 @@ class MissionSelectedFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
-            viewModel.playerLiveData?.value?.mission = position
             super.onBindViewHolder(holder, position, payloads)
+            viewModel.playerLiveData.value?.mission = position
         }
     }
 

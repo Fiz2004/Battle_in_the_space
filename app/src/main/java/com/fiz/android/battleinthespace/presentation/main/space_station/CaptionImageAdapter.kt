@@ -1,12 +1,12 @@
-package com.fiz.android.battleinthespace.interfaces.main.space_station
+package com.fiz.android.battleinthespace.presentation.main.space_station
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.fiz.android.battleinthespace.data.ProductTypes
 import com.fiz.android.battleinthespace.databinding.CardCaptionImageBinding
-import com.fiz.android.battleinthespace.options.ProductTypes
 
 class CaptionImageAdapter(
     private val items: List<ProductTypes>) :

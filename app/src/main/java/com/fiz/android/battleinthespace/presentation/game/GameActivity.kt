@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.game
+package com.fiz.android.battleinthespace.presentation.game
 
 import android.os.Bundle
 import android.view.MotionEvent

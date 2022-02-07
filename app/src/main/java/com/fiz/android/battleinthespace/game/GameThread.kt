@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.media.SoundPool
 import android.util.SparseIntArray
 import android.view.SurfaceView
-import com.fiz.android.battleinthespace.interfaces.game.GameViewModel
+import com.fiz.android.battleinthespace.presentation.game.GameViewModel
 import kotlin.math.min
 
 class GameThread(

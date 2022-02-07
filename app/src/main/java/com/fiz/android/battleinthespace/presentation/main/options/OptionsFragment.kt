@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.interfaces.main.options
+package com.fiz.android.battleinthespace.presentation.main.options
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
-import com.fiz.android.battleinthespace.interfaces.main.MainViewModel
+import com.fiz.android.battleinthespace.presentation.main.MainViewModel
 
 class OptionsFragment : Fragment() {
     private var _binding: FragmentOptionsBinding? = null

@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".interfaces.main.MissionSelectedFragment">
+        tools:context=".presentation.main.MissionSelectedFragment">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -19,7 +19,7 @@
                 android:layout_height="wrap_content" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.fiz.android.battleinthespace.interfaces.main.NestedScrollableHost
+        <com.fiz.android.battleinthespace.presentation.main.NestedScrollableHost
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -35,6 +35,6 @@
 
             </androidx.viewpager2.widget.ViewPager2>
 
-        </com.fiz.android.battleinthespace.interfaces.main.NestedScrollableHost>
+        </com.fiz.android.battleinthespace.presentation.main.NestedScrollableHost>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
