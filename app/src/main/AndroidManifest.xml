@@ -3,19 +3,17 @@
     package="com.fiz.android.battleinthespace">
 
     <application
-        android:name=".options.BattleInTheSpaceApplication"
+        android:name=".BattleInTheSpaceApplication"
         android:allowBackup="true"
         android:icon="@drawable/spaceship_fly1"
         android:label="@string/app_name"
         android:roundIcon="@drawable/spaceship_fly1"
-        android:supportsRtl="true"
-        android:fullBackupContent="@xml/backup_descriptor"
         android:theme="@style/Theme.BattleInTheSpace">
         <activity
-            android:name=".presentation.game.GameActivity"
+            android:name=".game.presentation.GameActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.main.MainActivity"
+            android:name=".base.presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -6,7 +6,7 @@
 
         <variable
             name="player"
-            type="com.fiz.android.battleinthespace.data.Player" />
+            type="com.fiz.android.battleinthespace.base.data.Player" />
 
         <variable
             name="count"
@@ -14,7 +14,7 @@
 
         <variable
             name="mainViewModel"
-            type="com.fiz.android.battleinthespace.presentation.main.MainViewModel" />
+            type="com.fiz.android.battleinthespace.base.presentation.MainViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

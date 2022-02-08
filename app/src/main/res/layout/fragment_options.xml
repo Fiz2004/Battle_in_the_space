@@ -9,14 +9,14 @@
 
         <variable
             name="mainViewModel"
-            type="com.fiz.android.battleinthespace.presentation.main.MainViewModel" />
+            type="com.fiz.android.battleinthespace.base.presentation.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp"
-        tools:context=".presentation.main.options.OptionsFragment">
+        tools:context=".base.presentation.options.OptionsFragment">
 
         <TextView
             android:id="@+id/txtForRadioGroup"

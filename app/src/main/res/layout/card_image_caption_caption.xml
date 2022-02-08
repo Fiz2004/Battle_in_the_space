@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.fiz.android.battleinthespace.data.Product" />
+            type="com.fiz.android.battleinthespace.base.data.Product" />
     </data>
 
     <androidx.cardview.widget.CardView

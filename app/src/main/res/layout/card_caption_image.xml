@@ -5,7 +5,7 @@
 
         <variable
             name="item"
-            type="com.fiz.android.battleinthespace.data.ProductTypes" />
+            type="com.fiz.android.battleinthespace.base.data.ProductTypes" />
     </data>
 
     <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
