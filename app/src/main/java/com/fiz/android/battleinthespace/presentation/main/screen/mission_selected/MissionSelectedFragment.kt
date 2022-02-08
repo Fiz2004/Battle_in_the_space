@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.database.PlayerRepository
 import com.fiz.android.battleinthespace.databinding.FragmentMissionSelectedBinding
 import com.fiz.android.battleinthespace.presentation.main.screen.mission_selected.MissionDestroyMeteoriteFragment
 import com.fiz.android.battleinthespace.presentation.main.screen.mission_selected.MissionDestroySpaceShipsFragment
@@ -24,7 +25,8 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -32,12 +34,6 @@ class MissionSelectedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         val pagerAdapter = SectionsPagerAdapter(this)
         binding.viewpagerMission.adapter = pagerAdapter
@@ -47,7 +43,22 @@ class MissionSelectedFragment : Fragment() {
         }.attach()
 
         binding.viewpagerMission.currentItem = viewModel.playerLiveData.value?.mission ?: 0
+
+        return binding.root
     }
+
+    //    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    //        super.onViewCreated(view, savedInstanceState)
+    //
+    //        val pagerAdapter = SectionsPagerAdapter(this)
+    //        binding.viewpagerMission.adapter = pagerAdapter
+    //
+    //        TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
+    //            tab.text = getTitle(position)
+    //        }.attach()
+    //
+    //        binding.viewpagerMission.currentItem = viewModel.playerLiveData.value?.mission ?: 0
+    //    }
 
     private fun getTitle(position: Int): CharSequence {
         return when (position) {

@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.fiz.android.battleinthespace.data.Player
 
@@ -12,16 +13,16 @@ interface PlayerDAO {
     fun update(player: Player)
 
     @Query("SELECT * from information_player_table WHERE id = :id")
-    fun get(id: Int): Player?
+    fun get(id: Int): LiveData<Player?>
 
     @Query("DELETE FROM information_player_table")
     fun clear()
 
     @Query("SELECT * FROM information_player_table")
-    fun getAll(): List<Player>
+    fun getAll(): LiveData<List<Player>>
 
     @Query("SELECT count(*) FROM information_player_table")
-    fun getCount(): Int?
+    fun getCount(): LiveData<Int?>
 }
 
 

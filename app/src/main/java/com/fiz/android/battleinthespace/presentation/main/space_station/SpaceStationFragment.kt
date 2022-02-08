@@ -11,15 +11,18 @@ import com.fiz.android.battleinthespace.data.Product
 import com.fiz.android.battleinthespace.data.ProductTypes
 import com.fiz.android.battleinthespace.data.Products
 import com.fiz.android.battleinthespace.data.StateProduct
+import com.fiz.android.battleinthespace.database.PlayerRepository
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 import com.fiz.android.battleinthespace.presentation.main.MainViewModel
+import com.fiz.android.battleinthespace.presentation.main.MainViewModelFactory
 
 class SpaceStationFragment : Fragment() {
     private var _binding: FragmentSpaceStationBinding? = null
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(requireActivity())[MainViewModel::class.java]
+        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
     private lateinit var captionImageAdapter: CaptionImageAdapter

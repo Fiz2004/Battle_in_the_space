@@ -2,27 +2,29 @@ package com.fiz.android.battleinthespace.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.fiz.android.battleinthespace.data.Player
 import com.fiz.android.battleinthespace.database.PlayerRepository
+import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
-    private val playerRepository = PlayerRepository.get()
+class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
+    init {
+        playerRepository.create()
+    }
 
-    private var _playerListLiveData = MutableLiveData(playerRepository.getPlayers())
+    private var _playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
     val playerListLiveData: LiveData<List<Player>>
         get() = _playerListLiveData
 
-    private var _playerLiveData =
-        MutableLiveData(playerListLiveData.value?.find { it.id == 0 })
-    val playerLiveData: LiveData<Player>
-        get() = _playerLiveData as LiveData<Player>
+    private var _playerLiveData: LiveData<Player?> = playerRepository.getPlayer(0)
+    val playerLiveData: LiveData<Player?>
+        get() = _playerLiveData
 
-    var money: MutableLiveData<Int> = MutableLiveData<Int>(_playerLiveData.value?.money)
+    var money: MutableLiveData<Int> = Transformations.map(_playerLiveData) {
+        it?.money
+    } as MutableLiveData<Int>
 
-    private val _countPlayerLiveData = MutableLiveData<Int>(4) /*playerRepository.getCountPlayer()*/
+    private val _countPlayerLiveData = MutableLiveData<Int>(4)
     val countPlayerLiveData: LiveData<Int>
         get() = _countPlayerLiveData
 
@@ -46,7 +48,9 @@ class MainViewModel : ViewModel() {
 
     fun savePlayers() {
         val player = playerLiveData.value!!
-        playerRepository.updatePlayer(player)
+        viewModelScope.launch {
+            playerRepository.updatePlayer(player)
+        }
     }
 
     fun onClickReset(count: Int) {
@@ -69,11 +73,13 @@ class MainViewModel : ViewModel() {
                 player4
             }
         }
-        _playerListLiveData.value?.get(count - 1)?.reset(player)
-        _playerLiveData =
-            MutableLiveData(playerListLiveData.value?.find { it.id == 0 })
-        money.value = _playerLiveData.value?.money
-        _type.value = 0
+        viewModelScope.launch {
+            _playerListLiveData.value?.get(count - 1)?.reset(player)
+            _playerLiveData =
+                MutableLiveData(playerListLiveData.value?.find { it.id == 0 })
+            money.value = _playerLiveData.value?.money
+            _type.value = 0
+        }
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -104,5 +110,11 @@ class MainViewModel : ViewModel() {
     fun configureMoney(cost: Int) {
         money.value = money.value?.minus(cost) ?: 0
         playerLiveData.value?.money = money.value!!
+    }
+}
+
+class MainViewModelFactory(private val dataSource: PlayerRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainViewModel(dataSource) as T
     }
 }

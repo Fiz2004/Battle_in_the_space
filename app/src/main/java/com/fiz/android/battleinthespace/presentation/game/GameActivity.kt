@@ -14,7 +14,6 @@ import com.fiz.android.battleinthespace.game.State
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private lateinit var viewModel: GameViewModel
-    private lateinit var viewModelFactory: GameViewModelFactory
 
     private val binding: ActivityGameBinding by lazy {
         ActivityGameBinding.inflate(layoutInflater)
@@ -32,7 +31,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
         val extras = intent.extras ?: return
 
-        viewModelFactory = GameViewModelFactory(extras)
+        val viewModelFactory = GameViewModelFactory(extras)
         viewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
 
         binding.newGameGameButton.setOnClickListener {

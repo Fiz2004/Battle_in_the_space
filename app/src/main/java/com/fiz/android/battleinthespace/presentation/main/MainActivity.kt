@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.database.PlayerRepository
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.android.battleinthespace.presentation.game.GameActivity
 import com.fiz.android.battleinthespace.presentation.main.options.OptionsFragment
@@ -20,14 +21,15 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this)[MainViewModel::class.java]
+        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    val activityLauncher = registerForActivityResult(GameActivityContract()) { result ->
+    private val activityLauncher = registerForActivityResult(GameActivityContract()) { result ->
         if (result != null)
             viewModel.money.value = viewModel.money.value?.plus(result)
     }
