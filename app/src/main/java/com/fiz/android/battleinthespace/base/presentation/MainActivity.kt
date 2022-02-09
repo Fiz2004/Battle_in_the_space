@@ -42,7 +42,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel.playerListLiveData.observe(this) {
-            viewModel.player = it[0]
+            if (it == null || it.isEmpty())
+                viewModel.fillInitValue()
+            else
+                viewModel.player = it[0]
         }
 
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
