@@ -4,18 +4,16 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout-land/activity_game.xml" value="0.19929453262786595" />
-        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_game.xml" value="0.1" />
+        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_game.xml" value="0.24380530973451328" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_main.xml" value="0.2869791666666667" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/activity_options.xml" value="0.2869791666666667" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/card_caption_image.xml" value="0.1" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/card_image_caption_caption.xml" value="0.23541666666666666" />
-        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/card_options.xml" value="0.2682291666666667" />
-        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_options.xml" value="0.1" />
+        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_options.xml" value="0.23541666666666666" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_space_station.xml" value="0.13134057971014493" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/fragment_statistics.xml" value="0.13134057971014493" />
-        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/menu/drawer_game_menu.xml" value="0.23645833333333333" />
+        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/layout/sign_dialog.xml" value="0.19427083333333334" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2415" />
-        <entry key="..\:/Programs/AndroidStudioProjects/Battle_in_the_space/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battleinthespace/app/src/main/res/layout/activity_game.xml" value="0.5651041666666666" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battleinthespace/app/src/main/res/layout/activity_main.xml" value="0.32916666666666666" />
         <entry key="..\:/Programs/AndroidStudioProjects/Battleinthespace/app/src/main/res/layout/card_image_caption_caption.xml" value="0.415625" />

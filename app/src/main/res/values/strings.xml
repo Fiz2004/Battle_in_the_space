@@ -96,5 +96,9 @@
     <string name="select_count_players_textview">Select the number of players:</string>
     <string name="controller">Controller:</string>
     <string name="reset">RESET</string>
-    <string name="sign">Sign</string>
+    <!-- sign dialog -->
+    <string name="signUp">Sign Up</string>
+    <string name="signIn">Sign In</string>
+    <string name="enterEmail">Enter Email</string>
+    <string name="enterPassword">Enter Password</string>
 </resources>

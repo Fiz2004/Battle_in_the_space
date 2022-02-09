@@ -11,7 +11,6 @@ import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
-import com.fiz.android.battleinthespace.dialoghelper.DialogConst
 import com.fiz.android.battleinthespace.dialoghelper.DialogHelper
 import com.google.firebase.auth.FirebaseUser
 
@@ -33,7 +32,7 @@ class OptionsFragment : Fragment() {
 
         binding.onePlayer.signUp.setOnClickListener {
             if (binding.onePlayer.signUp.text == "Sign_up") {
-                dialogHelper.createSignDialog(DialogConst.SIGN_UP_STATE)
+                dialogHelper.createSignDialog(DialogHelper.SIGN_UP_STATE)
             } else {
                 viewModel.email.value = null
                 viewModel.mAuth.signOut()
@@ -41,7 +40,7 @@ class OptionsFragment : Fragment() {
         }
 
         binding.onePlayer.signIn.setOnClickListener {
-            dialogHelper.createSignDialog(DialogConst.SIGN_IN_STATE)
+            dialogHelper.createSignDialog(DialogHelper.SIGN_IN_STATE)
         }
 
         binding.twoPlayer.signUp.visibility = View.GONE

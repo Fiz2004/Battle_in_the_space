@@ -5,50 +5,56 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btSignUpIn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edSignPassword" />
-
         <TextView
-            android:id="@+id/tvSignTitle"
+            android:id="@+id/signUpInTitleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:text="@string/signUp"
             android:gravity="center"
-            android:text="TextView"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/edSignEmail"
+            android:id="@+id/signEmailEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:inputType="textEmailAddress"
+            android:hint="@string/enterEmail"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvSignTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/signUpInTitleTextView" />
 
         <EditText
-            android:id="@+id/edSignPassword"
+            android:id="@+id/signPasswordEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:inputType="textPassword"
+            android:hint="@string/enterPassword"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edSignEmail" />
+            app:layout_constraintTop_toBottomOf="@+id/signEmailEditText" />
+
+        <Button
+            android:id="@+id/signUpInButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/signUp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/signPasswordEditText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

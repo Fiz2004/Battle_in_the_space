@@ -1,38 +1,46 @@
 package com.fiz.android.battleinthespace.dialoghelper
 
 import android.app.AlertDialog
+import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.accounthelper.AccountHelper
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
-class DialogHelper(val act: MainActivity) {
+class DialogHelper(private val act: MainActivity) {
     private val accHelper = AccountHelper(act)
+    private lateinit var rootDialogElement: SignDialogBinding
     fun createSignDialog(index: Int) {
         val builder = AlertDialog.Builder(act)
-        val rootDialogElement = SignDialogBinding.inflate(act.layoutInflater)
+        rootDialogElement = SignDialogBinding.inflate(act.layoutInflater)
         val view = rootDialogElement.root
         builder.setView(view)
 
-        if (index == DialogConst.SIGN_UP_STATE) {
-            rootDialogElement.tvSignTitle.text = "Register"
-            rootDialogElement.btSignUpIn.text = "Sign Up"
+        if (index == SIGN_UP_STATE) {
+            updateUI(act.resources.getString(R.string.signUp))
         } else {
-            rootDialogElement.tvSignTitle.text = "Enter"
-            rootDialogElement.btSignUpIn.text = "Sign In"
+            updateUI(act.resources.getString(R.string.signIn))
         }
         val dialog = builder.create()
-        rootDialogElement.btSignUpIn.setOnClickListener {
+        rootDialogElement.signUpInButton.setOnClickListener {
             dialog.dismiss()
-            if (index == DialogConst.SIGN_UP_STATE) {
-                accHelper.signUpWithEmail(
-                    rootDialogElement.edSignEmail.text.toString(),
-                    rootDialogElement.edSignPassword.text.toString())
+            val email: String = rootDialogElement.signEmailEditText.text.toString()
+            val password: String = rootDialogElement.signPasswordEditText.text.toString()
+            if (index == SIGN_UP_STATE) {
+                accHelper.signUpWithEmail(email, password)
             } else {
-                accHelper.signInWithEmail(
-                    rootDialogElement.edSignEmail.text.toString(),
-                    rootDialogElement.edSignPassword.text.toString())
+                accHelper.signInWithEmail(email, password)
             }
         }
         dialog.show()
+    }
+
+    private fun updateUI(txt: String) {
+        rootDialogElement.signUpInTitleTextView.text = txt
+        rootDialogElement.signUpInButton.text = txt
+    }
+
+    companion object {
+        const val SIGN_UP_STATE = 0
+        const val SIGN_IN_STATE = 1
     }
 }
