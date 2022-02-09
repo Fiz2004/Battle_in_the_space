@@ -5,11 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.android.battleinthespace.base.data.ProductTypes
+import com.fiz.android.battleinthespace.base.data.ItemTypesDefault
 import com.fiz.android.battleinthespace.databinding.CardCaptionImageBinding
 
 class CaptionImageAdapter(
-    private val items: List<ProductTypes>) :
+    private val itemDefaults: List<ItemTypesDefault>) :
     RecyclerView.Adapter<CaptionImageAdapter.ViewHolder>() {
 
     fun interface Listener {
@@ -29,11 +29,11 @@ class CaptionImageAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(itemDefaults[position])
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return itemDefaults.size
     }
 
     inner class ViewHolder(val binding: CardCaptionImageBinding) : RecyclerView.ViewHolder(binding.root),
@@ -43,12 +43,12 @@ class CaptionImageAdapter(
             itemView.setOnClickListener(this)
         }
 
-        fun bind(item: ProductTypes) {
-            binding.item = item
-            val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
+        fun bind(itemDefault: ItemTypesDefault) {
+            binding.item = itemDefault
+            val drawable = ContextCompat.getDrawable(itemView.context, itemDefault.imageId)
             binding.infoImage.setImageDrawable(drawable)
-            binding.infoImage.contentDescription = itemView.context.resources.getString(item.name)
-            binding.infoText.text = itemView.context.resources.getString(item.name)
+            binding.infoImage.contentDescription = itemView.context.resources.getString(itemDefault.name)
+            binding.infoText.text = itemView.context.resources.getString(itemDefault.name)
         }
 
         override fun onClick(p0: View?) {

@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.Product
+import com.fiz.android.battleinthespace.base.data.Item
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.databinding.CardImageCaptionCaptionBinding
 
 
-class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
+class ImagesCaptionCaptionAdapter(private val products: List<Item>) :
     RecyclerView.Adapter<ImagesCaptionCaptionAdapter.ViewHolder>() {
 
     fun interface Listener {
@@ -50,14 +50,14 @@ class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
             itemView.setOnClickListener(this)
         }
 
-        fun bind(products: Product) {
-            binding.item = products
-            val drawable = ContextCompat.getDrawable(itemView.context, products.imageId)
+        fun bind(item: Item) {
+            binding.item = item
+            val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
 
             binding.infoImage.setImageDrawable(drawable)
-            binding.infoImage.contentDescription = (products.name + products.cost).toString()
-            itemView.isEnabled = products.state != StateProduct.INSTALL
-            when (products.state) {
+            binding.infoImage.contentDescription = (item.name + item.cost).toString()
+            itemView.isEnabled = item.state != StateProduct.INSTALL
+            when (item.state) {
                 StateProduct.INSTALL -> {
                     binding.cardView.setCardBackgroundColor(Color.RED)
                 }
@@ -69,8 +69,8 @@ class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
                 }
             }
 
-            val names = binding.root.context.resources.getString(products.name)
-            when (products.state) {
+            val names = binding.root.context.resources.getString(item.name)
+            when (item.state) {
                 StateProduct.INSTALL -> {
                     binding.infoText.text =
                         binding.root.context.resources.getString(R.string.install, names)
@@ -84,7 +84,7 @@ class ImagesCaptionCaptionAdapter(private val products: List<Product>) :
                 }
             }
 
-            binding.costText.text = binding.root.context.resources.getString(R.string.cost, products.cost)
+            binding.costText.text = binding.root.context.resources.getString(R.string.cost, item.cost)
         }
 
         fun bind() {

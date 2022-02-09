@@ -64,7 +64,7 @@ class SpaceStationFragment : Fragment() {
     }
 
     private fun configureCaptionImageAdapter() {
-        captionImageAdapter = CaptionImageAdapter(ProductTypes.createTypes())
+        captionImageAdapter = CaptionImageAdapter(ItemTypesDefault.createTypes())
 
         captionImageAdapter.setListener { position: Int ->
             viewModel.setType(position + 1)
@@ -74,9 +74,9 @@ class SpaceStationFragment : Fragment() {
 
     private fun configureImagesCaptionCaptionAdapter() {
         val currentType = viewModel.type - 1
-        val nameType = ProductTypes.createTypes()[currentType].name
+        val nameType = ItemTypesDefault.createTypes()[currentType].name
         val items = viewModel.player.items
-        val listProduct = Product.getListProduct(nameType, items)
+        val listProduct = Item.getListProduct(nameType, items)
 
         imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
 
@@ -85,7 +85,7 @@ class SpaceStationFragment : Fragment() {
                 viewModel.setType(0)
             } else {
                 if (listProduct[position].state == StateProduct.BUY) {
-                    val allProductsType = Products.createListProducts().filter { it.type == nameType }
+                    val allProductsType = ItemDefault.createListItems().filter { it.type == nameType }
                     allProductsType.forEach {
                         if (items[it.name] == StateProduct.INSTALL)
                             viewModel.player.items[it.name] = StateProduct.BUY
