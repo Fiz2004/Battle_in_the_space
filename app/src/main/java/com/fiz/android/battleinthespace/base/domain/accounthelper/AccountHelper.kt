@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.accounthelper
+package com.fiz.android.battleinthespace.base.domain
 
 import android.widget.Toast
 import com.fiz.android.battleinthespace.base.presentation.MainActivity

@@ -74,4 +74,6 @@
     <string name="signIn">Войти</string>
     <string name="enterEmail">Введите Email</string>
     <string name="enterPassword">Введите пароль</string>
+    <string name="forgotPassword">Восстановить пароль</string>
+    <string name="resetPassword">Для восстановления вашего пароля укажите email</string>
 </resources>

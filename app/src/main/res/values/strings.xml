@@ -101,4 +101,6 @@
     <string name="signIn">Sign In</string>
     <string name="enterEmail">Enter Email</string>
     <string name="enterPassword">Enter Password</string>
+    <string name="forgotPassword">Forgot Password</string>
+    <string name="resetPassword">To restore your password, specify email</string>
 </resources>

@@ -10,8 +10,8 @@ import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
+import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
 import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
-import com.fiz.android.battleinthespace.dialoghelper.DialogHelper
 import com.google.firebase.auth.FirebaseUser
 
 class OptionsFragment : Fragment() {
