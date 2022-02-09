@@ -5,14 +5,21 @@ import android.os.Bundle
 import androidx.lifecycle.*
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
+    val mAuth = FirebaseAuth.getInstance()
+
+    var email = MutableLiveData<FirebaseUser?>(null)
+
     var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
 
     var player: Player = Player(money = 200)
 
     private val _countPlayerLiveData = MutableLiveData(playerRepository.getCountPlayers())
+
     val countPlayerLiveData: LiveData<Int>
         get() = _countPlayerLiveData
 

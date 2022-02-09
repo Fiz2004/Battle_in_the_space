@@ -21,7 +21,7 @@ import com.fiz.android.battleinthespace.presentation.main.MissionSelectedFragmen
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by lazy {
+    val viewModel: MainViewModel by lazy {
         val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
         ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }

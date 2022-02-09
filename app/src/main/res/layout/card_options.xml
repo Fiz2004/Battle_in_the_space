@@ -57,7 +57,7 @@
                     android:text="@={player.name}" />
             </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
@@ -67,7 +67,6 @@
                     style="@style/TextViewStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:text="@string/controller" />
 
                 <ToggleButton
@@ -76,7 +75,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:layout_toEndOf="@+id/Players_controller_TextView"
                     android:checked="@={player.controllerPlayer}"
                     android:textOff="@string/controller_options_togglebutton_off"
                     android:textOn="@string/controller_options_togglebutton_on" />
@@ -84,11 +82,33 @@
                 <Button
                     android:id="@+id/reset"
                     style="@style/ButtonStyle"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toEndOf="@id/Players_ToggleButton"
                     android:onClick="@{()->mainViewModel.onClickReset(count)}"
                     android:text="@string/reset" />
-            </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/email"
+                    style="@style/TextViewStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No Email" />
+
+                <Button
+                    android:id="@+id/sign_up"
+                    style="@style/ButtonStyle"
+                    android:text="Sign Up" />
+
+                <Button
+                    android:id="@+id/sign_in"
+                    style="@style/ButtonStyle"
+                    android:text="Sign In" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>
