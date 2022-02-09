@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
+import com.fiz.android.battleinthespace.base.domain.AccountHelper
 import com.fiz.android.battleinthespace.base.presentation.options.OptionsFragment
 import com.fiz.android.battleinthespace.base.presentation.space_station.SpaceStationFragment
 import com.fiz.android.battleinthespace.base.presentation.statistics.StatisticsFragment
@@ -58,6 +59,11 @@ class MainActivity : AppCompatActivity() {
         binding.flyFab.setOnClickListener {
             activityLauncher.launch("123")
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == AccountHelper.GOOGLE_SIGN_IN_REQUEST_CODE)
+            super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onStop() {
