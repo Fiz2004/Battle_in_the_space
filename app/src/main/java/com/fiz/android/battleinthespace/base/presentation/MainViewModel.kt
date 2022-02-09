@@ -8,11 +8,11 @@ import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
-       var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
+    var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
 
     var player: Player = Player(money = 200)
 
-    private val _countPlayerLiveData = MutableLiveData(4)
+    private val _countPlayerLiveData = MutableLiveData(playerRepository.getCountPlayers())
     val countPlayerLiveData: LiveData<Int>
         get() = _countPlayerLiveData
 
@@ -33,6 +33,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     }
 
     fun savePlayers() {
+        playerRepository.saveCountPlayers(countPlayerLiveData.value ?: 4)
         playerRepository.updatePlayer(player)
     }
 

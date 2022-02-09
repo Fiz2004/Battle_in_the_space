@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.fiz.android.battleinthespace.base.data.database.PlayerDatabase
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import java.util.concurrent.Executors
 
 private const val DATABASE_NAME = "player-database"
 
-class PlayerRepository private constructor(context: Context) {
+class PlayerRepository private constructor(val context: Context) {
 
     private val database: PlayerDatabase = Room.databaseBuilder(
         context.applicationContext,
@@ -29,6 +30,14 @@ class PlayerRepository private constructor(context: Context) {
             addPlayer(player3)
             addPlayer(player4)
         }
+    }
+
+    fun saveCountPlayers(count: Int): Boolean {
+        return SharedPrefPlayerStorage(context).save(count)
+    }
+
+    fun getCountPlayers(): Int {
+        return SharedPrefPlayerStorage(context).get()
     }
 
     fun getPlayers(): LiveData<List<Player>> = playersDAO.getAll()
