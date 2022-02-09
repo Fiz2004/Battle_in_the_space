@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 
 class AccountHelper(private val act: MainActivity) {
     private lateinit var signInClient: GoogleSignInClient
@@ -23,16 +24,29 @@ class AccountHelper(private val act: MainActivity) {
         }
     }
 
+    //TODO Переделать на новый старт активити
     fun signInWithGoogle() {
         signInClient = getSignInClient()
         val intent = signInClient.signInIntent
         act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
     }
 
+    //TODO Сделать замену на classpath 'com.google.gms:google-services:4.3.10'
     private fun getSignInClient(): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
             .requestIdToken(act.getString(R.string.default_web_client_id)).build()
         return GoogleSignIn.getClient(act, gso)
+    }
+
+    fun signInFirebaseWithGoogle(token: String) {
+        val credetial = GoogleAuthProvider.getCredential(token, null)
+        act.viewModel.mAuth.signInWithCredential(credetial).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(act, "Sign in done", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(act, "Error Sign in done", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun signInWithEmail(email: String, password: String) {

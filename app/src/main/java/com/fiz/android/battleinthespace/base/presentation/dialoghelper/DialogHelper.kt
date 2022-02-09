@@ -9,7 +9,7 @@ import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
 class DialogHelper(private val act: MainActivity) {
-    private val accHelper = AccountHelper(act)
+    val accHelper = AccountHelper(act)
     fun createSignDialog(index: Int) {
         val builder = AlertDialog.Builder(act)
         val binding = SignDialogBinding.inflate(act.layoutInflater)
@@ -24,6 +24,10 @@ class DialogHelper(private val act: MainActivity) {
         binding.forgotPasswordButton.setOnClickListener {
             setOnClickResetPassword(dialog, binding)
         }
+        binding.signInGoogle.setOnClickListener {
+            accHelper.signInWithGoogle()
+        }
+
         dialog.show()
     }
 

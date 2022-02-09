@@ -41,10 +41,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
             android:ems="10"
             android:hint="@string/enterEmail"
             android:inputType="textEmailAddress"
+            android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dialogMessageTextView" />
@@ -54,19 +57,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
             android:ems="10"
             android:hint="@string/enterPassword"
             android:inputType="textPassword"
+            android:padding="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/signEmailEditText" />
 
         <com.google.android.gms.common.SignInButton
-            android:id="@+id/signUpInGoogle"
+            android:id="@+id/signInGoogle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             app:buttonSize="standard"
             app:layout_constraintEnd_toEndOf="parent"
@@ -78,13 +85,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
             android:text="@string/signUp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signUpInGoogle" />
+            app:layout_constraintTop_toBottomOf="@+id/signInGoogle" />
 
         <Button
             android:id="@+id/forgotPasswordButton"

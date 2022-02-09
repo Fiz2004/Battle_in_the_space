@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,12 +14,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.domain.AccountHelper
+import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
 import com.fiz.android.battleinthespace.base.presentation.options.OptionsFragment
 import com.fiz.android.battleinthespace.base.presentation.space_station.SpaceStationFragment
 import com.fiz.android.battleinthespace.base.presentation.statistics.StatisticsFragment
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.android.battleinthespace.game.presentation.GameActivity
 import com.fiz.android.battleinthespace.presentation.main.MissionSelectedFragment
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -61,9 +65,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //ToDo перенести в оптионс
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == AccountHelper.GOOGLE_SIGN_IN_REQUEST_CODE)
-            super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == AccountHelper.GOOGLE_SIGN_IN_REQUEST_CODE) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                if (account != null) {
+                    DialogHelper(this).accHelper.signInFirebaseWithGoogle(account.idToken!!)
+                }
+            } catch (e: ApiException) {
+                Log.d("MyLog", "Api error ${e.message}")
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onStop() {
