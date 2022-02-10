@@ -34,7 +34,7 @@ class OptionsFragment : Fragment() {
             if (binding.onePlayer.signUp.text == "Sign_up") {
                 dialogHelper.createSignDialog(DialogHelper.SIGN_UP_STATE)
             } else {
-                viewModel.email.value = null
+                viewModel.user.value = null
                 viewModel.mAuth.signOut()
             }
         }
@@ -53,12 +53,12 @@ class OptionsFragment : Fragment() {
         binding.fourPlayer.signIn.visibility = View.GONE
         binding.fourPlayer.email.visibility = View.GONE
 
-        viewModel.email.observe(requireActivity()) {
-            if (binding.onePlayer.signUp.text == "Sign_up") {
-                uiUpdate(it)
-            } else {
-                uiUpdate(null)
-            }
+        viewModel.user.observe(requireActivity()) {
+//            if (binding.onePlayer.signUp.text == "Sign_up") {
+            uiUpdate(it)
+//            } else {
+//                uiUpdate(null)
+//            }
         }
 
         return binding.root

@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
     val mAuth = FirebaseAuth.getInstance()
 
-    var email = MutableLiveData<FirebaseUser?>(null)
+    var user = MutableLiveData<FirebaseUser?>(null)
 
     var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
 

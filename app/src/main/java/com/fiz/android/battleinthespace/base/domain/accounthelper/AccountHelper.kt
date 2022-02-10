@@ -17,7 +17,7 @@ class AccountHelper(private val act: MainActivity) {
         act.viewModel.mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 sendEmailVerification(task.result?.user!!)
-                act.viewModel.email.value = task.result?.user!!
+                act.viewModel.user.value = task.result?.user!!
             } else {
                 Toast.makeText(act, "Error sign up", Toast.LENGTH_LONG).show()
             }
@@ -33,16 +33,20 @@ class AccountHelper(private val act: MainActivity) {
 
     //TODO Сделать замену на classpath 'com.google.gms:google-services:4.3.10'
     private fun getSignInClient(): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-            .requestIdToken(act.getString(R.string.default_web_client_id)).build()
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(act.getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+
         return GoogleSignIn.getClient(act, gso)
     }
 
     fun signInFirebaseWithGoogle(token: String) {
-        val credetial = GoogleAuthProvider.getCredential(token, null)
-        act.viewModel.mAuth.signInWithCredential(credetial).addOnCompleteListener { task ->
+        val credential = GoogleAuthProvider.getCredential(token, null)
+        act.viewModel.mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(act, "Sign in done", Toast.LENGTH_LONG).show()
+                act.viewModel.user.value = task.result?.user
             } else {
                 Toast.makeText(act, "Error Sign in done", Toast.LENGTH_LONG).show()
             }
@@ -53,7 +57,7 @@ class AccountHelper(private val act: MainActivity) {
         if (email.isEmpty() || password.isEmpty()) return
         act.viewModel.mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                act.viewModel.email.value = task.result?.user!!
+                act.viewModel.user.value = task.result?.user!!
             } else {
                 Toast.makeText(act, "Error sign in", Toast.LENGTH_LONG).show()
             }
