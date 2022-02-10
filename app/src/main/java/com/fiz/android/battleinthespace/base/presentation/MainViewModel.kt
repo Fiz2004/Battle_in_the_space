@@ -35,6 +35,18 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         _countPlayerLiveData.value = numberRadioButton
     }
 
+    fun initPlayer(newPlayer: Player) {
+        player = newPlayer
+    }
+
+    fun addMoney(value: Int) {
+        player.money += value
+    }
+
+    fun changeMission(value: Int) {
+        player.mission = value
+    }
+
     fun setType(value: Int) {
         _type = value
     }
@@ -81,7 +93,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         }
     }
 
-    fun onClickDone(intent: Intent): Intent {
+    fun getDataForIntent(intent: Intent): Intent {
         intent.putExtra("countPlayers", countPlayerLiveData.value)
         for (n in 0 until 4) {
             val value = (playerListLiveData.value)?.get(n) ?: throw Error("Не доступна LiveData")

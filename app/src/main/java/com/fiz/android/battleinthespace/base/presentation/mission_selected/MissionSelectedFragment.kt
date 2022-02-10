@@ -49,19 +49,6 @@ class MissionSelectedFragment : Fragment() {
         return binding.root
     }
 
-    //    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    //        super.onViewCreated(view, savedInstanceState)
-    //
-    //        val pagerAdapter = SectionsPagerAdapter(this)
-    //        binding.viewpagerMission.adapter = pagerAdapter
-    //
-    //        TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
-    //            tab.text = getTitle(position)
-    //        }.attach()
-    //
-    //        binding.viewpagerMission.currentItem = viewModel.playerLiveData.value?.mission ?: 0
-    //    }
-
     private fun getTitle(position: Int): CharSequence {
         return when (position) {
             0 -> resources.getText(R.string.mission_destroy_meteorites)
@@ -84,7 +71,7 @@ class MissionSelectedFragment : Fragment() {
 
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
             super.onBindViewHolder(holder, position, payloads)
-            viewModel.player.mission = position
+            viewModel.changeMission(position)
         }
     }
 

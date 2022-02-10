@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private val activityLauncher = registerForActivityResult(GameActivityContract()) { result ->
         if (result != null) {
-            viewModel.player.money += result
+            viewModel.addMoney(value = result)
             viewModel.savePlayers()
         }
     }
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             if (it == null || it.isEmpty())
                 viewModel.fillInitValue()
             else
-                viewModel.player = it[0]
+                viewModel.initPlayer(it[0])
         }
 
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun createIntent(context: Context, input: String?): Intent {
             val intent = Intent(context, GameActivity::class.java)
-            return viewModel.onClickDone(intent)
+            return viewModel.getDataForIntent(intent)
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?): Int? = when {
