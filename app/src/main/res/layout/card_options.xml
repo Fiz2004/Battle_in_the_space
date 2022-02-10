@@ -96,17 +96,17 @@
                     style="@style/TextViewStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No Email" />
+                    android:text="@string/no_email" />
 
                 <Button
-                    android:id="@+id/sign_up"
+                    android:id="@+id/sign_up_out"
                     style="@style/ButtonStyle"
-                    android:text="Sign Up" />
+                    android:text="@string/signUp" />
 
                 <Button
                     android:id="@+id/sign_in"
                     style="@style/ButtonStyle"
-                    android:text="Sign In" />
+                    android:text="@string/signIn" />
             </LinearLayout>
 
         </LinearLayout>

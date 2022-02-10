@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.view.View
 import android.widget.Toast
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.domain.AccountHelper
+import com.fiz.android.battleinthespace.base.domain.accounthelper.AccountHelper
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
@@ -33,7 +33,8 @@ class DialogHelper(private val act: MainActivity) {
 
     private fun setDialogState(
         index: Int,
-        binding: SignDialogBinding) {
+        binding: SignDialogBinding
+    ) {
         if (index == SIGN_UP_STATE) {
             val txt = act.resources.getString(R.string.signUp)
             binding.signUpInTitleTextView.text = txt
@@ -49,7 +50,8 @@ class DialogHelper(private val act: MainActivity) {
     private fun setOnClickSignUpIn(
         dialog: AlertDialog,
         binding: SignDialogBinding,
-        index: Int) {
+        index: Int
+    ) {
         dialog.dismiss()
         val email: String = binding.signEmailEditText.text.toString()
         val password: String = binding.signPasswordEditText.text.toString()

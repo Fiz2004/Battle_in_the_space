@@ -70,6 +70,8 @@
     <string name="select_count_players_textview">Выберите количество игроков:</string>
     <string name="controller">Управление:</string>
     <string name="reset">Сбросить</string>
+    <!-- sign dialog -->
+    <string name="no_email">Нет почты</string>
     <string name="signUp">Зарегистрироваться</string>
     <string name="signIn">Войти</string>
     <string name="enterEmail">Введите Email</string>

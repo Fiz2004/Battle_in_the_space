@@ -1,13 +1,13 @@
-package com.fiz.android.battleinthespace.base.domain
+package com.fiz.android.battleinthespace.base.domain.accounthelper
 
+import android.util.Log
 import android.widget.Toast
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.*
 
 class AccountHelper(private val act: MainActivity) {
     private lateinit var signInClient: GoogleSignInClient
@@ -19,7 +19,24 @@ class AccountHelper(private val act: MainActivity) {
                 sendEmailVerification(task.result?.user!!)
                 act.viewModel.user.value = task.result?.user!!
             } else {
-                Toast.makeText(act, "Error sign up", Toast.LENGTH_LONG).show()
+                if (task.exception is FirebaseAuthUserCollisionException) {
+                    val exception = task.exception as FirebaseAuthUserCollisionException
+                    if (exception.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
+                        Toast.makeText(act, FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE, Toast.LENGTH_LONG).show()
+                    }
+                }
+                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                    val exception = task.exception as FirebaseAuthInvalidCredentialsException
+                    if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
+                        Toast.makeText(act, FirebaseAuthConstants.ERROR_INVALID_EMAIL, Toast.LENGTH_LONG).show()
+                    }
+                }
+                if (task.exception is FirebaseAuthWeakPasswordException) {
+                    val exception = task.exception as FirebaseAuthWeakPasswordException
+                    if (exception.errorCode == FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
+                        Toast.makeText(act, FirebaseAuthConstants.ERROR_WEAK_PASSWORD, Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
     }
@@ -48,6 +65,7 @@ class AccountHelper(private val act: MainActivity) {
                 Toast.makeText(act, "Sign in done", Toast.LENGTH_LONG).show()
                 act.viewModel.user.value = task.result?.user
             } else {
+                Log.d("MyLog", "Google sign in exception: ${task.exception}")
                 Toast.makeText(act, "Error Sign in done", Toast.LENGTH_LONG).show()
             }
         }
@@ -59,7 +77,14 @@ class AccountHelper(private val act: MainActivity) {
             if (task.isSuccessful) {
                 act.viewModel.user.value = task.result?.user!!
             } else {
-                Toast.makeText(act, "Error sign in", Toast.LENGTH_LONG).show()
+                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                    val exception = task.exception as FirebaseAuthInvalidCredentialsException
+                    if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
+                        Toast.makeText(act, FirebaseAuthConstants.ERROR_INVALID_EMAIL, Toast.LENGTH_LONG).show()
+                    } else if (exception.errorCode == FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
+                        Toast.makeText(act, FirebaseAuthConstants.ERROR_WRONG_PASSWORD, Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
     }
@@ -76,5 +101,12 @@ class AccountHelper(private val act: MainActivity) {
 
     companion object {
         const val GOOGLE_SIGN_IN_REQUEST_CODE = 132
+
+        object FirebaseAuthConstants {
+            const val ERROR_EMAIL_ALREADY_IN_USE = "ERROR_EMAIL_ALREADY_IN_USE"
+            const val ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL"
+            const val ERROR_WRONG_PASSWORD = "ERROR_WRONG_PASSWORD"
+            const val ERROR_WEAK_PASSWORD = "ERROR_WEAK_PASSWORD"
+        }
     }
 }

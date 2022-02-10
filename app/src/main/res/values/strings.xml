@@ -97,6 +97,7 @@
     <string name="controller">Controller:</string>
     <string name="reset">RESET</string>
     <!-- sign dialog -->
+    <string name="no_email">No Email</string>
     <string name="signUp">Sign Up</string>
     <string name="signIn">Sign In</string>
     <string name="enterEmail">Enter Email</string>

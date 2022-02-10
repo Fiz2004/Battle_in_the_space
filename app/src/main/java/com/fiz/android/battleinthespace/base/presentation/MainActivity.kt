@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
-import com.fiz.android.battleinthespace.base.domain.AccountHelper
+import com.fiz.android.battleinthespace.base.domain.accounthelper.AccountHelper
 import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
 import com.fiz.android.battleinthespace.base.presentation.options.OptionsFragment
 import com.fiz.android.battleinthespace.base.presentation.space_station.SpaceStationFragment
