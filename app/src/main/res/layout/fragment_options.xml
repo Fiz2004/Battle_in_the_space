@@ -41,28 +41,28 @@
             <RadioButton
                 android:id="@+id/onePlayers_RadioButton"
                 style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveData==1}"
+                android:checked="@{mainViewModel.countPlayerLiveDataEquals(1)}"
                 android:onClick="@{()->mainViewModel.setCountPlayers(1)}"
                 android:text="@{@plurals/count_players(1,1)}" />
 
             <RadioButton
                 android:id="@+id/twoPlayers_RadioButton"
                 style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveData==2}"
+                android:checked="@{mainViewModel.countPlayerLiveDataEquals(2)}"
                 android:onClick="@{()->mainViewModel.setCountPlayers(2)}"
                 android:text="@{@plurals/count_players(2,2)}" />
 
             <RadioButton
                 android:id="@+id/threePlayers_RadioButton"
                 style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveData==3}"
+                android:checked="@{mainViewModel.countPlayerLiveDataEquals(3)}"
                 android:onClick="@{()->mainViewModel.setCountPlayers(3)}"
                 android:text="@{@plurals/count_players(3,3)}" />
 
             <RadioButton
                 android:id="@+id/fourPlayers_RadioButton"
                 style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveData==4}"
+                android:checked="@{mainViewModel.countPlayerLiveDataEquals(4)}"
                 android:onClick="@{()->mainViewModel.setCountPlayers(4)}"
                 android:text="@{@plurals/count_players(4,4)}" />
         </RadioGroup>
@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveData &gt;= 2 ?android.view.View.VISIBLE:android.view.View.GONE}"
+            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(2) ?android.view.View.VISIBLE:android.view.View.GONE}"
             app:count="@{2}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -100,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveData &gt;= 3 ?android.view.View.VISIBLE:android.view.View.GONE}"
+            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(3) ?android.view.View.VISIBLE:android.view.View.GONE}"
             app:count="@{3}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveData &gt;= 4 ?android.view.View.VISIBLE:android.view.View.GONE}"
+            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(4) ?android.view.View.VISIBLE:android.view.View.GONE}"
             app:count="@{4}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

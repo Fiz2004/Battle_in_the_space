@@ -44,7 +44,9 @@ class MissionSelectedFragment : Fragment() {
             tab.text = getTitle(position)
         }.attach()
 
-        binding.viewpagerMission.currentItem = viewModel.player.mission
+        viewModel.mission.observe(viewLifecycleOwner) {
+            binding.viewpagerMission.currentItem = it
+        }
 
         return binding.root
     }

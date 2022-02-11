@@ -65,6 +65,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getTitle(position: Int): CharSequence {
+        return when (position) {
+            0 -> resources.getText(R.string.title_mission_selection)
+            1 -> resources.getText(R.string.title_space_station)
+            2 -> resources.getText(R.string.title_statistics)
+            else -> resources.getText(R.string.title_options)
+        }
+    }
+
     //ToDo перенести в оптионс
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == AccountHelper.GOOGLE_SIGN_IN_REQUEST_CODE) {
@@ -84,15 +93,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         viewModel.savePlayers()
-    }
-
-    private fun getTitle(position: Int): CharSequence {
-        return when (position) {
-            0 -> resources.getText(R.string.title_mission_selection)
-            1 -> resources.getText(R.string.title_space_station)
-            2 -> resources.getText(R.string.title_statistics)
-            else -> resources.getText(R.string.title_options)
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

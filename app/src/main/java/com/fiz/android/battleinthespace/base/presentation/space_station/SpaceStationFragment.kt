@@ -17,7 +17,8 @@ import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 
 class SpaceStationFragment : Fragment() {
     private var _binding: FragmentSpaceStationBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
         val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
@@ -33,73 +34,53 @@ class SpaceStationFragment : Fragment() {
     ): View {
         _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
 
-        binding.mainViewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        viewModel.type.observe(viewLifecycleOwner) { type ->
+            binding.stationRecycler.adapter = if (type == 0) {
+                captionImageAdapter = CaptionImageAdapter(ItemTypesDefault.createTypes())
+                captionImageAdapter.setListener { position: Int ->
+                    viewModel.setType(position + 1)
+                }
+                captionImageAdapter
+            } else {
+                val currentType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
+                val nameType = ItemTypesDefault.createTypes()[currentType].name
+                val items = viewModel.items.value ?: throw Error("Не доступна Livedata items")
+                val listProduct = Item.getListProduct(nameType, items)
+                imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
+                imagesCaptionCaptionAdapter.setListener { position: Int ->
+                    if (position == 0) {
+                        viewModel.setType(0)
+                    } else {
+                        if (listProduct[position].state == StateProduct.BUY) {
+                            val allProductsType = ItemDefault.createListItems().filter { it.type == nameType }
+                            allProductsType.forEach {
+                                if (items[it.name] == StateProduct.INSTALL)
+                                    viewModel.changeItems(it.name, StateProduct.BUY)
+                            }
+                            val key = listProduct[position].name
+                            viewModel.changeItems(key, StateProduct.INSTALL)
+                        } else {
+                            val money = viewModel.money.value ?: throw Error("Не доступна Livedata money")
+                            if (money - listProduct[position].cost >= 0) {
+                                viewModel.moneyMinus(listProduct[position].cost)
+                                val key = listProduct[position].name
+                                viewModel.changeItems(key, StateProduct.BUY)
+                            }
+                        }
+                    }
+                }
+                imagesCaptionCaptionAdapter
+            }
+        }
+
+        viewModel.money.observe(viewLifecycleOwner) { money ->
+            binding.money.text = getString(R.string.balance, money)
+        }
+
+        val layoutManager = GridLayoutManager(activity, 2)
+        binding.stationRecycler.layoutManager = layoutManager
 
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        val layoutManager = GridLayoutManager(activity, 2)
-        binding.stationRecycler.layoutManager = layoutManager
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        updateUI()
-    }
-
-    private fun updateUI() {
-        binding.stationRecycler.adapter = if (viewModel.type == 0) {
-            configureCaptionImageAdapter()
-            captionImageAdapter
-        } else {
-            configureImagesCaptionCaptionAdapter()
-            imagesCaptionCaptionAdapter
-        }
-        binding.money.text = getString(R.string.balance, viewModel.player.money)
-    }
-
-    private fun configureCaptionImageAdapter() {
-        captionImageAdapter = CaptionImageAdapter(ItemTypesDefault.createTypes())
-
-        captionImageAdapter.setListener { position: Int ->
-            viewModel.setType(position + 1)
-            updateUI()
-        }
-    }
-
-    private fun configureImagesCaptionCaptionAdapter() {
-        val currentType = viewModel.type - 1
-        val nameType = ItemTypesDefault.createTypes()[currentType].name
-        val items = viewModel.player.items
-        val listProduct = Item.getListProduct(nameType, items)
-
-        imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
-
-        imagesCaptionCaptionAdapter.setListener { position: Int ->
-            if (position == 0) {
-                viewModel.setType(0)
-            } else {
-                if (listProduct[position].state == StateProduct.BUY) {
-                    val allProductsType = ItemDefault.createListItems().filter { it.type == nameType }
-                    allProductsType.forEach {
-                        if (items[it.name] == StateProduct.INSTALL)
-                            viewModel.player.items[it.name] = StateProduct.BUY
-                    }
-                    val key = listProduct[position].name
-                    viewModel.player.items[key] = StateProduct.INSTALL
-                } else
-                    if (viewModel.player.money.minus(listProduct[position].cost) >= 0) {
-                        viewModel.configureMoney(listProduct[position].cost)
-                        val key = listProduct[position].name
-                        viewModel.player.items[key] = StateProduct.BUY
-                    }
-            }
-            updateUI()
-        }
-    }
 }
