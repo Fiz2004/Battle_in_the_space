@@ -11,8 +11,8 @@ import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.*
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
-import com.fiz.android.battleinthespace.base.presentation.helpers.CaptionImageAdapter
-import com.fiz.android.battleinthespace.base.presentation.helpers.ImagesCaptionCaptionAdapter
+import com.fiz.android.battleinthespace.base.presentation.helpers.ItemsAdapter
+import com.fiz.android.battleinthespace.base.presentation.helpers.TypeItemsAdapter
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 
 class SpaceStationFragment : Fragment() {
@@ -25,8 +25,8 @@ class SpaceStationFragment : Fragment() {
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
-    private lateinit var captionImageAdapter: CaptionImageAdapter
-    private lateinit var imagesCaptionCaptionAdapter: ImagesCaptionCaptionAdapter
+    private lateinit var typeItemsAdapter: TypeItemsAdapter
+    private lateinit var itemsAdapter: ItemsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,23 +36,24 @@ class SpaceStationFragment : Fragment() {
 
         viewModel.type.observe(viewLifecycleOwner) { type ->
             binding.stationRecycler.adapter = if (type == 0) {
-                captionImageAdapter = CaptionImageAdapter(ItemTypesDefault.createTypes())
-                captionImageAdapter.setListener { position: Int ->
+                typeItemsAdapter = TypeItemsAdapter(TypeItems.createTypes())
+                typeItemsAdapter.setListener { position: Int ->
                     viewModel.setType(position + 1)
                 }
-                captionImageAdapter
+                typeItemsAdapter
             } else {
                 val currentType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
-                val nameType = ItemTypesDefault.createTypes()[currentType].name
-                val items = viewModel.items.value ?: throw Error("Не доступна Livedata items")
-                val listProduct = Item.getListProduct(nameType, items)
-                imagesCaptionCaptionAdapter = ImagesCaptionCaptionAdapter(listProduct)
-                imagesCaptionCaptionAdapter.setListener { position: Int ->
+                val nameType = TypeItems.createTypes()[currentType].name
+                val items = viewModel.getItems()
+                var listProduct = Item.getListProduct(nameType, items)
+                listProduct = Item.addZeroFirstItem(listProduct)
+                itemsAdapter = ItemsAdapter(listProduct)
+                itemsAdapter.setListener { position: Int ->
                     if (position == 0) {
                         viewModel.setType(0)
                     } else {
                         if (listProduct[position].state == StateProduct.BUY) {
-                            val allProductsType = ItemDefault.createListItems().filter { it.type == nameType }
+                            val allProductsType = ItemsDatabase.createListItems().filter { it.type == nameType }
                             allProductsType.forEach {
                                 if (items[it.name] == StateProduct.INSTALL)
                                     viewModel.changeItems(it.name, StateProduct.BUY)
@@ -60,22 +61,17 @@ class SpaceStationFragment : Fragment() {
                             val key = listProduct[position].name
                             viewModel.changeItems(key, StateProduct.INSTALL)
                         } else {
-                            val money = viewModel.money.value ?: throw Error("Не доступна Livedata money")
-                            if (money - listProduct[position].cost >= 0) {
-                                viewModel.moneyMinus(listProduct[position].cost)
-                                val key = listProduct[position].name
-                                viewModel.changeItems(key, StateProduct.BUY)
-                            }
+                            viewModel.buyItem(listProduct, position)
+                            binding.money.text = getString(R.string.balance, viewModel.getMoney())
                         }
+                        viewModel.setType(viewModel.type.value!!)
                     }
                 }
-                imagesCaptionCaptionAdapter
+                itemsAdapter
             }
         }
 
-        viewModel.money.observe(viewLifecycleOwner) { money ->
-            binding.money.text = getString(R.string.balance, money)
-        }
+        binding.money.text = getString(R.string.balance, viewModel.getMoney())
 
         val layoutManager = GridLayoutManager(activity, 2)
         binding.stationRecycler.layoutManager = layoutManager

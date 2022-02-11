@@ -2,12 +2,17 @@ package com.fiz.android.battleinthespace.base.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.fiz.android.battleinthespace.base.data.Item
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import kotlin.collections.set
 
 class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
     val mAuth = FirebaseAuth.getInstance()
@@ -16,36 +21,24 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
 
     var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
 
-    private var player: MutableLiveData<Player> = Transformations.map(playerListLiveData) {
-        it[0]
-    } as MutableLiveData<Player>
-
-    var items: MutableLiveData<HashMap<Int, StateProduct>> = Transformations.map(player) {
-        it.items
-    } as MutableLiveData<HashMap<Int, StateProduct>>
-
-    private var _money: MutableLiveData<Int> = Transformations.map(player) {
-        it.money
-    } as MutableLiveData<Int>
-    val money: LiveData<Int>
-        get() = _money
-
-    private var _mission: MutableLiveData<Int> = Transformations.map(player) {
-        it.mission
-    } as MutableLiveData<Int>
-    val mission: LiveData<Int>
-        get() = _mission
-
-    private val countPlayerLiveData: MutableLiveData<Int> = Transformations.map(playerListLiveData) {
-        it.size
-    } as MutableLiveData<Int>
+    private var player: Player = Player(money = 666)
 
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
         get() = _type
 
+    val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
+
+    fun getItems(): HashMap<Int, StateProduct> {
+        return player.items
+    }
+
+    fun getMoney(): Int {
+        return player.money
+    }
+
     fun changeItems(Key: Int, value: StateProduct) {
-        items.value?.set(Key, value)
+        player.items[Key] = value
     }
 
     fun fillInitValue() {
@@ -53,36 +46,37 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     }
 
     fun setCountPlayers(numberRadioButton: Int) {
-        countPlayerLiveData.value = numberRadioButton
+        countPlayer.value = numberRadioButton
     }
 
     fun initPlayer(newPlayer: Player) {
-        player.value = newPlayer
+        player = newPlayer
     }
 
     fun addMoney(value: Int) {
-        _money.value = money.value?.plus(value)
+        player.money += value
     }
 
     fun changeMission(value: Int) {
-        _mission.value = value
+        player.mission = value
     }
 
     fun setType(value: Int) {
         _type.value = value
+
     }
 
     fun savePlayers() {
-        playerRepository.saveCountPlayers(countPlayerLiveData.value ?: 4)
-        player.value?.let { playerRepository.updatePlayer(it) }
+        playerRepository.saveCountPlayers(countPlayer.value!!)
+        playerRepository.updatePlayer(player)
     }
 
     fun countPlayerLiveDataEquals(value: Int): Boolean {
-        return countPlayerLiveData.value == value
+        return countPlayer.value == value
     }
 
     fun countPlayerLiveDataCompare(value: Int): Boolean {
-        return countPlayerLiveData.value!! >= value
+        return countPlayer.value!! >= value
     }
 
     fun onClickReset(count: Int) {
@@ -104,7 +98,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(
             "countPlayers",
-            countPlayerLiveData.value ?: throw Error("Не доступна LiveData countPlayerLiveData"))
+            countPlayer.value!!)
         for (n in 0 until 4) {
             val value = (playerListLiveData.value)?.get(n) ?: throw Error("Не доступна LiveData playerListLiveData")
 
@@ -116,7 +110,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     }
 
     fun getDataForIntent(intent: Intent): Intent {
-        intent.putExtra("countPlayers", countPlayerLiveData.value)
+        intent.putExtra("countPlayers", countPlayer.value)
         for (n in 0 until 4) {
             val value = (playerListLiveData.value)?.get(n) ?: throw Error("Не доступна LiveData playerListLiveData")
 
@@ -128,8 +122,15 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         return intent
     }
 
-    fun moneyMinus(cost: Int) {
-        _money.value = money.value?.minus(cost)
+    fun buyItem(
+        listProduct: List<Item>,
+        position: Int) {
+        val money = getMoney()
+        if (money - listProduct[position].cost >= 0) {
+            player.money -= listProduct[position].cost
+            val key = listProduct[position].name
+            changeItems(key, StateProduct.BUY)
+        }
     }
 }
 

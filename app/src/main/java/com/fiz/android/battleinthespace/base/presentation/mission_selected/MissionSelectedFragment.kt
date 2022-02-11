@@ -44,10 +44,6 @@ class MissionSelectedFragment : Fragment() {
             tab.text = getTitle(position)
         }.attach()
 
-        viewModel.mission.observe(viewLifecycleOwner) {
-            binding.viewpagerMission.currentItem = it
-        }
-
         return binding.root
     }
 
@@ -74,6 +70,7 @@ class MissionSelectedFragment : Fragment() {
         override fun onBindViewHolder(holder: FragmentViewHolder, position: Int, payloads: MutableList<Any>) {
             super.onBindViewHolder(holder, position, payloads)
             viewModel.changeMission(position)
+            binding.viewpagerMission.currentItem = position
         }
     }
 

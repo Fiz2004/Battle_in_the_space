@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.Item
 import com.fiz.android.battleinthespace.base.data.StateProduct
-import com.fiz.android.battleinthespace.databinding.CardImageCaptionCaptionBinding
+import com.fiz.android.battleinthespace.databinding.ListItemItemBinding
 
 
-class ImagesCaptionCaptionAdapter(private val products: List<Item>) :
-    RecyclerView.Adapter<ImagesCaptionCaptionAdapter.ViewHolder>() {
+class ItemsAdapter(private val Items: List<Item>) :
+    RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
 
     fun interface Listener {
         fun onClick(position: Int)
@@ -27,31 +27,33 @@ class ImagesCaptionCaptionAdapter(private val products: List<Item>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = CardImageCaptionCaptionBinding.inflate(inflater, parent, false)
+        val binding = ListItemItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        // position==0 Возникает когда возвращаемся назад из меню покупки.
         if (position == 0)
             holder.bind()
         else
-            holder.bind(products[position])
+            holder.bind(Items[position])
     }
 
     override fun getItemCount(): Int {
-        return products.size
+        return Items.size
     }
 
-    inner class ViewHolder(val binding: CardImageCaptionCaptionBinding) : RecyclerView.ViewHolder(binding.root),
+    inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root),
         View.OnClickListener {
         private val colorDefault = binding.cardView.cardBackgroundColor
+        var item: Item? = null
 
         init {
             itemView.setOnClickListener(this)
         }
 
         fun bind(item: Item) {
-            binding.item = item
+            this.item = item
             val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
 
             binding.infoImage.setImageDrawable(drawable)
@@ -97,7 +99,7 @@ class ImagesCaptionCaptionAdapter(private val products: List<Item>) :
         }
 
         override fun onClick(v: View) {
-            if (binding.item?.state == StateProduct.NONE && binding.item?.cost != 0) {
+            if (item != null && item?.cost != 0 && item?.state == StateProduct.NONE) {
                 binding.cardView.setCardBackgroundColor(Color.YELLOW)
                 binding.infoText.text = binding.root.context.resources.getString(R.string.buying_question)
                 binding.costText.visibility = View.GONE
@@ -108,14 +110,14 @@ class ImagesCaptionCaptionAdapter(private val products: List<Item>) :
                 binding.undoButton.setOnClickListener {
                     binding.buttonsLayout.visibility = View.GONE
                     binding.costText.visibility = View.VISIBLE
-                    bind(binding.item!!)
+                    bind(item!!)
                 }
                 return
             }
             if (binding.costText.visibility == View.GONE) {
                 binding.buttonsLayout.visibility = View.GONE
                 binding.costText.visibility = View.VISIBLE
-                bind(binding.item!!)
+                bind(item!!)
                 return
             }
             listener.onClick(layoutPosition)
