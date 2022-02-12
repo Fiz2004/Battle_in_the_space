@@ -27,7 +27,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     val type: LiveData<Int>
         get() = _type
 
-    val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
+    private val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
 
     fun getItems(): HashMap<Int, StateProduct> {
         return player.items

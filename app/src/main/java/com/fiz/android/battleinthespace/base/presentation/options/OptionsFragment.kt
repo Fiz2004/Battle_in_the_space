@@ -36,6 +36,7 @@ class OptionsFragment : Fragment() {
             } else {
                 viewModel.user.value = null
                 viewModel.mAuth.signOut()
+                dialogHelper.accHelper.signInOutG()
             }
         }
 
@@ -60,6 +61,7 @@ class OptionsFragment : Fragment() {
                 uiUpdate(null)
             }
         }
+
 
         return binding.root
     }

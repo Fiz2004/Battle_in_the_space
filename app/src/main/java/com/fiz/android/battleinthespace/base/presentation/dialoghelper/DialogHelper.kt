@@ -25,7 +25,7 @@ class DialogHelper(private val act: MainActivity) {
             setOnClickResetPassword(dialog, binding)
         }
         binding.signInGoogle.setOnClickListener {
-            accHelper.signInWithGoogle()
+            setOnClickSignInGoogle(dialog)
         }
 
         dialog.show()
@@ -75,6 +75,11 @@ class DialogHelper(private val act: MainActivity) {
             binding.dialogMessageTextView.visibility = View.VISIBLE
 
         }
+    }
+
+    private fun setOnClickSignInGoogle(dialog: AlertDialog?) {
+        accHelper.signInWithGoogle()
+        dialog?.dismiss()
     }
 
     companion object {

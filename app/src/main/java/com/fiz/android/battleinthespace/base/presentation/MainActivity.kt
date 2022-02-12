@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity() {
                 val account = task.getResult(ApiException::class.java)
                 if (account != null) {
                     DialogHelper(this).accHelper.signInFirebaseWithGoogle(account.idToken!!)
+                } else {
                 }
             } catch (e: ApiException) {
                 Log.d("MyLog", "Api error ${e.message}")
