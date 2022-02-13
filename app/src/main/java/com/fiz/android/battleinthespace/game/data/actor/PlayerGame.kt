@@ -6,6 +6,7 @@ class PlayerGame(var number: Int, val controller: Controller) {
     var score: Int = 0
     var main: Boolean = false
     var life: Int = 3
+    var weapon: Weapon = OneBullet()
 
     init {
         controller.linkPlayer(this)
