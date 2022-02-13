@@ -20,6 +20,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         app:cardCornerRadius="4dp"
         app:cardElevation="2dp"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup">
@@ -27,6 +28,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="8dp"
             android:orientation="vertical">
 
             <TextView
@@ -34,11 +36,13 @@
                 style="@style/TextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:text="@{@plurals/count_players(count,count)}" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -46,6 +50,7 @@
                     style="@style/TextViewStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
                     android:text="@string/name_options_textview" />
 
                 <EditText
@@ -53,6 +58,7 @@
                     style="@style/EditTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
                     android:hint="@string/name_options_edittext"
                     android:text="@={player.name}" />
             </LinearLayout>
@@ -60,6 +66,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -67,6 +74,7 @@
                     style="@style/TextViewStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
                     android:text="@string/controller" />
 
                 <ToggleButton
@@ -74,6 +82,7 @@
                     style="@style/ButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
                     android:layout_marginEnd="8dp"
                     android:checked="@={player.controllerPlayer}"
                     android:textOff="@string/controller_options_togglebutton_off"
@@ -82,32 +91,37 @@
                 <Button
                     android:id="@+id/reset"
                     style="@style/ButtonStyle"
+                    android:layout_margin="8dp"
                     android:onClick="@{()->mainViewModel.onClickReset(count)}"
                     android:text="@string/reset" />
             </LinearLayout>
 
-            <LinearLayout
+
+            <TextView
+                android:id="@+id/email"
+                style="@style/TextViewStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_margin="8dp"
+                android:text="@string/no_email" />
 
-                <TextView
-                    android:id="@+id/email"
-                    style="@style/TextViewStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_email" />
+            <Button
+                android:id="@+id/sign_up"
+                style="@style/ButtonStyle"
+                android:layout_margin="8dp"
+                android:text="@string/signUp" />
 
-                <Button
-                    android:id="@+id/sign_up_out"
-                    style="@style/ButtonStyle"
-                    android:text="@string/signUp" />
+            <Button
+                android:id="@+id/sign_in"
+                style="@style/ButtonStyle"
+                android:layout_margin="8dp"
+                android:text="@string/signIn" />
 
-                <Button
-                    android:id="@+id/sign_in"
-                    style="@style/ButtonStyle"
-                    android:text="@string/signIn" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/sign_out"
+                style="@style/ButtonStyle"
+                android:layout_margin="8dp"
+                android:text="@string/signOut" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

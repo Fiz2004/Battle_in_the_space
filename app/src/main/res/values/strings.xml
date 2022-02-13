@@ -100,6 +100,7 @@
     <string name="no_email">No Email</string>
     <string name="signUp">Sign Up</string>
     <string name="signIn">Sign In</string>
+    <string name="signOut">Sign Out</string>
     <string name="enterEmail">Enter Email</string>
     <string name="enterPassword">Enter Password</string>
     <string name="forgotPassword">Forgot Password</string>

@@ -19,7 +19,7 @@
                 android:layout_height="wrap_content" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.fiz.android.battleinthespace.presentation.main.NestedScrollableHost
+        <com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -35,6 +35,6 @@
 
             </androidx.viewpager2.widget.ViewPager2>
 
-        </com.fiz.android.battleinthespace.presentation.main.NestedScrollableHost>
+        </com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

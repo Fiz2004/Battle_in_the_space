@@ -12,115 +12,120 @@
             type="com.fiz.android.battleinthespace.base.presentation.MainViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="10dp"
-        tools:context=".base.presentation.options.OptionsFragment">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/txtForRadioGroup"
-            style="@style/TextViewStyle"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/select_count_players_textview"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            tools:context=".base.presentation.options.OptionsFragment">
 
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtForRadioGroup">
+            <TextView
+                android:id="@+id/txtForRadioGroup"
+                style="@style/TextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_count_players_textview"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <RadioButton
-                android:id="@+id/onePlayers_RadioButton"
-                style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveDataEquals(1)}"
-                android:onClick="@{()->mainViewModel.setCountPlayers(1)}"
-                android:text="@{@plurals/count_players(1,1)}" />
+            <RadioGroup
+                android:id="@+id/radioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtForRadioGroup">
 
-            <RadioButton
-                android:id="@+id/twoPlayers_RadioButton"
-                style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveDataEquals(2)}"
-                android:onClick="@{()->mainViewModel.setCountPlayers(2)}"
-                android:text="@{@plurals/count_players(2,2)}" />
+                <RadioButton
+                    android:id="@+id/onePlayers_RadioButton"
+                    style="@style/RadioButtonStyle"
+                    android:checked="@{mainViewModel.countPlayerLiveDataEquals(1)}"
+                    android:onClick="@{()->mainViewModel.setCountPlayers(1)}"
+                    android:text="@{@plurals/count_players(1,1)}" />
 
-            <RadioButton
-                android:id="@+id/threePlayers_RadioButton"
-                style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveDataEquals(3)}"
-                android:onClick="@{()->mainViewModel.setCountPlayers(3)}"
-                android:text="@{@plurals/count_players(3,3)}" />
+                <RadioButton
+                    android:id="@+id/twoPlayers_RadioButton"
+                    style="@style/RadioButtonStyle"
+                    android:checked="@{mainViewModel.countPlayerLiveDataEquals(2)}"
+                    android:onClick="@{()->mainViewModel.setCountPlayers(2)}"
+                    android:text="@{@plurals/count_players(2,2)}" />
 
-            <RadioButton
-                android:id="@+id/fourPlayers_RadioButton"
-                style="@style/RadioButtonStyle"
-                android:checked="@{mainViewModel.countPlayerLiveDataEquals(4)}"
-                android:onClick="@{()->mainViewModel.setCountPlayers(4)}"
-                android:text="@{@plurals/count_players(4,4)}" />
-        </RadioGroup>
+                <RadioButton
+                    android:id="@+id/threePlayers_RadioButton"
+                    style="@style/RadioButtonStyle"
+                    android:checked="@{mainViewModel.countPlayerLiveDataEquals(3)}"
+                    android:onClick="@{()->mainViewModel.setCountPlayers(3)}"
+                    android:text="@{@plurals/count_players(3,3)}" />
 
-        <include
-            android:id="@+id/onePlayer"
-            layout="@layout/card_options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            app:count="@{1}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-            app:mainViewModel="@{mainViewModel}"
-            app:player="@{mainViewModel.playerListLiveData[0]}" />
+                <RadioButton
+                    android:id="@+id/fourPlayers_RadioButton"
+                    style="@style/RadioButtonStyle"
+                    android:checked="@{mainViewModel.countPlayerLiveDataEquals(4)}"
+                    android:onClick="@{()->mainViewModel.setCountPlayers(4)}"
+                    android:text="@{@plurals/count_players(4,4)}" />
+            </RadioGroup>
 
-        <include
-            android:id="@+id/twoPlayer"
-            layout="@layout/card_options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(2) ?android.view.View.VISIBLE:android.view.View.GONE}"
-            app:count="@{2}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/onePlayer"
-            app:mainViewModel="@{mainViewModel}"
-            app:player="@{mainViewModel.playerListLiveData[1]}" />
+            <include
+                android:id="@+id/onePlayer"
+                layout="@layout/card_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                app:count="@{1}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+                app:mainViewModel="@{mainViewModel}"
+                app:player="@{mainViewModel.playerListLiveData[0]}" />
 
-        <include
-            android:id="@+id/threePlayer"
-            layout="@layout/card_options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(3) ?android.view.View.VISIBLE:android.view.View.GONE}"
-            app:count="@{3}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/twoPlayer"
-            app:mainViewModel="@{mainViewModel}"
-            app:player="@{mainViewModel.playerListLiveData[2]}" />
+            <include
+                android:id="@+id/twoPlayer"
+                layout="@layout/card_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:visibility="@{mainViewModel.countPlayerLiveDataCompare(2) ?android.view.View.VISIBLE:android.view.View.GONE}"
+                app:count="@{2}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/onePlayer"
+                app:mainViewModel="@{mainViewModel}"
+                app:player="@{mainViewModel.playerListLiveData[1]}" />
 
-        <include
-            android:id="@+id/fourPlayer"
-            layout="@layout/card_options"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:visibility="@{mainViewModel.countPlayerLiveDataCompare(4) ?android.view.View.VISIBLE:android.view.View.GONE}"
-            app:count="@{4}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/threePlayer"
-            app:mainViewModel="@{mainViewModel}"
-            app:player="@{mainViewModel.playerListLiveData[3]}" />
+            <include
+                android:id="@+id/threePlayer"
+                layout="@layout/card_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:visibility="@{mainViewModel.countPlayerLiveDataCompare(3) ?android.view.View.VISIBLE:android.view.View.GONE}"
+                app:count="@{3}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/twoPlayer"
+                app:mainViewModel="@{mainViewModel}"
+                app:player="@{mainViewModel.playerListLiveData[2]}" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <include
+                android:id="@+id/fourPlayer"
+                layout="@layout/card_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:visibility="@{mainViewModel.countPlayerLiveDataCompare(4) ?android.view.View.VISIBLE:android.view.View.GONE}"
+                app:count="@{4}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/threePlayer"
+                app:mainViewModel="@{mainViewModel}"
+                app:player="@{mainViewModel.playerListLiveData[3]}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>
