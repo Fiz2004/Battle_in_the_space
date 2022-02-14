@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.*
+import com.fiz.android.battleinthespace.base.data.Item
+import com.fiz.android.battleinthespace.base.data.PlayerRepository
+import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.helpers.ItemsAdapter
@@ -35,40 +37,38 @@ class SpaceStationFragment : Fragment() {
         _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
 
         viewModel.type.observe(viewLifecycleOwner) { type ->
-            binding.stationRecycler.adapter = if (type == 0) {
-                typeItemsAdapter = TypeItemsAdapter(TypeItems.createTypes())
-                typeItemsAdapter.setListener { position: Int ->
-                    viewModel.setType(position + 1)
-                }
-                typeItemsAdapter
-            } else {
-                val currentType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
-                val nameType = TypeItems.createTypes()[currentType].name
-                val items = viewModel.getItems()
-                var listProduct = Item.getListProduct(nameType, items)
-                listProduct = Item.addZeroFirstItem(listProduct)
-                itemsAdapter = ItemsAdapter(listProduct)
-                itemsAdapter.setListener { position: Int ->
-                    if (position == 0) {
-                        viewModel.setType(0)
-                    } else {
-                        if (listProduct[position].state == StateProduct.BUY) {
-                            val allProductsType = ItemsDatabase.createListItems().filter { it.type == nameType }
-                            allProductsType.forEach {
-                                if (items[it.name] == StateProduct.INSTALL)
-                                    viewModel.changeItems(it.name, StateProduct.BUY)
-                            }
-                            val key = listProduct[position].name
-                            viewModel.changeItems(key, StateProduct.INSTALL)
-                        } else {
-                            viewModel.buyItem(listProduct, position)
-                            binding.money.text = getString(R.string.balance, viewModel.getMoney())
-                        }
-                        viewModel.setType(viewModel.type.value!!)
+            binding.stationRecycler.adapter =
+                if (type == 0) {
+                    typeItemsAdapter = TypeItemsAdapter(viewModel.player.items)
+                    typeItemsAdapter.setListener { position: Int ->
+                        viewModel.setType(position + 1)
                     }
+                    typeItemsAdapter
+                } else {
+                    val indexType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
+                    val items = viewModel.getItems()
+                    var listProduct = items[indexType].items
+                    listProduct = Item.addZeroFirstItem(listProduct) as MutableList<Item>
+                    itemsAdapter = ItemsAdapter(listProduct)
+                    itemsAdapter.setListener { position: Int ->
+                        if (position == 0) {
+                            viewModel.setType(0)
+                        } else {
+                            if (listProduct[position].state == StateProduct.BUY) {
+                                listProduct.forEachIndexed { index, it ->
+                                    if (it.state == StateProduct.INSTALL)
+                                        viewModel.changeItems(index - 1, indexType, StateProduct.BUY)
+                                }
+                                viewModel.changeItems(position - 1, indexType, StateProduct.INSTALL)
+                            } else {
+                                viewModel.buyItem(position - 1, indexType)
+                                binding.money.text = getString(R.string.balance, viewModel.getMoney())
+                            }
+                            viewModel.setType(viewModel.type.value!!)
+                        }
+                    }
+                    itemsAdapter
                 }
-                itemsAdapter
-            }
         }
 
         binding.money.text = getString(R.string.balance, viewModel.getMoney())
@@ -77,6 +77,11 @@ class SpaceStationFragment : Fragment() {
         binding.stationRecycler.layoutManager = layoutManager
 
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.money.text = getString(R.string.balance, viewModel.getMoney())
     }
 
 }

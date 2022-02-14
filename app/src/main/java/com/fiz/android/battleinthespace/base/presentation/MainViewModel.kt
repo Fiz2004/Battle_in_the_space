@@ -6,13 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.fiz.android.battleinthespace.base.data.Item
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.StateProduct
+import com.fiz.android.battleinthespace.base.data.TypeItems
+import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import kotlin.collections.set
 
 class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
     val mAuth = FirebaseAuth.getInstance()
@@ -21,7 +21,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
 
     var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
 
-    private var player: Player = Player(money = 666)
+    var player: Player = Player(money = 666)
 
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
@@ -29,7 +29,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
 
     private val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
 
-    fun getItems(): HashMap<Int, StateProduct> {
+    fun getItems(): List<TypeItems> {
         return player.items
     }
 
@@ -37,8 +37,8 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         return player.money
     }
 
-    fun changeItems(Key: Int, value: StateProduct) {
-        player.items[Key] = value
+    fun changeItems(key: Int, type: Int, value: StateProduct) {
+        player.items[type].items[key].state = value
     }
 
     fun fillInitValue() {
@@ -105,7 +105,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
             outState.putString("name$n", value.name)
             outState.putBoolean("playerControllerPlayer$n", value.controllerPlayer)
             outState.putInt("mission$n", value.mission)
-            outState.putSerializable("items$n", value.items)
+            outState.putString("items$n", PlayerTypeConverters().fromItems(value.items))
         }
     }
 
@@ -117,19 +117,18 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
             intent.putExtra("name$n", value.name)
             intent.putExtra("playerControllerPlayer$n", value.controllerPlayer)
             intent.putExtra("mission$n", value.mission)
-            intent.putExtra("items$n", value.items)
+            intent.putExtra("items$n", PlayerTypeConverters().fromItems(value.items))
         }
         return intent
     }
 
     fun buyItem(
-        listProduct: List<Item>,
-        position: Int) {
+        index: Int,
+        indexType: Int) {
         val money = getMoney()
-        if (money - listProduct[position].cost >= 0) {
-            player.money -= listProduct[position].cost
-            val key = listProduct[position].name
-            changeItems(key, StateProduct.BUY)
+        if (money - getItems()[indexType].items[index].cost >= 0) {
+            player.money -= getItems()[indexType].items[index].cost
+            changeItems(index, indexType, StateProduct.BUY)
         }
     }
 }

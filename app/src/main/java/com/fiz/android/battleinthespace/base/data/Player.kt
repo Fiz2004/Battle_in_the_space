@@ -18,5 +18,5 @@ data class Player(
     @NonNull @ColumnInfo(name = "money")
     var money: Int = 1000,
     @NonNull @ColumnInfo(name = "items")
-    var items: HashMap<Int, StateProduct> = ItemsDatabase.itemsDefault()
+    var items: List<TypeItems> = ItemsDatabase.getStartItems()
 )

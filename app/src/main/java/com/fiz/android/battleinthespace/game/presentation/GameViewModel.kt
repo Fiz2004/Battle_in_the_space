@@ -7,7 +7,7 @@ import android.view.SurfaceView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.base.data.Player
-import com.fiz.android.battleinthespace.base.data.StateProduct
+import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.GameThread
 
@@ -18,12 +18,12 @@ class GameViewModel(extras: Bundle) :
     val players: List<Player> = List(countPlayers) { Player() }
 
     init {
-        for (n in 0 until countPlayers)
+        for (n in 0 until countPlayers) {
             players[n].name = extras.getString("name$n").toString()
-        for (n in 0 until countPlayers)
             players[n].controllerPlayer = extras.getBoolean("playerControllerPlayer$n")
-        players[0].mission = extras.getInt("mission0")
-        players[0].items = extras.getSerializable("items0") as HashMap<Int, StateProduct>
+            players[n].mission = extras.getInt("mission$n")
+            players[n].items = PlayerTypeConverters().toItems(extras.getString("items$n"))
+        }
     }
 
 

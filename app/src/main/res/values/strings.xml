@@ -69,18 +69,26 @@
     <string name="ok">OK</string>
     <string name="undo">Undo</string>
 
+    <!-- type Item -->
+
     <string name="weapon">Weapon</string>
     <string name="flight_speed">Flight speed</string>
     <string name="turning_speed">Turning speed</string>
     <string name="rate_of_fire">Rate of fire</string>
     <string name="body">Body</string>
 
+    <!-- name Item -->
+
     <string name="back">Back</string>
+
+    <!-- name Weapon -->
 
     <string name="bullet">Bullet</string>
     <string name="double_bullet">Double bullet</string>
     <string name="missile">Missile</string>
     <string name="ball">Ball</string>
+
+    <!-- name Other -->
 
     <string name="basic_engine">Basic engine</string>
     <string name="basic_steering_wheel">basic steering wheel</string>
@@ -96,7 +104,9 @@
     <string name="select_count_players_textview">Select the number of players:</string>
     <string name="controller">Controller:</string>
     <string name="reset">RESET</string>
+
     <!-- sign dialog -->
+
     <string name="no_email">No Email</string>
     <string name="signUp">Sign Up</string>
     <string name="signIn">Sign In</string>
