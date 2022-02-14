@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.game.data.actor
 
+import com.fiz.android.battleinthespace.game.data.actor.weapon.Weapon
 import com.fiz.android.battleinthespace.game.data.engine.Collision
 import com.fiz.android.battleinthespace.game.data.engine.Physics
 import com.fiz.android.battleinthespace.game.data.engine.Vec
@@ -213,7 +214,7 @@ class ListActors(
         }
         bullets = bullets.filter { it.inGame }.toMutableList()
         bullets = bullets.filter {
-            it.roadLength <= Weapon.roadLengthMax
+            it.roadLength <= it.roadLengthMax
         }.toMutableList()
     }
 

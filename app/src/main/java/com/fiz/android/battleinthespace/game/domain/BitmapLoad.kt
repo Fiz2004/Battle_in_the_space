@@ -20,6 +20,8 @@ open class BitmapLoad(private val context: Context) {
         var result: Array<Bitmap> = emptyArray()
         result += BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
         result += BitmapFactory.decodeResource(context.resources, R.drawable.double_bullet)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.missile)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.ball)
         return result
     }
 

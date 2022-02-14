@@ -1,6 +1,7 @@
 package com.fiz.android.battleinthespace.game.data.actor
 
 import android.graphics.Bitmap
+import com.fiz.android.battleinthespace.game.data.actor.weapon.Weapon
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.Display
 

@@ -2,7 +2,7 @@ package com.fiz.android.battleinthespace.game.domain
 
 import com.fiz.android.battleinthespace.game.data.actor.ListActors
 import com.fiz.android.battleinthespace.game.data.actor.PlayerGame
-import com.fiz.android.battleinthespace.game.data.actor.Weapon
+import com.fiz.android.battleinthespace.game.data.actor.weapon.Weapon
 import com.fiz.android.battleinthespace.game.data.engine.Physics
 import java.io.Serializable
 

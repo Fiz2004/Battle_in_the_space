@@ -1,6 +1,7 @@
-package com.fiz.android.battleinthespace.game.data.actor
+package com.fiz.android.battleinthespace.game.data.actor.weapon
 
 import android.graphics.Bitmap
+import com.fiz.android.battleinthespace.game.data.actor.SpaceShip
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.Display
 import kotlin.math.cos
@@ -9,7 +10,7 @@ import kotlin.math.sqrt
 
 private const val SPEED_MAX: Double = 4.0
 
-class Weapon(
+class OneBullet(
     center: Vec,
 
     speed: Vec,
@@ -18,17 +19,17 @@ class Weapon(
 
     size: Double = 0.1,
     inGame: Boolean = true,
-    var roadLength: Double,
+    roadLength: Double,
 
-    var player: Int,
-    var type: Int = 0
-) : MoveableActor(
-    center, speed, angle, size, inGame, SPEED_MAX
+    player: Int
+) : Weapon(
+    center, speed, angle, size, inGame, roadLength, player, SPEED_MAX
 ) {
-    companion object {
-        const val roadLengthMax = 6
 
-        fun create(spaceShips: MutableList<SpaceShip>, player: Int, type: Int): Weapon {
+    override var roadLengthMax = 6.0
+
+    companion object {
+        fun create(spaceShips: MutableList<SpaceShip>, player: Int): Weapon {
             val spaceship = spaceShips[player]
             val center = Vec(
                 spaceship.center.x + (spaceship.halfSize) * cos(spaceship.angleToRadians),
@@ -40,8 +41,8 @@ class Weapon(
             )
             val angle = spaceship.angle
             val roadLength = 0.0
-            val size = 0.1 * type
-            return Weapon(center, speed, angle, size, true, roadLength, player, type)
+            val size = 0.1
+            return OneBullet(center, speed, angle, size, true, roadLength, player)
         }
     }
 
@@ -51,6 +52,6 @@ class Weapon(
     }
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bmpWeapon[type]
+        return display.bmpWeapon[0]
     }
 }
