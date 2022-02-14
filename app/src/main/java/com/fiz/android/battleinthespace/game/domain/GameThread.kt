@@ -20,9 +20,8 @@ class GameThread(
     val controllers: Array<Controller> = Array(players.size) { Controller(context = context) }
 
     var stateGame: StateGame = StateGame(
-        players.size,
-        players.map { it.name } as MutableList<String>,
-        controllers)
+        players,
+        controllers = controllers)
 
     init {
         stateGame.setCallBacks(this)

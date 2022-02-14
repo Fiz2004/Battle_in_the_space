@@ -1,7 +1,7 @@
 package com.fiz.android.battleinthespace.game.domain
 
-import com.fiz.android.battleinthespace.game.data.actor.Bullet
 import com.fiz.android.battleinthespace.game.data.actor.Meteorite
+import com.fiz.android.battleinthespace.game.data.actor.Weapon
 import com.fiz.android.battleinthespace.game.data.engine.Physics
 import kotlin.math.max
 import kotlin.math.min
@@ -24,7 +24,7 @@ class AI(private var stateGame: StateGame) {
             val angle = Physics.findAngle(spaceship.center, minDistanceMeteorite.center)
             controller.angle = angle.toFloat()
 
-            if (minDistance > Bullet.roadLengthMax)
+            if (minDistance > Weapon.roadLengthMax)
                 controller.power = min((stateGame.level.width / minDistance).toFloat(), 1F)
             else
                 controller.power = 0F

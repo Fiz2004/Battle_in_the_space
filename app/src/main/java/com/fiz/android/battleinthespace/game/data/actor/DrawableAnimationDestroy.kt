@@ -18,7 +18,7 @@ class BulletAnimationDestroy(
     override var timeShowMax: Double,
     override var timeShow: Double = timeShowMax, override var frame: Int = 0) : Actor(_center, _angle, _size),
     DrawableAnimationDestroy {
-    constructor(bullet: Bullet) : this(Vec(bullet.center), bullet.angle, bullet.size, 1.0)
+    constructor(weapon: Weapon) : this(Vec(weapon.center), weapon.angle, weapon.size, 1.0)
 
     override fun getBitmap(display: Display): Bitmap {
         return display.bmpBulletDestroy[frame]

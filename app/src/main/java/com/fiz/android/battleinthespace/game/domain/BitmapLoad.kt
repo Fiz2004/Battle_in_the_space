@@ -15,7 +15,14 @@ private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
 open class BitmapLoad(private val context: Context) {
     val bmpBackground: Array<Bitmap> by lazy(::initBmpBackground)
-    val bmpBullet: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
+    val bmpWeapon: Array<Bitmap> by lazy(::initBmpWeapon)
+    private fun initBmpWeapon(): Array<Bitmap> {
+        var result: Array<Bitmap> = emptyArray()
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.double_bullet)
+        return result
+    }
+
     val bmpBulletDestroy: Array<Bitmap> by lazy(::initBmpBulletDestroy)
     val bmpMeteorites: Array<Array<Bitmap>> by lazy(::initBmpMeteorite)
     val bmpSpaceship: Array<Bitmap> by lazy(::initBmpSpaceship)

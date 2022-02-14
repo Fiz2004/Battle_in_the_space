@@ -1,8 +1,8 @@
 package com.fiz.android.battleinthespace.game.domain
 
-import com.fiz.android.battleinthespace.game.data.actor.Bullet
 import com.fiz.android.battleinthespace.game.data.actor.ListActors
 import com.fiz.android.battleinthespace.game.data.actor.PlayerGame
+import com.fiz.android.battleinthespace.game.data.actor.Weapon
 import com.fiz.android.battleinthespace.game.data.engine.Physics
 import java.io.Serializable
 
@@ -65,7 +65,10 @@ class Level(
 
             if (spaceShip.playerGame.controller.isCanFire(deltaTime)) {
                 if (spaceShip.inGame) {
-                    listActors.bullets += Bullet.create(listActors.spaceShips, spaceShip.playerGame.number)
+                    listActors.bullets += Weapon.create(
+                        listActors.spaceShips,
+                        spaceShip.playerGame.number,
+                        spaceShip.playerGame.weapon)
                     callbacks.playSound(1)
                 }
             }

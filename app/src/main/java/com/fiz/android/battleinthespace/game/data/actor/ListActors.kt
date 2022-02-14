@@ -30,7 +30,7 @@ class ListActors(
         }
 
     var spaceShips: MutableList<SpaceShip> = mutableListOf()
-    var bullets: MutableList<Bullet> = mutableListOf()
+    var bullets: MutableList<Weapon> = mutableListOf()
     var meteorites: MutableList<Meteorite> = mutableListOf()
     var listAnimationDestroy: MutableList<DrawableAnimationDestroy> = mutableListOf()
 
@@ -166,7 +166,7 @@ class ListActors(
         }
     }
 
-    private fun getSpaceShipsIsCollision(bullet: Bullet): List<SpaceShip> {
+    private fun getSpaceShipsIsCollision(bullet: Weapon): List<SpaceShip> {
         return spaceShips.filterIndexed { indexSpaceShip, spaceShip ->
             overlap(spaceShip, bullet) && bullet.player != indexSpaceShip
         }
@@ -213,7 +213,7 @@ class ListActors(
         }
         bullets = bullets.filter { it.inGame }.toMutableList()
         bullets = bullets.filter {
-            it.roadLength <= Bullet.roadLengthMax
+            it.roadLength <= Weapon.roadLengthMax
         }.toMutableList()
     }
 

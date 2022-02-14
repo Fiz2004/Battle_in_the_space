@@ -1,19 +1,21 @@
 package com.fiz.android.battleinthespace.game.domain
 
+import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.game.data.actor.ListActors
 import com.fiz.android.battleinthespace.game.data.actor.PlayerGame
 import java.io.Serializable
 
 class StateGame(
-    var countPlayers: Int,
-    var name: MutableList<String>,
+    players: List<Player>,
     controllers: Array<Controller>
 ) : Serializable, ListActors.CallBacks {
     lateinit var level: Level
+    var countPlayers = players.size
+    var name = players.map { it.name } as MutableList<String>
     var round: Int = 1
     var status: String = "playing"
     var playerGames: MutableList<PlayerGame> =
-        MutableList(countPlayers) { index -> PlayerGame(index, controllers[index]) }
+        MutableList(countPlayers) { index -> PlayerGame(index, controllers[index], players[index]) }
 
     private lateinit var callbacks: ListActors.CallBacks
 

@@ -108,18 +108,21 @@
             <Button
                 android:id="@+id/sign_up"
                 style="@style/ButtonStyle"
+                android:layout_width="match_parent"
                 android:layout_margin="8dp"
                 android:text="@string/signUp" />
 
             <Button
                 android:id="@+id/sign_in"
                 style="@style/ButtonStyle"
+                android:layout_width="match_parent"
                 android:layout_margin="8dp"
                 android:text="@string/signIn" />
 
             <Button
                 android:id="@+id/sign_out"
                 style="@style/ButtonStyle"
+                android:layout_width="match_parent"
                 android:layout_margin="8dp"
                 android:text="@string/signOut" />
 
