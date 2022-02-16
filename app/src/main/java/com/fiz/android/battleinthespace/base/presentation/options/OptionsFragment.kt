@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
@@ -19,7 +18,7 @@ class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        val viewModelFactory = MainViewModelFactory()
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
@@ -39,8 +38,6 @@ class OptionsFragment : Fragment() {
         }
 
         binding.onePlayer.signOut.setOnClickListener {
-            viewModel.user.value = null
-            viewModel.mAuth.signOut()
             viewModel.signInOutG(requireActivity() as MainActivity)
         }
 

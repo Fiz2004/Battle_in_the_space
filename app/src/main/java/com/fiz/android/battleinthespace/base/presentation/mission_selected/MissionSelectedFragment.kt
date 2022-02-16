@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.mission_selected.MissionDestroyMeteoriteFragment
@@ -22,7 +21,7 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        val viewModelFactory = MainViewModelFactory()
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 

@@ -4,11 +4,9 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
@@ -17,7 +15,7 @@ import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
 class DialogHelper : DialogFragment() {
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        val viewModelFactory = MainViewModelFactory()
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
@@ -78,18 +76,14 @@ class DialogHelper : DialogFragment() {
 
     private fun setOnClickResetPassword(dialog: AlertDialog?, binding: SignDialogBinding) {
         if (binding.signEmailEditText.text.isNotEmpty()) {
-            (requireActivity() as MainActivity).viewModel.mAuth.sendPasswordResetEmail(binding.signEmailEditText.text.toString())
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(requireActivity(), "email was sent", Toast.LENGTH_LONG).show()
-                    }
-                }
+            viewModel.resetPassword(binding.signEmailEditText.text.toString())
             dialog?.dismiss()
         } else {
             binding.dialogMessageTextView.visibility = View.VISIBLE
 
         }
     }
+
 
     private fun setOnClickSignInGoogle(dialog: AlertDialog?) {
         viewModel.signInWithGoogle(requireActivity() as MainActivity)

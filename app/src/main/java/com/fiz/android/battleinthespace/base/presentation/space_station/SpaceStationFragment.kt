@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.Item
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
@@ -21,7 +20,7 @@ import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 
 class SpaceStationFragment : Fragment() {
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        val viewModelFactory = MainViewModelFactory()
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 

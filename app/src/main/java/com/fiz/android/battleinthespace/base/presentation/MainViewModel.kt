@@ -2,32 +2,23 @@ package com.fiz.android.battleinthespace.base.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.fiz.android.battleinthespace.R
+import androidx.lifecycle.*
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.base.data.TypeItems
 import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
 import com.fiz.android.battleinthespace.base.domain.accounthelper.AccountHelper
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
 
-class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel() {
-    val mAuth = FirebaseAuth.getInstance()
-
-    var user = MutableLiveData<FirebaseUser?>(null)
-
+class MainViewModel(
+    private val playerRepository: PlayerRepository,
+    private val accountHelper: AccountHelper) : ViewModel() {
     var playerListLiveData: LiveData<List<Player>?> = playerRepository.getPlayers()
 
     var player: Player = Player(money = 666)
+
+    val user = Transformations.map(accountHelper.user) { it }
+    val mAuth = accountHelper.mAuth
 
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
@@ -36,6 +27,10 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
     private var _errorTextToToast = MutableLiveData<String?>(null)
     val errorTextToToast: LiveData<String?>
         get() = _errorTextToToast
+
+    init {
+        accountHelper.initErrorTextToToast(_errorTextToToast)
+    }
 
     private val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
 
@@ -105,7 +100,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         playerRepository.updatePlayer(player)
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
+    fun addSaveInstanceState(outState: Bundle) {
         outState.putInt(
             "countPlayers",
             countPlayer.value!!)
@@ -142,146 +137,49 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
         }
     }
 
-    fun setErrorTextToToast(value: String) {
-        _errorTextToToast.value = value
+    fun gameActivityFinish(intent: Intent) {
+        val result = intent.getIntExtra("score", 0)
+        addMoney(value = result)
+        savePlayers()
     }
 
+    fun refreshPlayerListLiveData(playerList: List<Player>?) {
+        if (playerList == null || playerList.isEmpty())
+            fillInitValue()
+        else
+            initPlayer(playerList[0])
+    }
 
     fun signUpWithEmail(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) return
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { onCompleteListenerSignUpWithEmail(it, email, password) }
-    }
-
-    private fun onCompleteListenerSignUpWithEmail(task: Task<AuthResult>, email: String, password: String) {
-        if (task.isSuccessful) {
-            sendEmailVerification(task.result?.user!!)
-            user.value = task.result?.user!!
-        } else {
-            if (printInfoExceptionAndResolveProcess(task))
-                linkEmailToG(email, password)
-        }
-    }
-
-    private fun linkEmailToG(email: String, password: String) {
-        val credential = EmailAuthProvider.getCredential(email, password)
-        mAuth.currentUser?.linkWithCredential(credential)
-            ?.addOnCompleteListener { onCompleteListenerLinkEmailToG(it) }
-    }
-
-    private fun onCompleteListenerLinkEmailToG(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("Link ok")
-        } else {
-            printInfoExceptionAndResolveProcess(task)
-        }
-    }
-
-    fun signInWithGoogle(act: MainActivity) {
-        val signInClient = getSignInClient(act)
-        val intent = signInClient.signInIntent
-        act.googleSignInActivityLauncher.launch(intent)
-    }
-
-    fun signInOutG(act: MainActivity) {
-        getSignInClient(act).signOut()
-    }
-
-    //TODO Разобраться почему R.string не найден classpath 'com.google.gms:google-services:4.3.10'
-    private fun getSignInClient(act: MainActivity): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(act.getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-
-        return GoogleSignIn.getClient(act, gso)
-    }
-
-    fun signInFirebaseWithGoogle(token: String) {
-        val credential = GoogleAuthProvider.getCredential(token, null)
-        if (mAuth != null) {
-            mAuth.signInWithCredential(credential)
-                .addOnCompleteListener { onCompleteListenerSignInFirebaseWithGoogle(it) }
-        } else {
-            setErrorTextToToast("У вас уже есть аккаунт с таким email, войдите сначала через почту")
-        }
-    }
-
-    private fun onCompleteListenerSignInFirebaseWithGoogle(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("Sign in done")
-            user.value = task.result?.user
-        } else {
-            Log.d("MyLog", "Google sign in exception: ${task.exception}")
-            setErrorTextToToast("Error Sign in done")
-        }
+        accountHelper.signUpWithEmail(email, password)
     }
 
     fun signInWithEmail(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) return
-        mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { onCompleteListenerSignInWithEmail(it) }
+        accountHelper.signInWithEmail(email, password)
     }
 
-    private fun onCompleteListenerSignInWithEmail(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            user.value = task.result?.user!!
-        } else {
-            printInfoExceptionAndResolveProcess(task)
-        }
+    fun signInWithGoogle(act: MainActivity) {
+        accountHelper.signInWithGoogle(act)
     }
 
-    private fun sendEmailVerification(user: FirebaseUser) {
-        user.sendEmailVerification()
-            .addOnCompleteListener { onCompleteListenerSendEmailVerification(it) }
+    fun signInFirebaseWithGoogle(result: Intent) {
+        accountHelper.signInFirebaseWithGoogle(result)
     }
 
-    private fun onCompleteListenerSendEmailVerification(task: Task<Void>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("send email")
-        } else {
-            setErrorTextToToast("Error send email")
-        }
+    fun resetPassword(email: String) {
+        accountHelper.resetPassword(email)
     }
 
-    private fun printInfoExceptionAndResolveProcess(task: Task<AuthResult>): Boolean {
-        if (task.exception is FirebaseAuthUserCollisionException) {
-            val exception = task.exception as FirebaseAuthUserCollisionException
-            if (exception.errorCode == AccountHelper.Companion.FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
-                setErrorTextToToast(AccountHelper.Companion.FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE)
-                return true
-            }
-        }
-        if (task.exception is FirebaseAuthInvalidCredentialsException) {
-            val exception = task.exception as FirebaseAuthInvalidCredentialsException
-            if (exception.errorCode == AccountHelper.Companion.FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
-                setErrorTextToToast(AccountHelper.Companion.FirebaseAuthConstants.ERROR_INVALID_EMAIL)
-            }
-            if (exception.errorCode == AccountHelper.Companion.FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
-                setErrorTextToToast(AccountHelper.Companion.FirebaseAuthConstants.ERROR_WRONG_PASSWORD)
-            }
-        }
-        if (task.exception is FirebaseAuthWeakPasswordException) {
-            val exception = task.exception as FirebaseAuthWeakPasswordException
-            if (exception.errorCode == AccountHelper.Companion.FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
-                setErrorTextToToast(AccountHelper.Companion.FirebaseAuthConstants.ERROR_WEAK_PASSWORD)
-            }
-        }
-        if (task.exception is FirebaseAuthInvalidUserException) {
-            val exception = task.exception as FirebaseAuthInvalidCredentialsException
-            // Если пользователя нет с таким email
-            if (exception.errorCode == AccountHelper.Companion.FirebaseAuthConstants.ERROR_USER_NOT_FOUND) {
-                setErrorTextToToast(AccountHelper.Companion.FirebaseAuthConstants.ERROR_USER_NOT_FOUND)
-            }
-        }
-        return false
+    fun signInOutG(act: MainActivity) {
+        accountHelper.signInOutG(act)
     }
-
-
 }
 
-class MainViewModelFactory(private val dataSource: PlayerRepository) : ViewModelProvider.Factory {
+class MainViewModelFactory : ViewModelProvider.Factory {
+    private val dataSource = PlayerRepository.get()
+    private val accountHelper = AccountHelper()
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(dataSource) as T
+        return MainViewModel(dataSource, accountHelper) as T
     }
 }
