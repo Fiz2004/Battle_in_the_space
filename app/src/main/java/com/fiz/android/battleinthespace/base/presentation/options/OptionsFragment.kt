@@ -16,33 +16,39 @@ import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
 import com.google.firebase.auth.FirebaseUser
 
 class OptionsFragment : Fragment() {
-    private val dialogHelper by lazy { DialogHelper(requireActivity() as MainActivity) }
-    private var _binding: FragmentOptionsBinding? = null
-    private val binding get() = _binding!!
+    private val dialogHelper by lazy { DialogHelper() }
 
     private val viewModel: MainViewModel by lazy {
         val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        _binding = FragmentOptionsBinding.inflate(inflater, container, false)
+    private lateinit var binding: FragmentOptionsBinding
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentOptionsBinding.inflate(inflater, container, false)
 
         binding.mainViewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.onePlayer.signUp.setOnClickListener {
-            dialogHelper.createSignDialog(DialogHelper.SIGN_UP_STATE)
+            val args = Bundle()
+            args.putInt("index", DialogHelper.SIGN_UP_STATE)
+            dialogHelper.arguments = args
+            dialogHelper.show(childFragmentManager, "0")
         }
 
         binding.onePlayer.signOut.setOnClickListener {
             viewModel.user.value = null
             viewModel.mAuth.signOut()
-            dialogHelper.accHelper.signInOutG()
+            viewModel.signInOutG(requireActivity() as MainActivity)
         }
 
         binding.onePlayer.signIn.setOnClickListener {
-            dialogHelper.createSignDialog(DialogHelper.SIGN_IN_STATE)
+            val args = Bundle()
+            args.putInt("index", DialogHelper.SIGN_IN_STATE)
+            dialogHelper.arguments = args
+            dialogHelper.show(childFragmentManager, "1")
         }
 
         binding.twoPlayer.signUp.visibility = View.GONE
@@ -69,11 +75,6 @@ class OptionsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         uiUpdate(viewModel.mAuth.currentUser)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun uiUpdate(user: FirebaseUser?) {

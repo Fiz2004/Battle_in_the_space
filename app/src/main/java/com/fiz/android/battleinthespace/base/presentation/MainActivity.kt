@@ -5,14 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
+import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.presentation.options.OptionsFragment
 import com.fiz.android.battleinthespace.base.presentation.space_station.SpaceStationFragment
 import com.fiz.android.battleinthespace.base.presentation.statistics.StatisticsFragment
@@ -22,11 +23,12 @@ import com.fiz.android.battleinthespace.presentation.main.MissionSelectedFragmen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.tabs.TabLayoutMediator
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    val viewModel by viewModels<MainViewModel>()
+    val viewModel: MainViewModel by lazy {
+        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    }
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -45,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 if (account != null) {
-                    DialogHelper(this).accHelper.signInFirebaseWithGoogle(account.idToken!!)
+                    viewModel.signInFirebaseWithGoogle(account.idToken!!)
                 } else {
                 }
             } catch (e: ApiException) {
@@ -63,6 +65,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.fillInitValue()
             else
                 viewModel.initPlayer(it[0])
+        }
+
+        viewModel.errorTextToToast.observe(this) {
+            it?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
         }
 
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
