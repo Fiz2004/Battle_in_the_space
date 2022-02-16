@@ -12,18 +12,8 @@ import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.databinding.ListItemItemBinding
 
 
-class ItemsAdapter(private val Items: List<Item>) :
+class ItemsAdapter(private val Items: List<Item>, val callback: CallBackItemClick) :
     RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
-
-    fun interface Listener {
-        fun onClick(position: Int)
-    }
-
-    private lateinit var listener: Listener
-
-    fun setListener(listener: Listener) {
-        this.listener = listener
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -43,14 +33,9 @@ class ItemsAdapter(private val Items: List<Item>) :
         return Items.size
     }
 
-    inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root),
-        View.OnClickListener {
-        private val colorDefault = binding.cardView.cardBackgroundColor
+    inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        private val colorDefault = binding.cardView.cardBackgroundColor.defaultColor
         var item: Item? = null
-
-        init {
-            itemView.setOnClickListener(this)
-        }
 
         fun bind(item: Item) {
             this.item = item
@@ -59,34 +44,42 @@ class ItemsAdapter(private val Items: List<Item>) :
             binding.infoImage.setImageDrawable(drawable)
             binding.infoImage.contentDescription = (item.name + item.cost).toString()
             itemView.isEnabled = item.state != StateProduct.INSTALL
-            when (item.state) {
-                StateProduct.INSTALL -> {
-                    binding.cardView.setCardBackgroundColor(Color.RED)
-                }
-                StateProduct.BUY -> {
-                    binding.cardView.setCardBackgroundColor(Color.GREEN)
-                }
-                else -> {
-                    binding.cardView.setCardBackgroundColor(colorDefault)
-                }
+            val color: Int = when (item.state) {
+                StateProduct.INSTALL -> Color.RED
+                StateProduct.BUY -> Color.GREEN
+                else -> colorDefault
             }
+            binding.cardView.setCardBackgroundColor(color)
 
             val names = binding.root.context.resources.getString(item.name)
-            when (item.state) {
-                StateProduct.INSTALL -> {
-                    binding.infoText.text =
-                        binding.root.context.resources.getString(R.string.install, names)
-                }
-                StateProduct.BUY -> {
-                    binding.infoText.text =
-                        binding.root.context.resources.getString(R.string.buying, names)
-                }
-                else -> {
-                    binding.infoText.text = names
-                }
+            val info = when (item.state) {
+                StateProduct.INSTALL ->
+                    binding.root.context.resources.getString(R.string.install, names)
+                StateProduct.BUY ->
+                    binding.root.context.resources.getString(R.string.buying, names)
+                else -> names
             }
-
+            binding.infoText.text = info
             binding.costText.text = binding.root.context.resources.getString(R.string.cost, item.cost)
+
+            binding.cardView.setOnClickListener {
+                if (item.cost != 0 && item.state == StateProduct.NONE) {
+                    binding.cardView.setCardBackgroundColor(Color.YELLOW)
+                    binding.infoText.text = binding.root.context.resources.getString(R.string.buying_question)
+                    binding.costText.visibility = View.GONE
+                    binding.buttonsLayout.visibility = View.VISIBLE
+                    binding.okButton.setOnClickListener {
+                        callback.onClick(layoutPosition)
+                    }
+                    binding.undoButton.setOnClickListener {
+                        binding.buttonsLayout.visibility = View.GONE
+                        binding.costText.visibility = View.VISIBLE
+                        bind(item)
+                    }
+                    return@setOnClickListener
+                }
+                callback.onClick(layoutPosition)
+            }
         }
 
         fun bind() {
@@ -96,32 +89,14 @@ class ItemsAdapter(private val Items: List<Item>) :
             itemView.isEnabled = true
             binding.infoText.text = itemView.context.resources.getString(R.string.back)
             binding.costText.text = ""
-        }
 
-        override fun onClick(v: View) {
-            if (item != null && item?.cost != 0 && item?.state == StateProduct.NONE) {
-                binding.cardView.setCardBackgroundColor(Color.YELLOW)
-                binding.infoText.text = binding.root.context.resources.getString(R.string.buying_question)
-                binding.costText.visibility = View.GONE
-                binding.buttonsLayout.visibility = View.VISIBLE
-                binding.okButton.setOnClickListener {
-                    listener.onClick(layoutPosition)
-                }
-                binding.undoButton.setOnClickListener {
-                    binding.buttonsLayout.visibility = View.GONE
-                    binding.costText.visibility = View.VISIBLE
-                    bind(item!!)
-                }
-                return
+            binding.cardView.setOnClickListener {
+                callback.onClick(layoutPosition)
             }
-            if (binding.costText.visibility == View.GONE) {
-                binding.buttonsLayout.visibility = View.GONE
-                binding.costText.visibility = View.VISIBLE
-                bind(item!!)
-                return
-            }
-            listener.onClick(layoutPosition)
         }
-
     }
+}
+
+class CallBackItemClick(val item: (Int) -> Unit) {
+    fun onClick(position: Int) = item(position)
 }

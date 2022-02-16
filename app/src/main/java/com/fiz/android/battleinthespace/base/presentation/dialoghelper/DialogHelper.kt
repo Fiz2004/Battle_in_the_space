@@ -7,16 +7,16 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.base.presentation.AccountViewModel
+import com.fiz.android.battleinthespace.base.presentation.AccountViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
-import com.fiz.android.battleinthespace.base.presentation.MainViewModel
-import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
 
 class DialogHelper : DialogFragment() {
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory()
-        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
+    private val accountViewModel: AccountViewModel by lazy {
+        val viewModelFactory = AccountViewModelFactory()
+        ViewModelProvider(requireActivity(), viewModelFactory)[AccountViewModel::class.java]
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -68,15 +68,15 @@ class DialogHelper : DialogFragment() {
         val email: String = binding.signEmailEditText.text.toString()
         val password: String = binding.signPasswordEditText.text.toString()
         if (index == SIGN_UP_STATE) {
-            viewModel.signUpWithEmail(email, password)
+            accountViewModel.signUpWithEmail(email, password)
         } else {
-            viewModel.signInWithEmail(email, password)
+            accountViewModel.signInWithEmail(email, password)
         }
     }
 
     private fun setOnClickResetPassword(dialog: AlertDialog?, binding: SignDialogBinding) {
         if (binding.signEmailEditText.text.isNotEmpty()) {
-            viewModel.resetPassword(binding.signEmailEditText.text.toString())
+            accountViewModel.resetPassword(binding.signEmailEditText.text.toString())
             dialog?.dismiss()
         } else {
             binding.dialogMessageTextView.visibility = View.VISIBLE
@@ -86,7 +86,7 @@ class DialogHelper : DialogFragment() {
 
 
     private fun setOnClickSignInGoogle(dialog: AlertDialog?) {
-        viewModel.signInWithGoogle(requireActivity() as MainActivity)
+        accountViewModel.signInWithGoogle(requireActivity() as MainActivity)
         dialog?.dismiss()
     }
 

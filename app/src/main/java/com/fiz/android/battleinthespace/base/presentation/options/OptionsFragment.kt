@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.presentation.MainActivity
-import com.fiz.android.battleinthespace.base.presentation.MainViewModel
-import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
+import com.fiz.android.battleinthespace.base.presentation.*
 import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
 import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
 import com.google.firebase.auth.FirebaseUser
@@ -20,6 +18,11 @@ class OptionsFragment : Fragment() {
     private val viewModel: MainViewModel by lazy {
         val viewModelFactory = MainViewModelFactory()
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
+    }
+
+    private val accountViewModel: AccountViewModel by lazy {
+        val viewModelFactory = AccountViewModelFactory()
+        ViewModelProvider(requireActivity(), viewModelFactory)[AccountViewModel::class.java]
     }
 
     private lateinit var binding: FragmentOptionsBinding
@@ -38,7 +41,7 @@ class OptionsFragment : Fragment() {
         }
 
         binding.onePlayer.signOut.setOnClickListener {
-            viewModel.signInOutG(requireActivity() as MainActivity)
+            accountViewModel.signInOutG(requireActivity() as MainActivity)
         }
 
         binding.onePlayer.signIn.setOnClickListener {
@@ -61,7 +64,7 @@ class OptionsFragment : Fragment() {
         binding.fourPlayer.signOut.visibility = View.GONE
         binding.fourPlayer.email.visibility = View.GONE
 
-        viewModel.user.observe(requireActivity()) {
+        accountViewModel.user.observe(requireActivity()) {
             uiUpdate(it)
         }
 
@@ -71,7 +74,7 @@ class OptionsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        uiUpdate(viewModel.mAuth.currentUser)
+        uiUpdate(accountViewModel.mAuth.currentUser)
     }
 
     private fun uiUpdate(user: FirebaseUser?) {

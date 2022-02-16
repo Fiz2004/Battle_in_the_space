@@ -17,6 +17,11 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 
+    private val accountViewModel: AccountViewModel by lazy {
+        val viewModelFactory = AccountViewModelFactory()
+        ViewModelProvider(this, viewModelFactory)[AccountViewModel::class.java]
+    }
+
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -26,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     val googleSignInActivityLauncher = registerForActivityResult(ActivityContract()) { result ->
-        result?.let { viewModel.signInFirebaseWithGoogle(result) }
+        result?.let { accountViewModel.signInFirebaseWithGoogle(result) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.refreshPlayerListLiveData(it)
         }
 
-        viewModel.errorTextToToast.observe(this) {
+        accountViewModel.errorTextToToast.observe(this) {
             it?.let {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }

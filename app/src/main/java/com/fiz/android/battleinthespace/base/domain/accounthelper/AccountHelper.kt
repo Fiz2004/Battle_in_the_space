@@ -21,30 +21,26 @@ class AccountHelper {
     fun signUpWithEmail(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) return
         mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { onCompleteListenerSignUpWithEmail(it, email, password) }
-    }
-
-    private fun onCompleteListenerSignUpWithEmail(task: Task<AuthResult>, email: String, password: String) {
-        if (task.isSuccessful) {
-            sendEmailVerification(task.result?.user!!)
-            user.value = task.result?.user!!
-        } else {
-            if (printInfoExceptionAndResolveProcess(task))
-                linkEmailToG(email, password)
-        }
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    sendEmailVerification(it.result?.user!!)
+                } else {
+                    if (printInfoExceptionAndResolveProcess(it))
+                        linkEmailToG(email, password)
+                }
+            }
     }
 
     private fun sendEmailVerification(user: FirebaseUser) {
         user.sendEmailVerification()
-            .addOnCompleteListener { onCompleteListenerSendEmailVerification(it) }
-    }
-
-    private fun onCompleteListenerSendEmailVerification(task: Task<Void>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("send email")
-        } else {
-            setErrorTextToToast("Error send email")
-        }
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    setErrorTextToToast("send email")
+                    this.user.value = user
+                } else {
+                    setErrorTextToToast("Error send email")
+                }
+            }
     }
 
     fun signInFirebaseWithGoogle(result: Intent) {
@@ -55,7 +51,15 @@ class AccountHelper {
                 val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
                 if (mAuth != null) {
                     mAuth.signInWithCredential(credential)
-                        .addOnCompleteListener { onCompleteListenerSignInFirebaseWithGoogle(it) }
+                        .addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                setErrorTextToToast("Sign in done")
+                                user.value = it.result?.user
+                            } else {
+                                Log.d("MyLog", "Google sign in exception: ${it.exception}")
+                                setErrorTextToToast("Error Sign in done")
+                            }
+                        }
                 } else {
                     setErrorTextToToast("У вас уже есть аккаунт с таким email, войдите сначала через почту")
                 }
@@ -66,28 +70,16 @@ class AccountHelper {
         }
     }
 
-    private fun onCompleteListenerSignInFirebaseWithGoogle(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("Sign in done")
-            user.value = task.result?.user
-        } else {
-            Log.d("MyLog", "Google sign in exception: ${task.exception}")
-            setErrorTextToToast("Error Sign in done")
-        }
-    }
-
     private fun linkEmailToG(email: String, password: String) {
         val credential = EmailAuthProvider.getCredential(email, password)
         mAuth.currentUser?.linkWithCredential(credential)
-            ?.addOnCompleteListener { onCompleteListenerLinkEmailToG(it) }
-    }
-
-    private fun onCompleteListenerLinkEmailToG(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            setErrorTextToToast("Link ok")
-        } else {
-            printInfoExceptionAndResolveProcess(task)
-        }
+            ?.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    setErrorTextToToast("Link ok")
+                } else {
+                    printInfoExceptionAndResolveProcess(it)
+                }
+            }
     }
 
     private fun printInfoExceptionAndResolveProcess(task: Task<AuthResult>): Boolean {
@@ -157,15 +149,13 @@ class AccountHelper {
     fun signInWithEmail(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) return
         mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { onCompleteListenerSignInWithEmail(it) }
-    }
-
-    private fun onCompleteListenerSignInWithEmail(task: Task<AuthResult>) {
-        if (task.isSuccessful) {
-            user.value = task.result?.user!!
-        } else {
-            printInfoExceptionAndResolveProcess(task)
-        }
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    user.value = it.result?.user!!
+                } else {
+                    printInfoExceptionAndResolveProcess(it)
+                }
+            }
     }
 
     fun initErrorTextToToast(errorTextToToast: MutableLiveData<String?>) {

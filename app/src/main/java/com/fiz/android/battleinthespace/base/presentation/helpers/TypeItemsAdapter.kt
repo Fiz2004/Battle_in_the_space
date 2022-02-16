@@ -34,6 +34,8 @@ class TypeItemsAdapter(
             binding.infoImage.setImageDrawable(drawable)
             binding.infoImage.contentDescription = itemView.context.resources.getString(itemDefault.name)
             binding.infoText.text = itemView.context.resources.getString(itemDefault.name)
+
+            binding.cardView.setOnClickListener { callback.onClick(layoutPosition) }
         }
     }
 }

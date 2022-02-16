@@ -8,10 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.data.Item
-import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
+import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackItemClick
 import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackTypeItemClick
 import com.fiz.android.battleinthespace.base.presentation.helpers.ItemsAdapter
 import com.fiz.android.battleinthespace.base.presentation.helpers.TypeItemsAdapter
@@ -35,52 +34,46 @@ class SpaceStationFragment : Fragment() {
     ): View {
         binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
 
-        viewModel.type.observe(viewLifecycleOwner) { type ->
-            binding.stationRecycler.adapter =
-                if (type == 0) {
-                    typeItemsAdapter = TypeItemsAdapter(viewModel.player.items,
-                        CallBackTypeItemClick { position: Int ->
-                            viewModel.setType(position + 1)
-                        })
-                    typeItemsAdapter
-                } else {
-                    val indexType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
-                    val items = viewModel.getItems()
-                    var listProduct = items[indexType].items
-                    listProduct = Item.addZeroFirstItem(listProduct) as MutableList<Item>
-                    itemsAdapter = ItemsAdapter(listProduct)
-                    itemsAdapter.setListener { position: Int ->
-                        if (position == 0) {
-                            viewModel.setType(0)
-                        } else {
-                            if (listProduct[position].state == StateProduct.BUY) {
-                                listProduct.forEachIndexed { index, it ->
-                                    if (it.state == StateProduct.INSTALL)
-                                        viewModel.changeItems(index - 1, indexType, StateProduct.BUY)
-                                }
-                                viewModel.changeItems(position - 1, indexType, StateProduct.INSTALL)
-                            } else {
-                                viewModel.buyItem(position - 1, indexType)
-                                binding.money.text = getString(R.string.balance, viewModel.getMoney())
-                            }
-                            viewModel.setType(viewModel.type.value!!)
-                        }
-                    }
-                    itemsAdapter
-                }
-        }
-
-        binding.money.text = getString(R.string.balance, viewModel.getMoney())
-
         val layoutManager = GridLayoutManager(activity, 2)
         binding.stationRecycler.layoutManager = layoutManager
 
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.money.text = getString(R.string.balance, viewModel.getMoney())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.type.observe(viewLifecycleOwner) { type ->
+            setAdapter(type)
+        }
+
+        viewModel.money.observe(viewLifecycleOwner) {
+            binding.money.text = getString(R.string.balance, it)
+        }
+
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        setAdapter(viewModel.type.value ?: 0)
+    }
+
+    private fun setAdapter(type: Int) {
+        binding.stationRecycler.adapter =
+            if (type == 0) {
+                val items = viewModel.getItems()
+                typeItemsAdapter = TypeItemsAdapter(items,
+                    CallBackTypeItemClick { position: Int ->
+                        viewModel.setType(position + 1)
+                    })
+                typeItemsAdapter
+            } else {
+                itemsAdapter = ItemsAdapter(viewModel.getItemsWithZero(),
+                    CallBackItemClick { position: Int ->
+                        viewModel.clickItems(position)
+                    })
+                itemsAdapter
+            }
+    }
 }

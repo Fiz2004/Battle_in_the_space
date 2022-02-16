@@ -2,35 +2,27 @@ package com.fiz.android.battleinthespace.base.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.*
-import com.fiz.android.battleinthespace.base.data.Player
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
-import com.fiz.android.battleinthespace.base.data.StateProduct
-import com.fiz.android.battleinthespace.base.data.TypeItems
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.fiz.android.battleinthespace.base.data.*
 import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
-import com.fiz.android.battleinthespace.base.domain.accounthelper.AccountHelper
 
 class MainViewModel(
-    private val playerRepository: PlayerRepository,
-    private val accountHelper: AccountHelper) : ViewModel() {
+    private val playerRepository: PlayerRepository) : ViewModel() {
+
     var playerListLiveData: LiveData<List<Player>?> = playerRepository.getPlayers()
 
     var player: Player = Player(money = 666)
-
-    val user = Transformations.map(accountHelper.user) { it }
-    val mAuth = accountHelper.mAuth
 
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
         get() = _type
 
-    private var _errorTextToToast = MutableLiveData<String?>(null)
-    val errorTextToToast: LiveData<String?>
-        get() = _errorTextToToast
-
-    init {
-        accountHelper.initErrorTextToToast(_errorTextToToast)
-    }
+    private var _money = MutableLiveData(player.money)
+    val money: LiveData<Int>
+        get() = _money
 
     private val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
 
@@ -38,28 +30,12 @@ class MainViewModel(
         return player.items
     }
 
-    fun getMoney(): Int {
-        return player.money
-    }
-
-    fun changeItems(key: Int, type: Int, value: StateProduct) {
+    private fun changeItems(key: Int, type: Int, value: StateProduct) {
         player.items[type].items[key].state = value
-    }
-
-    fun fillInitValue() {
-        playerRepository.fillInitValue()
     }
 
     fun setCountPlayers(numberRadioButton: Int) {
         countPlayer.value = numberRadioButton
-    }
-
-    fun initPlayer(newPlayer: Player) {
-        player = newPlayer
-    }
-
-    fun addMoney(value: Int) {
-        player.money += value
     }
 
     fun changeMission(value: Int) {
@@ -127,59 +103,62 @@ class MainViewModel(
         return intent
     }
 
-    fun buyItem(
+    private fun buyItem(
         index: Int,
         indexType: Int) {
-        val money = getMoney()
+        val money = player.money
         if (money - getItems()[indexType].items[index].cost >= 0) {
             player.money -= getItems()[indexType].items[index].cost
+            _money.value = player.money
             changeItems(index, indexType, StateProduct.BUY)
         }
     }
 
     fun gameActivityFinish(intent: Intent) {
-        val result = intent.getIntExtra("score", 0)
-        addMoney(value = result)
+        val score = intent.getIntExtra("score", 0)
+        player.money += score
+        _money.value = player.money
         savePlayers()
     }
 
     fun refreshPlayerListLiveData(playerList: List<Player>?) {
         if (playerList == null || playerList.isEmpty())
-            fillInitValue()
+            playerRepository.fillInitValue()
         else
-            initPlayer(playerList[0])
+            player = playerList[0]
+        _money.value = player.money
     }
 
-    fun signUpWithEmail(email: String, password: String) {
-        accountHelper.signUpWithEmail(email, password)
+    fun clickItems(position: Int) {
+        if (position == 0) {
+            setType(0)
+        } else {
+            val indexType = type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
+            val listProduct = Item.addZeroFirstItem(getItems()[indexType].items)
+            if (listProduct[position].state == StateProduct.BUY) {
+                listProduct.forEachIndexed { index, it ->
+                    if (it.state == StateProduct.INSTALL)
+                        changeItems(index - 1, indexType, StateProduct.BUY)
+                }
+                changeItems(position - 1, indexType, StateProduct.INSTALL)
+            } else {
+                buyItem(position - 1, indexType)
+            }
+            setType(type.value!!)
+        }
     }
 
-    fun signInWithEmail(email: String, password: String) {
-        accountHelper.signInWithEmail(email, password)
-    }
-
-    fun signInWithGoogle(act: MainActivity) {
-        accountHelper.signInWithGoogle(act)
-    }
-
-    fun signInFirebaseWithGoogle(result: Intent) {
-        accountHelper.signInFirebaseWithGoogle(result)
-    }
-
-    fun resetPassword(email: String) {
-        accountHelper.resetPassword(email)
-    }
-
-    fun signInOutG(act: MainActivity) {
-        accountHelper.signInOutG(act)
+    fun getItemsWithZero(): List<Item> {
+        val indexType = type.value?.minus(1) ?: throw Error("Не доступна Livedata type")
+        val items = player.items
+        return Item.addZeroFirstItem(items[indexType].items)
     }
 }
 
 class MainViewModelFactory : ViewModelProvider.Factory {
     private val dataSource = PlayerRepository.get()
-    private val accountHelper = AccountHelper()
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(dataSource, accountHelper) as T
+        return MainViewModel(dataSource) as T
     }
 }
