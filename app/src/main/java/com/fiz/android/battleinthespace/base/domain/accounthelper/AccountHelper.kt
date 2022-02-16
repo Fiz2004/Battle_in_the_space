@@ -50,11 +50,10 @@ class AccountHelper(private val act: MainActivity) {
         }
     }
 
-    //TODO Переделать на новый старт активити
     fun signInWithGoogle() {
         val signInClient = getSignInClient()
         val intent = signInClient.signInIntent
-        act.startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
+        act.googleSignInActivityLauncher.launch(intent)
     }
 
     fun signInOutG() {
