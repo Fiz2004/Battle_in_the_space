@@ -5,27 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.Item
-import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
-import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
+import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackTypeItemClick
 import com.fiz.android.battleinthespace.base.presentation.helpers.ItemsAdapter
 import com.fiz.android.battleinthespace.base.presentation.helpers.TypeItemsAdapter
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SpaceStationFragment : Fragment() {
-    private var _binding: FragmentSpaceStationBinding? = null
-    private val binding
-        get() = _binding!!
+    private val viewModel by viewModels<MainViewModel>({ requireActivity() })
 
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(PlayerRepository.get())
-        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
-    }
+    private lateinit var binding: FragmentSpaceStationBinding
 
     private lateinit var typeItemsAdapter: TypeItemsAdapter
     private lateinit var itemsAdapter: ItemsAdapter
@@ -34,15 +30,15 @@ class SpaceStationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
+        binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
 
         viewModel.type.observe(viewLifecycleOwner) { type ->
             binding.stationRecycler.adapter =
                 if (type == 0) {
-                    typeItemsAdapter = TypeItemsAdapter(viewModel.player.items)
-                    typeItemsAdapter.setListener { position: Int ->
-                        viewModel.setType(position + 1)
-                    }
+                    typeItemsAdapter = TypeItemsAdapter(viewModel.player.items,
+                        CallBackTypeItemClick { position: Int ->
+                            viewModel.setType(position + 1)
+                        })
                     typeItemsAdapter
                 } else {
                     val indexType = viewModel.type.value?.minus(1) ?: throw Error("Не доступна Livedata type")

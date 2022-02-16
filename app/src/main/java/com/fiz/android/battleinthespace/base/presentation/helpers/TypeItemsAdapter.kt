@@ -1,7 +1,6 @@
 package com.fiz.android.battleinthespace.base.presentation.helpers
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -9,18 +8,9 @@ import com.fiz.android.battleinthespace.base.data.TypeItems
 import com.fiz.android.battleinthespace.databinding.ListItemTypeItemsBinding
 
 class TypeItemsAdapter(
-    private val itemDefaults: List<TypeItems>) :
+    private val itemDefaults: List<TypeItems>,
+    val callback: CallBackTypeItemClick) :
     RecyclerView.Adapter<TypeItemsAdapter.ViewHolder>() {
-
-    fun interface Listener {
-        fun onClick(position: Int)
-    }
-
-    private lateinit var listener: Listener
-
-    fun setListener(listener: Listener) {
-        this.listener = listener
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -30,18 +20,14 @@ class TypeItemsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(itemDefaults[position])
+        holder.binding.cardView.setOnClickListener { callback.onClick(position) }
     }
 
     override fun getItemCount(): Int {
         return itemDefaults.size
     }
 
-    inner class ViewHolder(val binding: ListItemTypeItemsBinding) : RecyclerView.ViewHolder(binding.root),
-        View.OnClickListener {
-
-        init {
-            itemView.setOnClickListener(this)
-        }
+    inner class ViewHolder(val binding: ListItemTypeItemsBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(itemDefault: TypeItems) {
             val drawable = ContextCompat.getDrawable(itemView.context, itemDefault.imageId)
@@ -49,9 +35,9 @@ class TypeItemsAdapter(
             binding.infoImage.contentDescription = itemView.context.resources.getString(itemDefault.name)
             binding.infoText.text = itemView.context.resources.getString(itemDefault.name)
         }
-
-        override fun onClick(p0: View?) {
-            listener.onClick(layoutPosition)
-        }
     }
+}
+
+class CallBackTypeItemClick(val typeItem: (Int) -> Unit) {
+    fun onClick(position: Int) = typeItem(position)
 }

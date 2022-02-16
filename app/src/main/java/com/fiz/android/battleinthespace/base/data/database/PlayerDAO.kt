@@ -19,7 +19,7 @@ interface PlayerDAO {
     fun clear()
 
     @Query("SELECT * FROM information_player_table")
-    fun getAll(): LiveData<List<Player>>
+    fun getAll(): LiveData<List<Player>?>
 
     @Query("SELECT count(*) FROM information_player_table")
     fun getCount(): Int?

@@ -2,22 +2,18 @@ package com.fiz.android.battleinthespace.base.data
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.Room
-import com.fiz.android.battleinthespace.base.data.database.PlayerDatabase
+import com.fiz.android.battleinthespace.base.data.database.PlayerDao
 import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Singleton
 
-private const val DATABASE_NAME = "player-database"
+@Singleton
+class PlayerRepository @Inject constructor(@ApplicationContext val context: Context) {
 
-class PlayerRepository private constructor(val context: Context) {
-
-    private val database: PlayerDatabase = Room.databaseBuilder(
-        context.applicationContext,
-        PlayerDatabase::class.java,
-        DATABASE_NAME
-    ).build()
-
-    private val playersDAO = database.playerDao()
+    @Inject
+    lateinit var playersDao: PlayerDao
 
     fun fillInitValue() {
         Executors.newSingleThreadExecutor().execute {
@@ -40,32 +36,19 @@ class PlayerRepository private constructor(val context: Context) {
         return SharedPrefPlayerStorage(context).get()
     }
 
-    fun getPlayers(): LiveData<List<Player>> = playersDAO.getAll()
+    fun getPlayers(): LiveData<List<Player>?> = playersDao.getAll()
 
-    fun getPlayer(id: Int): LiveData<Player?> = playersDAO.get(id)
+    fun getPlayer(id: Int): LiveData<Player?> = playersDao.get(id)
 
     private fun addPlayer(player: Player) {
         Executors.newSingleThreadExecutor().execute {
-            playersDAO.addPlayer(player)
+            playersDao.addPlayer(player)
         }
     }
 
     fun updatePlayer(player: Player) {
         Executors.newSingleThreadExecutor().execute {
-            playersDAO.update(player)
-        }
-    }
-
-    companion object {
-        private var INSTANCE: PlayerRepository? = null
-        fun initialize(context: Context) {
-            if (INSTANCE == null) {
-                INSTANCE = PlayerRepository(context)
-            }
-        }
-
-        fun get(): PlayerRepository {
-            return INSTANCE ?: throw IllegalStateException("CrimeRepository must be initialized")
+            playersDao.update(player)
         }
     }
 }

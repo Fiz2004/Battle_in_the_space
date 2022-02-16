@@ -19,7 +19,7 @@ class MainViewModel(private val playerRepository: PlayerRepository) : ViewModel(
 
     var user = MutableLiveData<FirebaseUser?>(null)
 
-    var playerListLiveData: LiveData<List<Player>> = playerRepository.getPlayers()
+    var playerListLiveData: LiveData<List<Player>?> = playerRepository.getPlayers()
 
     var player: Player = Player(money = 666)
 
