@@ -16,6 +16,8 @@ class MainViewModel(
 
     var player: Player = Player(money = 666)
 
+    var controllerPlayer: MutableLiveData<List<Boolean>> = MutableLiveData(listOf(true, false, false, false))
+
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
         get() = _type
@@ -65,6 +67,8 @@ class MainViewModel(
         val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
         val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
         val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+
+        controllerPlayer.value = listOf(true, false, false, false)
 
         val player = when (count) {
             1 -> player1

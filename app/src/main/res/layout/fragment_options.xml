@@ -39,6 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:weightSum="100"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/txtForRadioGroup">
@@ -46,6 +47,7 @@
                 <RadioButton
                     android:id="@+id/onePlayers_RadioButton"
                     style="@style/RadioButtonStyle"
+                    android:layout_weight="25"
                     android:checked="@{mainViewModel.countPlayerLiveDataEquals(1)}"
                     android:onClick="@{()->mainViewModel.setCountPlayers(1)}"
                     android:text="@{@plurals/count_players(1,1)}" />
@@ -53,6 +55,7 @@
                 <RadioButton
                     android:id="@+id/twoPlayers_RadioButton"
                     style="@style/RadioButtonStyle"
+                    android:layout_weight="25"
                     android:checked="@{mainViewModel.countPlayerLiveDataEquals(2)}"
                     android:onClick="@{()->mainViewModel.setCountPlayers(2)}"
                     android:text="@{@plurals/count_players(2,2)}" />
@@ -60,6 +63,7 @@
                 <RadioButton
                     android:id="@+id/threePlayers_RadioButton"
                     style="@style/RadioButtonStyle"
+                    android:layout_weight="25"
                     android:checked="@{mainViewModel.countPlayerLiveDataEquals(3)}"
                     android:onClick="@{()->mainViewModel.setCountPlayers(3)}"
                     android:text="@{@plurals/count_players(3,3)}" />
@@ -67,10 +71,12 @@
                 <RadioButton
                     android:id="@+id/fourPlayers_RadioButton"
                     style="@style/RadioButtonStyle"
+                    android:layout_weight="25"
                     android:checked="@{mainViewModel.countPlayerLiveDataEquals(4)}"
                     android:onClick="@{()->mainViewModel.setCountPlayers(4)}"
                     android:text="@{@plurals/count_players(4,4)}" />
             </RadioGroup>
+
 
             <include
                 android:id="@+id/onePlayer"
@@ -83,6 +89,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/radioGroup"
                 app:mainViewModel="@{mainViewModel}"
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[0]}"
                 app:player="@{mainViewModel.playerListLiveData[0]}" />
 
             <include
@@ -97,6 +104,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/onePlayer"
                 app:mainViewModel="@{mainViewModel}"
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[1]}"
                 app:player="@{mainViewModel.playerListLiveData[1]}" />
 
             <include
@@ -111,6 +119,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/twoPlayer"
                 app:mainViewModel="@{mainViewModel}"
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[2]}"
                 app:player="@{mainViewModel.playerListLiveData[2]}" />
 
             <include
@@ -125,6 +134,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/threePlayer"
                 app:mainViewModel="@{mainViewModel}"
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[3]}"
                 app:player="@{mainViewModel.playerListLiveData[3]}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

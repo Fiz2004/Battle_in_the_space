@@ -9,6 +9,10 @@
             type="com.fiz.android.battleinthespace.base.data.Player" />
 
         <variable
+            name="controllerPlayer"
+            type="boolean" />
+
+        <variable
             name="count"
             type="int" />
 
@@ -17,7 +21,7 @@
             type="com.fiz.android.battleinthespace.base.presentation.MainViewModel" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -54,14 +58,21 @@
                     android:layout_margin="8dp"
                     android:text="@string/name_options_textview" />
 
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/Players_EditText"
-                    style="@style/EditTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
                     android:hint="@string/name_options_edittext"
-                    android:text="@={player.name}" />
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:text="@={player.name}" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
             </LinearLayout>
 
             <LinearLayout
@@ -73,26 +84,17 @@
                 <TextView
                     android:id="@+id/Players_controller_TextView"
                     style="@style/TextViewStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
                     android:text="@string/controller" />
 
-                <ToggleButton
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/Players_ToggleButton"
                     style="@style/ButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:checked="@={player.controllerPlayer}"
-                    android:textOff="@string/controller_options_togglebutton_off"
-                    android:textOn="@string/controller_options_togglebutton_on" />
+                    android:checked="@={controllerPlayer}"
+                    android:text="@{controllerPlayer ? @string/controller_options_togglebutton_on : @string/controller_options_togglebutton_off}" />
 
                 <Button
                     android:id="@+id/reset"
                     style="@style/ButtonStyle"
-                    android:layout_margin="8dp"
                     android:onClick="@{()->mainViewModel.onClickReset(count)}"
                     android:text="@string/reset" />
             </LinearLayout>
@@ -107,27 +109,27 @@
                 android:text="@string/no_email"
                 android:textSize="18sp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/sign_up"
-                style="@style/ButtonStyle"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="8dp"
+                android:textSize="14sp"
                 android:text="@string/signUp" />
 
             <Button
                 android:id="@+id/sign_in"
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
-                android:layout_margin="8dp"
                 android:text="@string/signIn" />
 
             <Button
                 android:id="@+id/sign_out"
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
-                android:layout_margin="8dp"
                 android:text="@string/signOut" />
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </layout>
