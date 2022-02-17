@@ -12,13 +12,13 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="@+id/nestedScrollView">
 
-            <ImageView
-                android:id="@+id/info_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/title_mission_selection"
-                android:scaleType="centerCrop"
-                android:src="@drawable/mission_selected_background" />
+            <!--            <ImageView-->
+            <!--                android:id="@+id/info_image"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:contentDescription="@string/title_mission_selection"-->
+            <!--                android:scaleType="centerCrop"-->
+            <!--                android:src="@drawable/mission_selected_background" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,7 +34,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/mission_selection_text_spaceShip_hunter"
-                    android:textColor="#FFFF8786"
                     android:textSize="18sp" />
             </LinearLayout>
         </FrameLayout>

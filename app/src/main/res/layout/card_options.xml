@@ -24,6 +24,7 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="?attr/materialCardViewOutlinedStyle"
         android:layout_margin="8dp"
         app:cardCornerRadius="4dp"
         app:cardElevation="2dp"

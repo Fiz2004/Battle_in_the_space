@@ -4,6 +4,7 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_view"
+        style="?attr/materialCardViewOutlinedStyle"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_margin="10dp"
@@ -45,22 +46,24 @@
                 android:orientation="horizontal"
                 android:visibility="gone">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/undo_Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginBottom="4dp"
                     android:layout_weight="1"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
                     android:text="@string/undo" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/ok_Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginBottom="4dp"
                     android:layout_weight="3"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
                     android:text="@string/ok" />
             </LinearLayout>
         </LinearLayout>

@@ -18,9 +18,4 @@
     <color name="secondaryDarkColor">#0086c3</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
-
-    <color name="my_app_background_color">#FAFAFA</color>
-    <color name="my_app_onbackground_color">#F5F5F5</color>
-    <color name="my_app_Surface_color">#ECEFF1</color>
-    <color name="my_app_onsurface_color">#CFD8DC</color>
 </resources>

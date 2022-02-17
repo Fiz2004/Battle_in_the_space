@@ -27,14 +27,17 @@
 
         </androidx.viewpager2.widget.ViewPager2>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fly_fab"
+            style="?attr/floatingActionButtonPrimaryStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
+            android:text="@string/fly"
             android:contentDescription="@string/fly"
-            android:src="@drawable/fly" />
+            app:fabSize="auto"
+            app:icon="@drawable/fly" />
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
