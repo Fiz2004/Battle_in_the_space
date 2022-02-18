@@ -1,11 +1,10 @@
 package com.fiz.android.battleinthespace.base.data.module
 
-import com.fiz.android.battleinthespace.base.data.ItemsDatabase
-import com.fiz.android.battleinthespace.base.data.Player
-import com.fiz.android.battleinthespace.base.data.TypeItems
+import com.fiz.android.battleinthespace.base.data.*
+import io.realm.RealmList
 import io.realm.RealmObject
-import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 
 
 open class PlayerRealm : RealmObject() {
@@ -15,9 +14,7 @@ open class PlayerRealm : RealmObject() {
     var controllerPlayer: Boolean = true
     var mission: Int = 0
     var money: Int = 1000
-
-    @Ignore
-    var items: List<TypeItems> = ItemsDatabase.getStartItems()
+    var items: RealmList<TypeItemsRealm> = RealmList()
 }
 
 fun PlayerRealm.asPlayer(): Player {
@@ -27,10 +24,36 @@ fun PlayerRealm.asPlayer(): Player {
         controllerPlayer = this.controllerPlayer,
         mission = this.mission,
         money = this.money,
-        items = ItemsDatabase.getStartItems()
+        items = this.items.map { typeItem ->
+            TypeItems(id = typeItem.id,
+                name = typeItem.nameId,
+                imageId = typeItem.imageId,
+                items = typeItem.items.map {
+                    Item(
+                        id = typeItem.id,
+                        name = it.nameId,
+                        imageId = it.imageId,
+                        cost = it.cost,
+                        state = it.state?.stateProduct ?: StateProduct.NONE
+                    )
+                } as MutableList<Item>)
+        }
     )
 }
 
-//open class TypeItemsRealm(@PrimaryKey val id: Int, val name: Int, val imageId: Int, var items: RealmList<Item>)
-//
-//open class Item(@PrimaryKey val id: Int, val name: Int, val imageId: Int, val cost: Int, var state: StateProduct)
+@RealmClass(embedded = true)
+open class TypeItemsRealm(
+    var id: Int = 0,
+    var nameId: Int = 0,
+    var imageId: Int = 0,
+    var items: RealmList<ItemRealm> = RealmList()
+) : RealmObject()
+
+@RealmClass(embedded = true)
+open class ItemRealm(
+    var id: Int = 0,
+    var nameId: Int = 0,
+    var imageId: Int = 0,
+    var cost: Int = 0,
+    var state: StateProductRealm? = StateProductRealm()
+) : RealmObject()

@@ -6,7 +6,7 @@
 
         <variable
             name="player"
-            type="com.fiz.android.battleinthespace.base.data.Player" />
+            type="com.fiz.android.battleinthespace.base.data.module.PlayerRealm" />
 
         <variable
             name="controllerPlayer"

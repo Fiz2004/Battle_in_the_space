@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.fiz.android.battleinthespace.base.data.database.PlayerDatabase
 import com.fiz.android.battleinthespace.base.data.database.realm.PlayerDatabaseRealm
+import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
 import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -57,7 +58,7 @@ class PlayerRepository private constructor(val context: Context) {
         return SharedPrefPlayerStorage(context).get()
     }
 
-    fun getPlayers(): LiveData<List<Player>?> = playersDAO.getAll()
+    fun getPlayers(): List<PlayerRealm>? = playersDAO.getAll()
 
     fun getPlayer(id: Int): LiveData<Player?> = playersDAO.get(id)
 

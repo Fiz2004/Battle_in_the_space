@@ -7,12 +7,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.base.data.*
-import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
+import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
+import com.fiz.android.battleinthespace.base.data.module.asPlayer
 
 class MainViewModel(
     private val playerRepository: PlayerRepository) : ViewModel() {
 
-    var playerListLiveData: LiveData<List<Player>?> = playerRepository.getPlayers()
+    var playerListLiveData: LiveData<List<PlayerRealm>?> =
+        MutableLiveData(playerRepository.getPlayers())
 
     var player: Player = Player(money = 666)
 
@@ -90,7 +92,7 @@ class MainViewModel(
             outState.putString("name$n", value.name)
             outState.putBoolean("playerControllerPlayer$n", value.controllerPlayer)
             outState.putInt("mission$n", value.mission)
-            outState.putString("items$n", PlayerTypeConverters().fromItems(value.items))
+//            outState.putString("items$n", PlayerTypeConverters().fromItems(value.items))
         }
     }
 
@@ -102,7 +104,7 @@ class MainViewModel(
             intent.putExtra("name$n", value.name)
             intent.putExtra("playerControllerPlayer$n", value.controllerPlayer)
             intent.putExtra("mission$n", value.mission)
-            intent.putExtra("items$n", PlayerTypeConverters().fromItems(value.items))
+//            intent.putExtra("items$n", PlayerTypeConverters().fromItems(value.items))
         }
         return intent
     }
@@ -125,11 +127,11 @@ class MainViewModel(
         savePlayers()
     }
 
-    fun refreshPlayerListLiveData(playerList: List<Player>?) {
+    fun refreshPlayerListLiveData(playerList: List<PlayerRealm>?) {
         if (playerList == null || playerList.isEmpty())
             playerRepository.fillInitValue()
         else
-            player = playerList[0]
+            player = playerList[0].asPlayer()
         _money.value = player.money
     }
 
