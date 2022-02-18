@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.fiz.android.battleinthespace.base.data.database.PlayerDatabase
+import com.fiz.android.battleinthespace.base.data.database.realm.PlayerDatabaseRealm
 import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
-import java.util.concurrent.Executors
+import io.realm.Realm
+import io.realm.RealmConfiguration
 
 private const val DATABASE_NAME = "player-database"
 
@@ -17,19 +19,34 @@ class PlayerRepository private constructor(val context: Context) {
         DATABASE_NAME
     ).build()
 
-    private val playersDAO = database.playerDao()
+    private val config = RealmConfiguration.Builder()
+        .name("BITS.realm")
+        .allowWritesOnUiThread(true)
+        .build()
+    private val databaseRealm = Realm.getInstance(config)
+
+    //    private val playersDAO = database.playerDao()
+    private val playersDAO = PlayerDatabaseRealm(databaseRealm)
 
     fun fillInitValue() {
-        Executors.newSingleThreadExecutor().execute {
-            val player1 = Player(id = 0, name = "Player 1")
-            val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
-            val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
-            val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
-            addPlayer(player1)
-            addPlayer(player2)
-            addPlayer(player3)
-            addPlayer(player4)
-        }
+        //        Executors.newSingleThreadExecutor().execute {
+        //            val player1 = Player(id = 0, name = "Player 1")
+        //            val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
+        //            val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
+        //            val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+        //            addPlayer(player1)
+        //            addPlayer(player2)
+        //            addPlayer(player3)
+        //            addPlayer(player4)
+        //        }
+        val player1 = Player(id = 0, name = "Player 1")
+        val player2 = Player(id = 1, name = "Player 2", controllerPlayer = false)
+        val player3 = Player(id = 2, name = "Player 3", controllerPlayer = false)
+        val player4 = Player(id = 3, name = "Player 4", controllerPlayer = false)
+        addPlayer(player1)
+        addPlayer(player2)
+        addPlayer(player3)
+        addPlayer(player4)
     }
 
     fun saveCountPlayers(count: Int): Boolean {
@@ -45,15 +62,19 @@ class PlayerRepository private constructor(val context: Context) {
     fun getPlayer(id: Int): LiveData<Player?> = playersDAO.get(id)
 
     private fun addPlayer(player: Player) {
-        Executors.newSingleThreadExecutor().execute {
-            playersDAO.addPlayer(player)
-        }
+        //        Executors.newSingleThreadExecutor().execute {
+        playersDAO.addPlayer(player)
+        //        }
     }
 
     fun updatePlayer(player: Player) {
-        Executors.newSingleThreadExecutor().execute {
-            playersDAO.update(player)
-        }
+        //        Executors.newSingleThreadExecutor().execute {
+        playersDAO.update(player)
+        //        }
+    }
+
+    fun close() {
+        databaseRealm.close()
     }
 
     companion object {
