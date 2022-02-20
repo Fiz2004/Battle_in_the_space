@@ -19,7 +19,7 @@ import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 
 class SpaceStationFragment : Fragment() {
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory()
+        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 

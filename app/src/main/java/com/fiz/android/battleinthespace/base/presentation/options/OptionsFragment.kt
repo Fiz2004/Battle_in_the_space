@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
@@ -16,7 +17,7 @@ class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory()
+        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
@@ -27,7 +28,11 @@ class OptionsFragment : Fragment() {
 
     private lateinit var binding: FragmentOptionsBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentOptionsBinding.inflate(inflater, container, false)
 
         binding.mainViewModel = viewModel
@@ -63,6 +68,28 @@ class OptionsFragment : Fragment() {
         binding.fourPlayer.signIn.visibility = View.GONE
         binding.fourPlayer.signOut.visibility = View.GONE
         binding.fourPlayer.email.visibility = View.GONE
+        binding.onePlayer.PlayersEditText.setText(viewModel.playerListLiveData.value?.get(0)?.name)
+        binding.twoPlayer.PlayersEditText.setText(viewModel.playerListLiveData.value?.get(1)?.name)
+        binding.threePlayer.PlayersEditText.setText(viewModel.playerListLiveData.value?.get(2)?.name)
+        binding.fourPlayer.PlayersEditText.setText(viewModel.playerListLiveData.value?.get(3)?.name)
+
+        binding.onePlayer.PlayersEditText.addTextChangedListener {
+            viewModel.player.name = binding.onePlayer.PlayersEditText.text.toString()
+            viewModel.playerListLiveData.value?.get(0)?.name =
+                binding.onePlayer.PlayersEditText.text.toString()
+        }
+        binding.twoPlayer.PlayersEditText.addTextChangedListener {
+            viewModel.playerListLiveData.value?.get(1)?.name =
+                binding.onePlayer.PlayersEditText.text.toString()
+        }
+        binding.threePlayer.PlayersEditText.addTextChangedListener {
+            viewModel.playerListLiveData.value?.get(2)?.name =
+                binding.onePlayer.PlayersEditText.text.toString()
+        }
+        binding.fourPlayer.PlayersEditText.addTextChangedListener {
+            viewModel.playerListLiveData.value?.get(3)?.name =
+                binding.onePlayer.PlayersEditText.text.toString()
+        }
 
         accountViewModel.user.observe(requireActivity()) {
             uiUpdate(it)

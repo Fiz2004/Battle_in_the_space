@@ -1,5 +1,6 @@
 package com.fiz.android.battleinthespace.base.presentation
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.LiveData
@@ -9,16 +10,30 @@ import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.base.data.*
 import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
 import com.fiz.android.battleinthespace.base.data.module.asPlayer
+import io.realm.Realm
+import io.realm.RealmChangeListener
+import io.realm.kotlin.where
 
 class MainViewModel(
-    private val playerRepository: PlayerRepository) : ViewModel() {
+    private val playerRepository: PlayerRepository
+) : ViewModel() {
 
-    var playerListLiveData: LiveData<List<PlayerRealm>?> =
-        MutableLiveData(playerRepository.getPlayers())
+    private lateinit var realmListener: RealmChangeListener<Realm>
+
+    var playerListLiveData: LiveData<List<Player>?>
+
+    init {
+        val list = mutableListOf<Player>()
+        for (player in playerRepository.getPlayers()!!)
+            list.add(player.asPlayer())
+        playerListLiveData = MutableLiveData(list)
+    }
+
 
     var player: Player = Player(money = 666)
 
-    var controllerPlayer: MutableLiveData<List<Boolean>> = MutableLiveData(listOf(true, false, false, false))
+    var controllerPlayer: MutableLiveData<List<Boolean>> =
+        MutableLiveData(listOf(true, false, false, false))
 
     private var _type = MutableLiveData(0)
     val type: LiveData<Int>
@@ -28,7 +43,16 @@ class MainViewModel(
     val money: LiveData<Int>
         get() = _money
 
-    private val countPlayer: MutableLiveData<Int> = MutableLiveData(playerRepository.getCountPlayers())
+    private val countPlayer: MutableLiveData<Int> =
+        MutableLiveData(playerRepository.getCountPlayers())
+
+    init {
+        realmListener = RealmChangeListener {
+            var playerListLiveData: LiveData<List<PlayerRealm>?> =
+                MutableLiveData(playerRepository.getPlayers())
+        }
+        playerRepository.databaseRealm.addChangeListener { }
+    }
 
     fun getItems(): List<TypeItems> {
         return player.items
@@ -85,9 +109,11 @@ class MainViewModel(
     fun addSaveInstanceState(outState: Bundle) {
         outState.putInt(
             "countPlayers",
-            countPlayer.value!!)
+            countPlayer.value!!
+        )
         for (n in 0 until 4) {
-            val value = (playerListLiveData.value)?.get(n) ?: throw Error("Не доступна LiveData playerListLiveData")
+            val value = (playerListLiveData.value)?.get(n)
+                ?: throw Error("Не доступна LiveData playerListLiveData")
 
             outState.putString("name$n", value.name)
             outState.putBoolean("playerControllerPlayer$n", value.controllerPlayer)
@@ -99,7 +125,8 @@ class MainViewModel(
     fun getDataForIntent(intent: Intent): Intent {
         intent.putExtra("countPlayers", countPlayer.value)
         for (n in 0 until 4) {
-            val value = (playerListLiveData.value)?.get(n) ?: throw Error("Не доступна LiveData playerListLiveData")
+            val value = (playerListLiveData.value)?.get(n)
+                ?: throw Error("Не доступна LiveData playerListLiveData")
 
             intent.putExtra("name$n", value.name)
             intent.putExtra("playerControllerPlayer$n", value.controllerPlayer)
@@ -111,7 +138,8 @@ class MainViewModel(
 
     private fun buyItem(
         index: Int,
-        indexType: Int) {
+        indexType: Int
+    ) {
         val money = player.money
         if (money - getItems()[indexType].items[index].cost >= 0) {
             player.money -= getItems()[indexType].items[index].cost
@@ -127,11 +155,12 @@ class MainViewModel(
         savePlayers()
     }
 
-    fun refreshPlayerListLiveData(playerList: List<PlayerRealm>?) {
+    fun refreshPlayerListLiveData(playerList: List<Player>?) {
         if (playerList == null || playerList.isEmpty())
             playerRepository.fillInitValue()
-        else
-            player = playerList[0].asPlayer()
+        player =
+            playerRepository.databaseRealm.where<PlayerRealm>().equalTo("id", 0.toInt()).findFirst()
+                ?.asPlayer()!!
         _money.value = player.money
     }
 
@@ -159,10 +188,16 @@ class MainViewModel(
         val items = player.items
         return Item.addZeroFirstItem(items[indexType].items)
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        playerRepository.databaseRealm.removeChangeListener { realmListener }
+        playerRepository.close()
+    }
 }
 
-class MainViewModelFactory : ViewModelProvider.Factory {
-    private val dataSource = PlayerRepository.get()
+class MainViewModelFactory(appContext: Context) : ViewModelProvider.Factory {
+    private val dataSource = PlayerRepository(appContext)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return MainViewModel(dataSource) as T

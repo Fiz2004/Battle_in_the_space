@@ -1,16 +1,13 @@
 package com.fiz.android.battleinthespace.base.data.database.realm
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.module.ItemRealm
 import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
 import com.fiz.android.battleinthespace.base.data.module.TypeItemsRealm
-import com.fiz.android.battleinthespace.base.data.module.asPlayer
 import io.realm.Realm
 import io.realm.kotlin.where
 
-class PlayerDatabaseRealm(val databaseRealm: Realm) {
+class PlayerDatabaseRealm(private val databaseRealm: Realm) {
     fun addPlayer(player: Player) {
         update(player)
     }
@@ -41,28 +38,26 @@ class PlayerDatabaseRealm(val databaseRealm: Realm) {
             playerRealm.items.add(typeItem)
 
         }
-        databaseRealm.executeTransaction {
+        databaseRealm.executeTransactionAsync {
             it.insertOrUpdate(playerRealm)
         }
     }
 
-    fun get(id: Int): LiveData<Player?> {
-        return MutableLiveData(
-            databaseRealm.where<PlayerRealm>().equalTo("id", id).findFirst()?.asPlayer()
-        )
+    fun get(id: Int): PlayerRealm? {
+        return databaseRealm.where<PlayerRealm>().equalTo("id", id).findFirst()
     }
 
     fun clear() {
-        val all = databaseRealm.where<PlayerRealm>().findAll()
-        all.deleteAllFromRealm()
+        databaseRealm.executeTransactionAsync {
+            it.deleteAll()
+        }
     }
 
     fun getAll(): List<PlayerRealm>? {
-        val all = databaseRealm.where<PlayerRealm>().findAll()
-        return all
+        return databaseRealm.where<PlayerRealm>().findAll()
     }
 
-    fun getCount(): Int? {
+    fun getCount(): Int {
         val all = databaseRealm.where<PlayerRealm>().findAll()
         return all.size
     }

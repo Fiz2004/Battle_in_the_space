@@ -21,7 +21,7 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory()
+        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 

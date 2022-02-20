@@ -5,10 +5,6 @@
     <data>
 
         <variable
-            name="player"
-            type="com.fiz.android.battleinthespace.base.data.module.PlayerRealm" />
-
-        <variable
             name="controllerPlayer"
             type="boolean" />
 
@@ -60,17 +56,16 @@
                     android:text="@string/name_options_textview" />
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/Players_EditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/name_options_edittext"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/Players_EditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPersonName"
-                        android:text="@={player.name}" />
+                        android:inputType="textPersonName" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 

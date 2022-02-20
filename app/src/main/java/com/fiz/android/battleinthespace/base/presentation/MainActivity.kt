@@ -13,7 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory()
+        val viewModelFactory = MainViewModelFactory(applicationContext)
         ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 

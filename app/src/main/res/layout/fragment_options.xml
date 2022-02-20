@@ -89,8 +89,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/radioGroup"
                 app:mainViewModel="@{mainViewModel}"
-                app:controllerPlayer="@{mainViewModel.controllerPlayer[0]}"
-                app:player="@{mainViewModel.playerListLiveData[0]}" />
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[0]}" />
 
             <include
                 android:id="@+id/twoPlayer"
@@ -104,8 +103,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/onePlayer"
                 app:mainViewModel="@{mainViewModel}"
-                app:controllerPlayer="@{mainViewModel.controllerPlayer[1]}"
-                app:player="@{mainViewModel.playerListLiveData[1]}" />
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[1]}" />
 
             <include
                 android:id="@+id/threePlayer"
@@ -119,8 +117,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/twoPlayer"
                 app:mainViewModel="@{mainViewModel}"
-                app:controllerPlayer="@{mainViewModel.controllerPlayer[2]}"
-                app:player="@{mainViewModel.playerListLiveData[2]}" />
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[2]}" />
 
             <include
                 android:id="@+id/fourPlayer"
@@ -134,8 +131,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/threePlayer"
                 app:mainViewModel="@{mainViewModel}"
-                app:controllerPlayer="@{mainViewModel.controllerPlayer[3]}"
-                app:player="@{mainViewModel.playerListLiveData[3]}" />
+                app:controllerPlayer="@{mainViewModel.controllerPlayer[3]}" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
