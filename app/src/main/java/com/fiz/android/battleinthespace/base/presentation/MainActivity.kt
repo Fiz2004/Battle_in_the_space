@@ -38,10 +38,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        viewModel.playerListLiveData.observe(this) {
-            viewModel.refreshPlayerListLiveData(it)
-        }
-
         accountViewModel.errorTextToToast.observe(this) {
             it?.let {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
@@ -56,9 +52,12 @@ class MainActivity : AppCompatActivity() {
         }.attach()
 
         binding.flyFab.setOnClickListener {
+            viewModel.savePlayers()
             val intent = Intent(this, GameActivity::class.java)
             gameActivityLauncher.launch(viewModel.getDataForIntent(intent))
         }
+
+        viewModel.initPlayerIfFirstStart()
     }
 
     override fun onStop() {

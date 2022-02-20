@@ -1,10 +1,12 @@
 package com.fiz.android.battleinthespace.base.data.module
 
-import com.fiz.android.battleinthespace.base.data.*
+import com.fiz.android.battleinthespace.base.data.Item
+import com.fiz.android.battleinthespace.base.data.Player
+import com.fiz.android.battleinthespace.base.data.StateProduct
+import com.fiz.android.battleinthespace.base.data.TypeItems
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import io.realm.annotations.RealmClass
 
 
 open class PlayerRealm : RealmObject() {
@@ -41,19 +43,3 @@ fun PlayerRealm.asPlayer(): Player {
     )
 }
 
-@RealmClass(embedded = true)
-open class TypeItemsRealm(
-    var id: Int = 0,
-    var nameId: Int = 0,
-    var imageId: Int = 0,
-    var items: RealmList<ItemRealm> = RealmList()
-) : RealmObject()
-
-@RealmClass(embedded = true)
-open class ItemRealm(
-    var id: Int = 0,
-    var nameId: Int = 0,
-    var imageId: Int = 0,
-    var cost: Int = 0,
-    var state: StateProductRealm? = StateProductRealm()
-) : RealmObject()

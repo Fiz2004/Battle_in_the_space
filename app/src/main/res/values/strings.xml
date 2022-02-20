@@ -18,6 +18,14 @@
     <string name="controller_options_togglebutton_off">Computer</string>
     <string name="controller_options_togglebutton_on">Player</string>
 
+    <plurals name="players_count">
+        <item quantity="one">Player %1$d</item>
+        <item quantity="few">Player %1$d</item>
+        <item quantity="many">Player %1$d</item>
+        <item quantity="other">Player %1$d</item>
+    </plurals>
+
+
     <string name="name1_options_edittext">Player 1</string>
     <string name="name2_options_edittext">Player 2</string>
     <string name="name3_options_edittext">Player 3</string>

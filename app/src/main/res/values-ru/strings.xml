@@ -11,6 +11,13 @@
         <item quantity="other">%1$d Игроков </item>
     </plurals>
 
+    <plurals name="players_count">
+        <item quantity="one">Игрок %1$d</item>
+        <item quantity="few">Игрок %1$d</item>
+        <item quantity="many">Игрок %1$d</item>
+        <item quantity="other">Игрок %1$d</item>
+    </plurals>
+
     <string name="name_options_textview">Имя:</string>
     <string name="name_options_edittext">Введите имя</string>
     <string name="controller_options_togglebutton_off">Компьютер</string>

@@ -29,7 +29,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
         val extras = intent.extras ?: return
 
-        val viewModelFactory = GameViewModelFactory(extras)
+        val viewModelFactory = GameViewModelFactory(extras, applicationContext)
         viewModel = ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
 
         binding.newGameGameButton.setOnClickListener {

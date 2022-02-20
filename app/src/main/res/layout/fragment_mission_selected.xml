@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.main.MissionSelectedFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".presentation.main.MissionSelectedFragment">
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs_mission"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="wrap_content" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs_mission"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.appbar.AppBarLayout>
+    <com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpager_mission"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewpager_mission"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </androidx.viewpager2.widget.ViewPager2>
 
-            </androidx.viewpager2.widget.ViewPager2>
-
-        </com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+    </com.fiz.android.battleinthespace.base.presentation.helpers.NestedScrollableHost>
+</androidx.constraintlayout.widget.ConstraintLayout>

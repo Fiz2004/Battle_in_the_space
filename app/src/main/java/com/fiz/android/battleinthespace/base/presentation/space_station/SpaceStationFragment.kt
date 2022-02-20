@@ -40,23 +40,15 @@ class SpaceStationFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.type.observe(viewLifecycleOwner) { type ->
-            setAdapter(type)
-        }
-
-        viewModel.money.observe(viewLifecycleOwner) {
-            binding.money.text = getString(R.string.balance, it)
-        }
-
-
+    private fun updateUI() {
+        setAdapter(viewModel.type)
+        binding.money.text = getString(R.string.balance, viewModel.players?.get(0)?.money)
     }
 
     override fun onResume() {
         super.onResume()
-        setAdapter(viewModel.type.value ?: 0)
+        setAdapter(viewModel.type)
+        updateUI()
     }
 
     private fun setAdapter(type: Int) {
@@ -65,13 +57,15 @@ class SpaceStationFragment : Fragment() {
                 val items = viewModel.getItems()
                 typeItemsAdapter = TypeItemsAdapter(items,
                     CallBackTypeItemClick { position: Int ->
-                        viewModel.setType(position + 1)
+                        viewModel.type = position + 1
+                        updateUI()
                     })
                 typeItemsAdapter
             } else {
-                itemsAdapter = ItemsAdapter(viewModel.getItemsWithZero(),
+                itemsAdapter = ItemsAdapter(viewModel.getItemsWithZero(viewModel.type),
                     CallBackItemClick { position: Int ->
-                        viewModel.clickItems(position)
+                        viewModel.clickItems(position, viewModel.type)
+                        updateUI()
                     })
                 itemsAdapter
             }

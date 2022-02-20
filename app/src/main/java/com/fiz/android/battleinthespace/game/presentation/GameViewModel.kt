@@ -7,25 +7,22 @@ import android.view.SurfaceView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.base.data.Player
-import com.fiz.android.battleinthespace.base.data.database.PlayerTypeConverters
+import com.fiz.android.battleinthespace.base.data.PlayerRepository
+import com.fiz.android.battleinthespace.base.data.module.asPlayer
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.GameThread
 
-class GameViewModel(extras: Bundle) :
+class GameViewModel(extras: Bundle, context: Context) :
     ViewModel() {
-    val countPlayers = extras.getInt("countPlayers")
+    private val countPlayers = extras.getInt("countPlayers")
 
-    val players: List<Player> = List(countPlayers) { Player() }
+    private val players: MutableList<Player> = MutableList(countPlayers) { Player() }
 
     init {
-        for (n in 0 until countPlayers) {
-            players[n].name = extras.getString("name$n").toString()
-            players[n].controllerPlayer = extras.getBoolean("playerControllerPlayer$n")
-            players[n].mission = extras.getInt("mission$n")
-            players[n].items = PlayerTypeConverters().toItems(extras.getString("items$n"))
-        }
+        for ((index, player) in PlayerRepository(context).getPlayers()!!.withIndex())
+            if (index < countPlayers)
+                players[index] = player.asPlayer()
     }
-
 
     lateinit var gameThread: GameThread
 
@@ -90,8 +87,9 @@ class GameViewModel(extras: Bundle) :
 
 }
 
-class GameViewModelFactory(private val extras: Bundle) : ViewModelProvider.Factory {
+class GameViewModelFactory(private val extras: Bundle, private val context: Context) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GameViewModel(extras) as T
+        return GameViewModel(extras, context) as T
     }
 }
