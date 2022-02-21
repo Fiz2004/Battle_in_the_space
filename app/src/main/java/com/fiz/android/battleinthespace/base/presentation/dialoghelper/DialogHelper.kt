@@ -1,9 +1,9 @@
 package com.fiz.android.battleinthespace.base.presentation.dialoghelper
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R

@@ -1,9 +1,9 @@
 package com.fiz.android.battleinthespace.base.presentation.helpers
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.appcompat.app.AppCompatActivity
 
 class ActivityContract : ActivityResultContract<Intent, Intent?>() {
 
@@ -12,7 +12,7 @@ class ActivityContract : ActivityResultContract<Intent, Intent?>() {
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Intent? = when {
-        resultCode != Activity.RESULT_OK -> null
+        resultCode != AppCompatActivity.RESULT_OK -> null
         else -> intent
     }
 }
