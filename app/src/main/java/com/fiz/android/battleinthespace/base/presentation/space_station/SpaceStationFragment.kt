@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackItemClick
@@ -23,7 +22,8 @@ class SpaceStationFragment : Fragment() {
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentSpaceStationBinding
+    private var _binding: FragmentSpaceStationBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var typeItemsAdapter: TypeItemsAdapter
     private lateinit var itemsAdapter: ItemsAdapter
@@ -32,17 +32,14 @@ class SpaceStationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
-
-        val layoutManager = GridLayoutManager(activity, 2)
-        binding.stationRecycler.layoutManager = layoutManager
-
+        _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
+        initUI()
         return binding.root
     }
 
-    private fun updateUI() {
-        setAdapter(viewModel.type)
-        binding.money.text = getString(R.string.balance, viewModel.players?.get(0)?.money)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onResume() {
@@ -51,22 +48,42 @@ class SpaceStationFragment : Fragment() {
         updateUI()
     }
 
+    private fun initUI() {
+        val layoutManager = GridLayoutManager(activity, 2)
+        binding.stationRecycler.layoutManager = layoutManager
+    }
+
+    private fun updateUI() {
+        setAdapter(viewModel.type)
+        val money = viewModel.getMoney()
+        binding.money.text = money
+    }
+
     private fun setAdapter(type: Int) {
+        fun callBackItemClick() = CallBackItemClick { position: Int ->
+            viewModel.clickItems(position, viewModel.type)
+            updateUI()
+        }
+
+        fun callBackTypeItemClick() = CallBackTypeItemClick { position: Int ->
+            viewModel.clickTypeItem(position + 1)
+            updateUI()
+        }
+
         binding.stationRecycler.adapter =
             if (type == 0) {
                 val items = viewModel.getItems()
-                typeItemsAdapter = TypeItemsAdapter(items,
-                    CallBackTypeItemClick { position: Int ->
-                        viewModel.type = position + 1
-                        updateUI()
-                    })
+                typeItemsAdapter = TypeItemsAdapter(
+                    items,
+                    callBackTypeItemClick()
+                )
                 typeItemsAdapter
             } else {
-                itemsAdapter = ItemsAdapter(viewModel.getItemsWithZero(viewModel.type),
-                    CallBackItemClick { position: Int ->
-                        viewModel.clickItems(position, viewModel.type)
-                        updateUI()
-                    })
+                val items = viewModel.getItemsWithZero(viewModel.type)
+                itemsAdapter = ItemsAdapter(
+                    items,
+                    callBackItemClick()
+                )
                 itemsAdapter
             }
     }

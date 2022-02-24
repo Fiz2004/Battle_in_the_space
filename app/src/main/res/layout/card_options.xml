@@ -65,7 +65,7 @@
                 style="@style/TextViewStyle"
                 android:text="@string/controller" />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/controllerPlayerSwitchCompat"
                 style="@style/ButtonStyle" />
 

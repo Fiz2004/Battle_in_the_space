@@ -5,13 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.*
 import com.fiz.android.battleinthespace.base.data.module.asPlayer
 import io.realm.Realm
 import io.realm.RealmChangeListener
 
 class MainViewModel(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository, private val appContext: Context
 ) : ViewModel() {
 
     var players: List<Player>?
@@ -109,6 +110,10 @@ class MainViewModel(
         }
     }
 
+    fun clickTypeItem(value: Int) {
+        type = value
+    }
+
     fun getDataForIntent(intent: Intent): Intent {
         intent.putExtra("countPlayers", countPlayer)
         for (n in 0 until 4) {
@@ -177,12 +182,16 @@ class MainViewModel(
         playerRepository.databaseRealm.removeChangeListener { realmListener }
         playerRepository.close()
     }
+
+    fun getMoney(): String {
+        return appContext.getString(R.string.balance, players?.get(0)?.money)
+    }
 }
 
-class MainViewModelFactory(appContext: Context) : ViewModelProvider.Factory {
+class MainViewModelFactory(private val appContext: Context) : ViewModelProvider.Factory {
     private val dataSource = PlayerRepository(appContext)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(dataSource) as T
+        return MainViewModel(dataSource, appContext) as T
     }
 }

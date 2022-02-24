@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager2.widget.ViewPager2
+import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.presentation.helpers.ActivityContract
 import com.fiz.android.battleinthespace.base.presentation.helpers.SectionsPagerAdapter
 import com.fiz.android.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.android.battleinthespace.game.presentation.GameActivity
-import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by lazy {
@@ -44,20 +45,57 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        initUI()
+
+        viewModel.initPlayerIfFirstStart()
+    }
+
+    private fun initUI() {
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
         binding.viewpager.adapter = pagerAdapter
 
-        TabLayoutMediator(binding.tabs, binding.viewpager) { tab, position ->
-            tab.text = SectionsPagerAdapter.getTitle(this, position)
-        }.attach()
+        binding.viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                when (position) {
+                    0 ->
+                        binding.bottomNavigation.menu.findItem(R.id.page_1).isChecked = true
+                    1 ->
+                        binding.bottomNavigation.menu.findItem(R.id.page_2).isChecked = true
+                    2 ->
+                        binding.bottomNavigation.menu.findItem(R.id.page_3).isChecked = true
+                    3 ->
+                        binding.bottomNavigation.menu.findItem(R.id.page_4).isChecked = true
+                }
+            }
+        })
+
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.page_1 -> {
+                    binding.viewpager.currentItem = 0
+                    true
+                }
+                R.id.page_2 -> {
+                    binding.viewpager.currentItem = 1
+                    true
+                }
+                R.id.page_3 -> {
+                    binding.viewpager.currentItem = 2
+                    true
+                }
+                else -> {
+                    binding.viewpager.currentItem = 3
+                    true
+                }
+            }
+        }
 
         binding.flyFab.setOnClickListener {
             viewModel.savePlayers()
             val intent = Intent(this, GameActivity::class.java)
             gameActivityLauncher.launch(viewModel.getDataForIntent(intent))
         }
-
-        viewModel.initPlayerIfFirstStart()
     }
 
     override fun onStop() {
