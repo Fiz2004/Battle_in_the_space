@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.base.presentation.helpers
+package com.fiz.android.battleinthespace.base.presentation.statistics
 
 import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER
@@ -33,12 +33,12 @@ class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        when (position) {
-            0 -> return ITEM_HEADER
-            1 -> return ITEM_HEADER
-            2 -> return ITEM_PLAYER
-            3 -> return ITEM_HEADER
-            else -> return ITEM_PLAYER
+        return when (position) {
+            0 -> ITEM_HEADER
+            1 -> ITEM_HEADER
+            2 -> ITEM_PLAYER
+            3 -> ITEM_HEADER
+            else -> ITEM_PLAYER
         }
 
     }
@@ -60,7 +60,7 @@ class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(player: Player) {
-            binding.statisticTextView.text = player.name + ":" + player.money
+            binding.statisticTextView.text = "${player.name}:${player.money}"
         }
     }
 

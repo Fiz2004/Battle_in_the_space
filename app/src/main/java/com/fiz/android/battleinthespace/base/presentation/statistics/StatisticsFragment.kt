@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
-import com.fiz.android.battleinthespace.base.presentation.helpers.StatisticsAdapter
 import com.fiz.android.battleinthespace.databinding.FragmentStatisticsBinding
 
 class StatisticsFragment : Fragment() {

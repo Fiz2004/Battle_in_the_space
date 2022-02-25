@@ -33,8 +33,12 @@ class SpaceStationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSpaceStationBinding.inflate(inflater, container, false)
-        initUI()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initUI()
     }
 
     override fun onDestroyView() {
@@ -72,19 +76,27 @@ class SpaceStationFragment : Fragment() {
 
         binding.stationRecycler.adapter =
             if (type == 0) {
-                val items = viewModel.getItems()
-                typeItemsAdapter = TypeItemsAdapter(
-                    items,
-                    callBackTypeItemClick()
-                )
-                typeItemsAdapter
+                getTypeItemsAdapter(::callBackTypeItemClick)
             } else {
-                val items = viewModel.getItemsWithZero(viewModel.type)
-                itemsAdapter = ItemsAdapter(
-                    items,
-                    callBackItemClick()
-                )
-                itemsAdapter
+                getItemsAdapter(::callBackItemClick)
             }
+    }
+
+    private fun getItemsAdapter(callBackItemClick: () -> CallBackItemClick): ItemsAdapter {
+        val items = viewModel.getItemsWithZero(viewModel.type)
+        itemsAdapter = ItemsAdapter(
+            items,
+            callBackItemClick()
+        )
+        return itemsAdapter
+    }
+
+    private fun getTypeItemsAdapter(callBackTypeItemClick: () -> CallBackTypeItemClick): TypeItemsAdapter {
+        val items = viewModel.getItems()
+        typeItemsAdapter = TypeItemsAdapter(
+            items,
+            callBackTypeItemClick()
+        )
+        return typeItemsAdapter
     }
 }
