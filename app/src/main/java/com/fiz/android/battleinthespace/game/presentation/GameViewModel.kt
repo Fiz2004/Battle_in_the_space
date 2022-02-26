@@ -11,6 +11,7 @@ import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.module.asPlayer
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.GameThread
+import com.fiz.android.battleinthespace.game.domain.StateGame
 
 class GameViewModel(extras: Bundle, context: Context) :
     ViewModel() {
@@ -18,31 +19,51 @@ class GameViewModel(extras: Bundle, context: Context) :
 
     private val players: MutableList<Player> = MutableList(countPlayers) { Player() }
 
+    private var stategame: StateGame? = null
+
     init {
         for ((index, player) in PlayerRepository(context).getPlayers()!!.withIndex())
             if (index < countPlayers)
                 players[index] = player.asPlayer()
+        try {
+            stategame = extras.getSerializable(StateGame::class.java.simpleName) as StateGame
+        } catch (e: Exception) {
+
+        }
     }
 
-    lateinit var gameThread: GameThread
+    var gameThread: GameThread? = null
 
-    fun gameThreadStart(context: Context, gameGameSurfaceview: SurfaceView, informationGameSurfaceview: SurfaceView) {
-        gameThread = GameThread(
-            players, context,
-            gameGameSurfaceview,
-            informationGameSurfaceview
-        )
+    fun gameThreadStart(
+        context: Context,
+        gameSurfaceview: SurfaceView,
+        informationGameSurfaceview: SurfaceView
+    ) {
+        if (gameThread == null) {
+            gameThread = GameThread(
+                players, context,
+                gameSurfaceview,
+                informationGameSurfaceview
+            )
+            gameThread?.running = true
+            gameThread?.start()
+        } else {
+            gameThread?.surface = gameSurfaceview
+            gameThread?.informationSurface = informationGameSurfaceview
+            gameThread?.display?.surface = gameSurfaceview
+            gameThread?.running = true
+        }
 
-        gameThread.running = true
-        gameThread.start()
+        if (stategame != null)
+            gameThread?.stateGame = stategame!!
     }
 
     fun gameThreadStop() {
         var retry = true
-        gameThread.running = false
+        gameThread?.running = false
         while (retry) {
             try {
-                gameThread.join()
+                gameThread?.join()
                 retry = false
             } catch (e: InterruptedException) { /* for Lint */
             }
@@ -50,11 +71,11 @@ class GameViewModel(extras: Bundle, context: Context) :
     }
 
     fun clickNewGameButton() {
-        gameThread.stateGame.status = "new game"
+        gameThread?.stateGame?.status = "new game"
     }
 
     fun clickPauseGameButton() {
-        gameThread.stateGame.clickPause()
+        gameThread?.stateGame?.clickPause()
     }
 
     fun onTouch(event: MotionEvent, left: Int, top: Int, width: Int, height: Int) {
@@ -65,23 +86,24 @@ class GameViewModel(extras: Bundle, context: Context) :
 
         var touchLeftSide = false
         if (point.x > left && point.x < left + width
-                && point.y > top && point.y < top + height
+            && point.y > top && point.y < top + height
         )
             touchLeftSide = true
 
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> gameThread.controllers.get(0).down(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_DOWN -> gameThread?.controllers?.get(0)
+                ?.down(touchLeftSide, point, pointerId)
             // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> gameThread.controllers.get(0)
-                .pointerDown(touchLeftSide, point, pointerId)
+            MotionEvent.ACTION_POINTER_DOWN -> gameThread?.controllers?.get(0)
+                ?.pointerDown(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> gameThread.controllers.get(0).up()
+            MotionEvent.ACTION_UP -> gameThread?.controllers?.get(0)?.up()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> gameThread.controllers.get(0).powerUp(event)
+            MotionEvent.ACTION_POINTER_UP -> gameThread?.controllers?.get(0)?.powerUp(event)
             // движение
-            MotionEvent.ACTION_MOVE -> gameThread.controllers.get(0).move(event)
+            MotionEvent.ACTION_MOVE -> gameThread?.controllers?.get(0)?.move(event)
         }
     }
 

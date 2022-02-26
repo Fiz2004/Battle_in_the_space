@@ -18,7 +18,7 @@ private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val DIVISION_BY_SCREEN = 11
 
 class Display(
-    private val surface: SurfaceView,
+    var surface: SurfaceView,
     private val context: Context,
 ) : BitmapLoad(context) {
 

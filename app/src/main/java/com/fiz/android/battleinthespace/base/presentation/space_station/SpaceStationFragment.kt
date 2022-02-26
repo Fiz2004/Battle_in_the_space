@@ -10,9 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackItemClick
-import com.fiz.android.battleinthespace.base.presentation.helpers.CallBackTypeItemClick
 import com.fiz.android.battleinthespace.base.presentation.helpers.ItemsAdapter
-import com.fiz.android.battleinthespace.base.presentation.helpers.TypeItemsAdapter
 import com.fiz.android.battleinthespace.databinding.FragmentSpaceStationBinding
 
 
@@ -48,7 +46,6 @@ class SpaceStationFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        setAdapter(viewModel.type)
         updateUI()
     }
 

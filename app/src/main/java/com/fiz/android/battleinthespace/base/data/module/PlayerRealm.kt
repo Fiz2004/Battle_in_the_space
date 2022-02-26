@@ -1,6 +1,9 @@
 package com.fiz.android.battleinthespace.base.data.module
 
-import com.fiz.android.battleinthespace.base.data.*
+import com.fiz.android.battleinthespace.base.data.Item
+import com.fiz.android.battleinthespace.base.data.ItemsDatabase
+import com.fiz.android.battleinthespace.base.data.Player
+import com.fiz.android.battleinthespace.base.data.StateProduct
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -20,15 +23,10 @@ fun PlayerRealm.asPlayer(): Player {
     var items = ItemsDatabase.getStartItems()
 
     items = this.items.mapIndexed { index, typeItem ->
-        TypeItems(id = typeItem.id,
-            name = items[index].name,
-            imageId = items[index].imageId,
+        items[index].copy(id = typeItem.id,
             items = typeItem.items.mapIndexed { indexItem, item ->
-                Item(
+                items[index].items[indexItem].copy(
                     id = typeItem.id,
-                    name = items[index].items[indexItem].name,
-                    imageId = items[index].items[indexItem].imageId,
-                    cost = items[index].items[indexItem].cost,
                     state = item.state?.stateProduct ?: StateProduct.NONE
                 )
             } as MutableList<Item>)

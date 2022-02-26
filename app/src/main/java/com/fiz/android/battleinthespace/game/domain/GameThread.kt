@@ -14,8 +14,8 @@ import kotlin.math.min
 class GameThread(
     players: List<Player>,
     context: Context,
-    private val surface: SurfaceView,
-    private val informationSurface: SurfaceView,
+    var surface: SurfaceView,
+    var informationSurface: SurfaceView,
 ) : Thread(), ListActors.CallBacks {
     val controllers: Array<Controller> = Array(players.size) { Controller(context = context) }
 
@@ -54,7 +54,7 @@ class GameThread(
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
 
-    private val display = Display(surface, context)
+    val display = Display(surface, context)
 
     var running = false
     var pause = false

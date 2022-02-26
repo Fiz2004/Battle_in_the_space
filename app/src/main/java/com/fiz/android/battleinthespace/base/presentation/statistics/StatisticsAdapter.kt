@@ -60,7 +60,7 @@ class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(player: Player) {
-            binding.statisticTextView.text = "${player.name}:${player.money}"
+            binding.statisticTextView.text = "${player.name}: ${player.money}"
         }
     }
 

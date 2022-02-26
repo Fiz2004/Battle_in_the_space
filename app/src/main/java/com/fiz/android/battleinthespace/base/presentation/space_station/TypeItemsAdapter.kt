@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.base.presentation.helpers
+package com.fiz.android.battleinthespace.base.presentation.space_station
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +9,8 @@ import com.fiz.android.battleinthespace.databinding.ListItemTypeItemsBinding
 
 class TypeItemsAdapter(
     private val itemDefaults: List<TypeItems>,
-    val callback: CallBackTypeItemClick) :
+    val callback: CallBackTypeItemClick
+) :
     RecyclerView.Adapter<TypeItemsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

@@ -53,21 +53,24 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
             binding.gameGameSurfaceview.left,
             binding.gameGameSurfaceview.top,
             binding.gameGameSurfaceview.width,
-            binding.gameGameSurfaceview.height)
+            binding.gameGameSurfaceview.height
+        )
         return super.onTouchEvent(event)
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        if (viewModel.gameThread.running) {
-            finishActivity()
-        }
+        if (isFinishing)
+            if (!viewModel.gameThread?.running!!) {
+                finishActivity()
+            }
     }
 
     private fun finishActivity() {
         val data = Intent()
-        data.putExtra("score", viewModel.gameThread.stateGame.playerGames[0].score)
+        val score = viewModel.gameThread?.stateGame?.playerGames?.get(0)?.score
+        data.putExtra("score", score)
         setResult(RESULT_OK, data)
         viewModel.gameThreadStop()
         finish()
@@ -75,7 +78,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(StateGame::class.java.simpleName, viewModel.gameThread.stateGame)
+        outState.putSerializable(StateGame::class.java.simpleName, viewModel.gameThread?.stateGame)
         super.onSaveInstanceState(outState)
     }
 
@@ -122,7 +125,11 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
     fun gameThreadStart() {
         if (isGameSurfaceViewReady && isInformationSurfaceViewReady)
-            viewModel.gameThreadStart(this, binding.gameGameSurfaceview, binding.informationGameSurfaceview)
+            viewModel.gameThreadStart(
+                this,
+                binding.gameGameSurfaceview,
+                binding.informationGameSurfaceview
+            )
 
     }
 }
