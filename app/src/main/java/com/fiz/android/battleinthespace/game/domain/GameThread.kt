@@ -54,7 +54,7 @@ class GameThread(
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
 
-    val display = Display(surface, context)
+    val display = Display(surface, stateGame, context)
 
     var running = false
     var pause = false

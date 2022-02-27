@@ -5,7 +5,7 @@ import com.fiz.android.battleinthespace.game.data.actor.Actor
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import kotlin.math.ceil
 
-class Viewport {
+class Viewport(surface: SurfaceView, stateGame: StateGame, sizeUnit: Float) {
     var left: Double = 0.0
     var top: Double = 0.0
     var width: Double = 0.0
@@ -15,23 +15,30 @@ class Viewport {
     private var widthAllViewportsOnScreen = 0.0
     private var heightAllViewportsOnScreen = 0.0
 
-    fun update(surface: SurfaceView, stateGame: StateGame, sizeUnit: Float) {
+    val marginX: Float
+    val marginY: Float
+
+    init {
         width = (surface.width / sizeUnit).toDouble()
         height = (surface.height / sizeUnit).toDouble()
 
         levelWidth = stateGame.level.width
         levelHeight = stateGame.level.height
 
-        val marginX = surface.width / sizeUnit / 2
-        val marginY = surface.height / sizeUnit / 2
-        val spaceship =
-            stateGame.level.listActors.spaceShips[stateGame.playerGames.indexOf(stateGame.playerGames.find { it.main })]
-        val center = spaceship.center
+        marginX = surface.width / sizeUnit / 2
+        marginY = surface.height / sizeUnit / 2
 
         val countViewportXOnScreen = ceil(width / levelWidth)
         val countViewportYOnScreen = ceil(height / levelHeight)
+
         widthAllViewportsOnScreen = levelWidth * countViewportXOnScreen
         heightAllViewportsOnScreen = levelHeight * countViewportYOnScreen
+    }
+
+    fun update(stateGame: StateGame) {
+        val spaceship =
+            stateGame.level.listActors.spaceShips[stateGame.playerGames.indexOf(stateGame.playerGames.find { it.main })]
+        val center = spaceship.center
 
         left = center.x - marginX
 

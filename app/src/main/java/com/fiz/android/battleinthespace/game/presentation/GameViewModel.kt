@@ -51,7 +51,9 @@ class GameViewModel(extras: Bundle, context: Context) :
             gameThread?.surface = gameSurfaceview
             gameThread?.informationSurface = informationGameSurfaceview
             gameThread?.display?.surface = gameSurfaceview
+            gameThread?.display?.viewPortUpdate()
             gameThread?.running = true
+
         }
 
         if (stategame != null)

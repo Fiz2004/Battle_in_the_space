@@ -19,30 +19,28 @@ private const val DIVISION_BY_SCREEN = 11
 
 class Display(
     var surface: SurfaceView,
+    private var stateGame: StateGame,
     private val context: Context,
 ) : BitmapLoad(context) {
-
-    companion object {
-        interface Listener {
-            fun pauseButtonClick(status: String)
-        }
-    }
 
     private val paint: Paint = Paint()
     private lateinit var canvas: Canvas
     private lateinit var canvasInfo: Canvas
-    private lateinit var stateGame: StateGame
     private lateinit var listener: Listener
 
     private var sizeUnit: Float = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
 
-    private val viewport = Viewport()
+    private var viewport = Viewport(surface, stateGame, sizeUnit)
+
+    fun viewPortUpdate() {
+        viewport = Viewport(surface, stateGame, sizeUnit)
+    }
 
     fun render(stateGame: StateGame, controller: Controller, canvas: Canvas) {
         this.stateGame = stateGame
         this.canvas = canvas
 
-        viewport.update(surface, stateGame, sizeUnit)
+        viewport.update(stateGame)
         drawBackground()
         drawActors()
         drawAnimationDestroys()
@@ -305,5 +303,10 @@ class Display(
         return result
     }
 
+    companion object {
+        interface Listener {
+            fun pauseButtonClick(status: String)
+        }
+    }
 }
 
