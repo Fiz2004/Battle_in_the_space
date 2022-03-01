@@ -2,7 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.BattleInTheSpace" parent="Theme.Material3.DynamicColors.Light">
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowActionBar">false</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
