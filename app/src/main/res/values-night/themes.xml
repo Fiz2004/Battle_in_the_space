@@ -1,7 +1,8 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.BattleInTheSpace" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.BattleInTheSpace" parent="Theme.Material3.DynamicColors.Dark">
         <item name="android:windowFullscreen">true</item>
+        <item name="android:windowActionBar">false</item>
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
