@@ -10,6 +10,7 @@ import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.Item
 import com.fiz.android.battleinthespace.base.data.StateProduct
 import com.fiz.android.battleinthespace.databinding.ListItemItemBinding
+import com.google.android.material.color.MaterialColors
 
 
 class ItemsAdapter(private val Items: List<Item>, val callback: CallBackItemClick) :
@@ -35,6 +36,7 @@ class ItemsAdapter(private val Items: List<Item>, val callback: CallBackItemClic
 
     inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val colorDefault = binding.cardView.cardBackgroundColor.defaultColor
+        private val colorFontDefault = binding.costText.textColors.defaultColor
         var item: Item? = null
 
         fun bind(item: Item) {
@@ -45,11 +47,30 @@ class ItemsAdapter(private val Items: List<Item>, val callback: CallBackItemClic
             binding.infoImage.contentDescription = (item.name + item.cost).toString()
             itemView.isEnabled = item.state != StateProduct.INSTALL
             val color: Int = when (item.state) {
-                StateProduct.INSTALL -> Color.RED
-                StateProduct.BUY -> Color.GREEN
-                else -> colorDefault
+                StateProduct.INSTALL -> {
+                    MaterialColors.getColor(binding.root, R.attr.colorTertiary)
+                }
+                StateProduct.BUY -> {
+                    MaterialColors.getColor(binding.root, R.attr.colorSecondary)
+                }
+                else -> {
+                    colorDefault
+                }
+            }
+            val colorFont: Int = when (item.state) {
+                StateProduct.INSTALL -> {
+                    MaterialColors.getColor(binding.root, R.attr.colorOnTertiary)
+                }
+                StateProduct.BUY -> {
+                    MaterialColors.getColor(binding.root, R.attr.colorOnSecondary)
+                }
+                else -> {
+                    colorFontDefault
+                }
             }
             binding.cardView.setCardBackgroundColor(color)
+            binding.costText.setTextColor(colorFont)
+            binding.infoText.setTextColor(colorFont)
 
             val names = binding.root.context.resources.getString(item.name)
             val info = when (item.state) {
