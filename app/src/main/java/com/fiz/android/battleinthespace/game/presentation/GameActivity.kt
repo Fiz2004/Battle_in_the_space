@@ -62,14 +62,14 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
         super.onDestroy()
 
         if (isFinishing)
-            if (!viewModel.gameThread?.running!!) {
+            if (!viewModel.gameScope?.running!!) {
                 finishActivity()
             }
     }
 
     private fun finishActivity() {
         val data = Intent()
-        val score = viewModel.gameThread?.stateGame?.playerGames?.get(0)?.score
+        val score = viewModel.gameScope?.stateGame?.playerGames?.get(0)?.score
         data.putExtra("score", score)
         setResult(RESULT_OK, data)
         viewModel.gameThreadStop()
@@ -78,7 +78,7 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(StateGame::class.java.simpleName, viewModel.gameThread?.stateGame)
+        outState.putSerializable(StateGame::class.java.simpleName, viewModel.gameScope?.stateGame)
         super.onSaveInstanceState(outState)
     }
 

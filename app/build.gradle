@@ -54,6 +54,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.1.0'
     implementation 'androidx.activity:activity-ktx:1.4.0'
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
 
 //    Realm
     implementation "io.realm:realm-annotations:10.10.1"

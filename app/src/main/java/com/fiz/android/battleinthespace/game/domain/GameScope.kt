@@ -11,17 +11,18 @@ import com.fiz.android.battleinthespace.game.data.actor.ListActors
 import kotlin.math.min
 
 
-class GameThread(
+class GameScope(
     players: List<Player>,
     context: Context,
     var surface: SurfaceView,
     var informationSurface: SurfaceView,
-) : Thread(), ListActors.CallBacks {
+) : ListActors.CallBacks {
     val controllers: Array<Controller> = Array(players.size) { Controller(context = context) }
 
     var stateGame: StateGame = StateGame(
         players,
-        controllers = controllers)
+        controllers = controllers
+    )
 
     init {
         stateGame.setCallBacks(this)
@@ -53,6 +54,7 @@ class GameThread(
 
     private var prevTime = System.currentTimeMillis()
     private var ending = 1.0
+    private var FPS: Int = 0
 
     val display = Display(surface, stateGame, context)
 
@@ -63,7 +65,7 @@ class GameThread(
         soundPool.play(soundMap.get(numberSound), 1F, 1F, 1, 0, 1F)
     }
 
-    override fun run() {
+    suspend fun run() {
         while (running) {
             if (!pause) {
                 AIUpdate()
@@ -95,7 +97,7 @@ class GameThread(
             informationCanvas = informationSurface.holder.lockCanvas()
             if (informationCanvas == null) return
             synchronized(informationSurface.holder) {
-                display.renderInfo(stateGame, informationCanvas)
+                display.renderInfo(stateGame, informationCanvas, FPS)
             }
         } finally {
             if (canvas != null)
@@ -108,6 +110,7 @@ class GameThread(
 
     private fun stateUpdate() {
         val now = System.currentTimeMillis()
+        FPS = (1000 / (now - prevTime)).toInt()
         val deltaTime = min(now - prevTime, 100).toInt() / 1000.0
 
         if (stateGame.status != "pause") {

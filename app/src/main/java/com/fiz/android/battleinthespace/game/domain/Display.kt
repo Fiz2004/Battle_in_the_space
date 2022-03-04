@@ -2,6 +2,7 @@ package com.fiz.android.battleinthespace.game.domain
 
 import android.content.Context
 import android.graphics.*
+import android.util.Log
 import android.view.SurfaceView
 import com.fiz.android.battleinthespace.game.data.actor.Actor
 import com.fiz.android.battleinthespace.game.data.actor.SpaceShip
@@ -122,7 +123,8 @@ class Display(
     private fun drawAnimationDestroys() {
         for (animationDestroy in stateGame.level.listActors.listAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
-            animationDestroy.frame = NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
+            animationDestroy.frame =
+                NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
             drawActor(animationDestroy as Actor, animationDestroy.getBitmap(this))
         }
     }
@@ -169,29 +171,30 @@ class Display(
     private fun drawHelper() {
         val mainSpaceship = stateGame.level.listActors.spaceShips.filter { it.playerGame.main }
         if (mainSpaceship.isNotEmpty()) {
-            stateGame.level.listActors.spaceShips.filter { it.inGame && !it.playerGame.main }.forEach {
-                if (viewport.getAllPoints(it).size == 0) {
-                    val paintFont = Paint()
-                    paintFont.color = getColor(it.playerGame.number)
-                    paintFont.style = Paint.Style.FILL
-                    paintFont.alpha = 80
-                    paintFont.strokeWidth = 30F
+            stateGame.level.listActors.spaceShips.filter { it.inGame && !it.playerGame.main }
+                .forEach {
+                    if (viewport.getAllPoints(it).size == 0) {
+                        val paintFont = Paint()
+                        paintFont.color = getColor(it.playerGame.number)
+                        paintFont.style = Paint.Style.FILL
+                        paintFont.alpha = 80
+                        paintFont.strokeWidth = 30F
 
-                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
-                    val angleToRadians = angle / 180.0 * Math.PI
-                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
-                    val cx =
-                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
-                    val cy =
-                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
-                    canvas.drawCircle(
-                        cx,
-                        cy,
-                        30F,
-                        paintFont
-                    )
+                        val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
+                        val angleToRadians = angle / 180.0 * Math.PI
+                        val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+                        val cx =
+                            (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
+                        val cy =
+                            (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
+                        canvas.drawCircle(
+                            cx,
+                            cy,
+                            30F,
+                            paintFont
+                        )
+                    }
                 }
-            }
 
             if (stateGame.level.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
                 stateGame.level.listActors.meteorites.forEach {
@@ -218,17 +221,17 @@ class Display(
         }
     }
 
-    fun renderInfo(stateGame: StateGame, canvasInfo: Canvas) {
+    fun renderInfo(stateGame: StateGame, canvasInfo: Canvas, FPS: Int) {
         this.stateGame = stateGame
         this.canvasInfo = canvasInfo
 
-        drawInfo()
+        drawInfo(FPS)
 
         listener = context as Listener
         listener.pauseButtonClick(stateGame.status)
     }
 
-    private fun drawInfo() {
+    private fun drawInfo(FPS: Int) {
         val width = canvasInfo.width
         val height = canvasInfo.height
         val minCharacteristic = min(width, height)
@@ -246,7 +249,12 @@ class Display(
         paintFont.textSize = baseTextSize
         paintFont.color = Color.WHITE
         paintFont.textAlign = Paint.Align.CENTER
-        canvasInfo.drawText("Round ${stateGame.round}", canvasInfo.width / 2F, baseTextSize, paintFont)
+        canvasInfo.drawText(
+            "Round ${stateGame.round}",
+            canvasInfo.width / 2F,
+            baseTextSize,
+            paintFont
+        )
 
         val maxTextWidth = getMaxTextWidth(paintFont)
 
@@ -280,6 +288,14 @@ class Display(
                 paintFont
             )
         }
+
+        Log.d("AAA", FPS.toString())
+        canvasInfo.drawText(
+            FPS.toString(),
+            0F,
+            baseTextSize,
+            paintFont
+        )
 
     }
 
