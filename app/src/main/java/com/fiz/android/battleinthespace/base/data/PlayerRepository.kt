@@ -1,6 +1,7 @@
 package com.fiz.android.battleinthespace.base.data
 
 import android.content.Context
+import com.fiz.android.battleinthespace.base.data.database.firebase.DBManager
 import com.fiz.android.battleinthespace.base.data.database.realm.PlayerDatabaseRealm
 import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
 import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
@@ -19,6 +20,8 @@ class PlayerRepository(val context: Context) {
     val databaseRealm = Realm.getInstance(config)
 
     private val playersDAO = PlayerDatabaseRealm(databaseRealm)
+
+    private val db = DBManager()
 
     fun fillInitValue() {
         val player1 = Player(id = 0, name = "Player 1")
@@ -45,6 +48,9 @@ class PlayerRepository(val context: Context) {
 
     private fun addPlayer(player: Player) {
         playersDAO.addPlayer(player)
+        //Создает уникальный ключ
+        val key = db.db.push().key
+        db.add(player)
     }
 
     fun updatePlayer(player: Player) {
