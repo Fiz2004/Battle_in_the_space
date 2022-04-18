@@ -1,6 +1,5 @@
 package com.fiz.android.battleinthespace.base.data
 
-import android.content.Context
 import com.fiz.android.battleinthespace.base.data.database.firebase.DBManager
 import com.fiz.android.battleinthespace.base.data.database.realm.PlayerDatabaseRealm
 import com.fiz.android.battleinthespace.base.data.module.PlayerRealm
@@ -10,7 +9,7 @@ import io.realm.RealmConfiguration
 
 private const val DATABASE_NAME = "BITS.realm"
 
-class PlayerRepository(val context: Context) {
+class PlayerRepository(val sharedPrefPlayerStorage: SharedPrefPlayerStorage) {
     private val config = RealmConfiguration.Builder()
         .name(DATABASE_NAME)
         .allowWritesOnUiThread(true)
@@ -35,11 +34,11 @@ class PlayerRepository(val context: Context) {
     }
 
     fun saveCountPlayers(count: Int): Boolean {
-        return SharedPrefPlayerStorage(context).save(count)
+        return sharedPrefPlayerStorage.save(count)
     }
 
     fun getCountPlayers(): Int {
-        return SharedPrefPlayerStorage(context).get()
+        return sharedPrefPlayerStorage.get()
     }
 
     fun getPlayers(): List<PlayerRealm>? = playersDAO.getAll()

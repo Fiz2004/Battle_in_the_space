@@ -5,19 +5,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.presentation.AccountViewModel
-import com.fiz.android.battleinthespace.base.presentation.AccountViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.MainActivity
 import com.fiz.android.battleinthespace.databinding.SignDialogBinding
 
 
 class DialogHelper : DialogFragment() {
-    private val accountViewModel: AccountViewModel by lazy {
-        val viewModelFactory = AccountViewModelFactory()
-        ViewModelProvider(requireActivity(), viewModelFactory)[AccountViewModel::class.java]
-    }
+    private val accountViewModel: AccountViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val index = requireArguments().getInt("index")

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import com.fiz.android.battleinthespace.R
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.mission_selected.MissionDestroyMeteoriteFragment
@@ -21,7 +22,8 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
+        val viewModelFactory =
+            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
@@ -39,6 +41,11 @@ class MissionSelectedFragment : Fragment() {
         }.attach()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun getTitle(position: Int): CharSequence {
@@ -66,11 +73,6 @@ class MissionSelectedFragment : Fragment() {
             viewModel.changeMission(position)
             binding.viewpagerMission.currentItem = position
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }
 

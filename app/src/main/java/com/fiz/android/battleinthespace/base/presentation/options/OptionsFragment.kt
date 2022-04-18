@@ -6,9 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.android.battleinthespace.R
-import com.fiz.android.battleinthespace.base.presentation.*
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
+import com.fiz.android.battleinthespace.base.presentation.AccountViewModel
+import com.fiz.android.battleinthespace.base.presentation.MainActivity
+import com.fiz.android.battleinthespace.base.presentation.MainViewModel
+import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.base.presentation.dialoghelper.DialogHelper
 import com.fiz.android.battleinthespace.databinding.FragmentOptionsBinding
 import com.google.firebase.auth.FirebaseUser
@@ -17,14 +22,12 @@ class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
+        val viewModelFactory =
+            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 
-    private val accountViewModel: AccountViewModel by lazy {
-        val viewModelFactory = AccountViewModelFactory()
-        ViewModelProvider(requireActivity(), viewModelFactory)[AccountViewModel::class.java]
-    }
+    private val accountViewModel: AccountViewModel by activityViewModels()
 
     private lateinit var binding: FragmentOptionsBinding
 

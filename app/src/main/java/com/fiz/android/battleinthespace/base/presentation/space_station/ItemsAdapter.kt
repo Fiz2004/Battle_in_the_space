@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.base.presentation.helpers
+package com.fiz.android.battleinthespace.base.presentation.utils
 
 import android.graphics.Color
 import android.view.LayoutInflater

@@ -1,4 +1,4 @@
-package com.fiz.android.battleinthespace.base.presentation.helpers
+package com.fiz.android.battleinthespace.base.presentation.utils
 
 import android.content.Context
 import android.util.AttributeSet

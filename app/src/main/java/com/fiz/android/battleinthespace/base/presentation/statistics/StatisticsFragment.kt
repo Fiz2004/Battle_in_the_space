@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import com.fiz.android.battleinthespace.base.presentation.MainViewModel
 import com.fiz.android.battleinthespace.base.presentation.MainViewModelFactory
 import com.fiz.android.battleinthespace.databinding.FragmentStatisticsBinding
@@ -15,7 +16,8 @@ class StatisticsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(requireActivity().applicationContext)
+        val viewModelFactory =
+            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
         ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
     }
 

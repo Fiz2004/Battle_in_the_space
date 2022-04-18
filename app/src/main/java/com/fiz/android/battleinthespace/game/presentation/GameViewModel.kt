@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.fiz.android.battleinthespace.base.data.Player
 import com.fiz.android.battleinthespace.base.data.PlayerRepository
 import com.fiz.android.battleinthespace.base.data.module.asPlayer
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import com.fiz.android.battleinthespace.game.data.engine.Vec
 import com.fiz.android.battleinthespace.game.domain.GameScope
 import com.fiz.android.battleinthespace.game.domain.StateGame
@@ -27,7 +28,8 @@ class GameViewModel(extras: Bundle, context: Context) :
     private var stategame: StateGame? = null
 
     init {
-        for ((index, player) in PlayerRepository(context).getPlayers()!!.withIndex())
+        for ((index, player) in PlayerRepository(SharedPrefPlayerStorage(context)).getPlayers()!!
+            .withIndex())
             if (index < countPlayers)
                 players[index] = player.asPlayer()
         try {

@@ -1,18 +1,17 @@
 package com.fiz.android.battleinthespace.base.presentation
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.fiz.android.battleinthespace.R
 import com.fiz.android.battleinthespace.base.data.*
 import com.fiz.android.battleinthespace.base.data.module.asPlayer
+import com.fiz.android.battleinthespace.base.data.storage.SharedPrefPlayerStorage
 import io.realm.Realm
 import io.realm.RealmChangeListener
 
 class MainViewModel(
-    private val playerRepository: PlayerRepository, private val appContext: Context
+    private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
     var players: List<Player>?
@@ -183,15 +182,16 @@ class MainViewModel(
         playerRepository.close()
     }
 
-    fun getMoney(): String {
-        return appContext.getString(R.string.balance, players?.get(0)?.money)
+    fun getMoney(): Int {
+        return players?.get(0)?.money ?: 0
     }
 }
 
-class MainViewModelFactory(private val appContext: Context) : ViewModelProvider.Factory {
-    private val dataSource = PlayerRepository(appContext)
+class MainViewModelFactory(sharedPrefPlayerStorage: SharedPrefPlayerStorage) :
+    ViewModelProvider.Factory {
+    private val dataSource = PlayerRepository(sharedPrefPlayerStorage)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(dataSource, appContext) as T
+        return MainViewModel(dataSource) as T
     }
 }
