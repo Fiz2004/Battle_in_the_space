@@ -57,22 +57,7 @@
     <string name="title_statistics">Statistics</string>
     <string name="title_options">Options</string>
 
-    <string name="mission_selection_text_meteorites_hunter">Your main task is to destroy
-        as many meteorites as possible and do it ahead of the rest.
-        Do not stop at anything to fulfill the main goal.
-        For the destruction of meteorites, you will receive money
-        for which you can improve your spaceship and take a leading
-        position in your universe.</string>
-
-    <string name="mission_selection_text_spaceShip_hunter">Your main task is to destroy as many of your
-        competitors as possible. Technologies have reached such a level that weapons do not harm
-        spaceships and for destruction it is necessary to collide them with meteorites.
-        For the destruction of competitors, you will receive money for which you can
-        improve your spaceship and take a leading position in your universe.</string>
     <string name="fly">fly</string>
-
-    <string name="mission_destroy_meteorites">Destroy meteorites</string>
-    <string name="mission_destroy_spaceships">Destroy spaceships</string>
 
     <string name="ok">OK</string>
     <string name="undo">Undo</string>

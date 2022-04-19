@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.utils
+package com.fiz.battleinthespace.feature_mainscreen.ui.utils
 
 import android.content.Context
 import android.util.AttributeSet

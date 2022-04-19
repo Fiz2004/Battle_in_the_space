@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.space_station
+package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.fiz.battleinthespace.database.Item
 import com.fiz.battleinthespace.database.StateProduct
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemItemBinding
@@ -13,8 +14,8 @@ import com.google.android.material.color.MaterialColors
 
 
 class ItemsAdapter(
-    private val Items: List<com.fiz.battleinthespace.database.Item>,
-    val callback: CallBackItemClick
+    private val Items: List<Item>,
+    val callback: (Int) -> Unit
 ) :
     RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
 
@@ -39,9 +40,9 @@ class ItemsAdapter(
     inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root) {
         private val colorDefault = binding.cardView.cardBackgroundColor.defaultColor
         private val colorFontDefault = binding.costText.textColors.defaultColor
-        var item: com.fiz.battleinthespace.database.Item? = null
+        var item: Item? = null
 
-        fun bind(item: com.fiz.battleinthespace.database.Item) {
+        fun bind(item: Item) {
             this.item = item
             val drawable = ContextCompat.getDrawable(itemView.context, item.imageId)
 
@@ -92,7 +93,7 @@ class ItemsAdapter(
                     binding.costText.visibility = View.GONE
                     binding.buttonsLayout.visibility = View.VISIBLE
                     binding.okButton.setOnClickListener {
-                        callback.onClick(layoutPosition)
+                        callback(layoutPosition)
                     }
                     binding.undoButton.setOnClickListener {
                         binding.buttonsLayout.visibility = View.GONE
@@ -101,7 +102,7 @@ class ItemsAdapter(
                     }
                     return@setOnClickListener
                 }
-                callback.onClick(layoutPosition)
+                callback(layoutPosition)
             }
         }
 
@@ -114,12 +115,8 @@ class ItemsAdapter(
             binding.costText.text = ""
 
             binding.cardView.setOnClickListener {
-                callback.onClick(layoutPosition)
+                callback(layoutPosition)
             }
         }
     }
-}
-
-class CallBackItemClick(val item: (Int) -> Unit) {
-    fun onClick(position: Int) = item(position)
 }

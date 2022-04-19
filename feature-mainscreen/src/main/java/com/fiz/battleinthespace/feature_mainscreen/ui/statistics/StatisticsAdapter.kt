@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.statistics
+package com.fiz.battleinthespace.feature_mainscreen.ui.statistics
 
 import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER

@@ -1,12 +1,11 @@
-package com.fiz.battleinthespace.feature_mainscreen
+package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.fiz.battleinthespace.database.PlayerRepository
-import com.fiz.battleinthespace.database.StateProduct
-import com.fiz.battleinthespace.database.TypeItems
+import com.fiz.battleinthespace.database.*
 import com.fiz.battleinthespace.database.module.asPlayer
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
 import io.realm.Realm
@@ -16,21 +15,19 @@ class MainViewModel(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
-    var players: List<com.fiz.battleinthespace.database.Player>?
+    var players: List<Player>?
 
     init {
-        val list = mutableListOf<com.fiz.battleinthespace.database.Player>()
+        val list = mutableListOf<Player>()
         for (player in playerRepository.getPlayers()!!)
             list.add(player.asPlayer())
         players = list
     }
 
-    var type: Int = 0
-
     private var countPlayer: Int = playerRepository.getCountPlayers()
 
     private var realmListener: RealmChangeListener<Realm> = RealmChangeListener {
-        val list = mutableListOf<com.fiz.battleinthespace.database.Player>()
+        val list = mutableListOf<Player>()
         for (player in playerRepository.getPlayers()!!)
             list.add(player.asPlayer())
         players = list
@@ -39,6 +36,10 @@ class MainViewModel(
     init {
         playerRepository.databaseRealm.addChangeListener(realmListener)
     }
+
+    var money = MutableLiveData(0); private set
+    var type = MutableLiveData(0); private set
+
 
     fun getItems(): List<TypeItems> {
         return players?.get(0)?.items!!
@@ -52,7 +53,7 @@ class MainViewModel(
         countPlayer = numberRadioButton
     }
 
-    fun changeMission(value: Int) {
+    fun eventClickOnMission(value: Int) {
         players?.get(0)?.mission = value
     }
 
@@ -71,18 +72,18 @@ class MainViewModel(
     }
 
     fun onClickReset(count: Int) {
-        val player1 = com.fiz.battleinthespace.database.Player(id = 0, name = "Player 1")
-        val player2 = com.fiz.battleinthespace.database.Player(
+        val player1 = Player(id = 0, name = "Player 1")
+        val player2 = Player(
             id = 1,
             name = "Player 2",
             controllerPlayer = false
         )
-        val player3 = com.fiz.battleinthespace.database.Player(
+        val player3 = Player(
             id = 2,
             name = "Player 3",
             controllerPlayer = false
         )
-        val player4 = com.fiz.battleinthespace.database.Player(
+        val player4 = Player(
             id = 3,
             name = "Player 4",
             controllerPlayer = false
@@ -124,7 +125,7 @@ class MainViewModel(
     }
 
     fun clickTypeItem(value: Int) {
-        type = value
+        type.postValue(value)
     }
 
     fun getDataForIntent(intent: Intent): Intent {
@@ -166,13 +167,14 @@ class MainViewModel(
             playerRepository.fillInitValue()
     }
 
-    fun clickItems(position: Int, type: Int) {
+    fun clickItems(position: Int) {
         if (position == 0) {
-            this.type = 0
+            this.type.postValue(0)
         } else {
+            val type = this.type.value ?: return
             val indexType = type - 1
             val listProduct =
-                com.fiz.battleinthespace.database.Item.addZeroFirstItem(getItems()[indexType].items)
+                Item.addZeroFirstItem(getItems()[indexType].items)
             if (listProduct[position].state == StateProduct.BUY) {
                 listProduct.forEachIndexed { index, it ->
                     if (it.state == StateProduct.INSTALL)
@@ -185,10 +187,11 @@ class MainViewModel(
         }
     }
 
-    fun getItemsWithZero(type: Int): List<com.fiz.battleinthespace.database.Item> {
+    fun getItemsWithZero(): List<Item> {
+        val type = this.type.value ?: return listOf()
         val indexType = type - 1
         val items = players?.get(0)?.items!!
-        return com.fiz.battleinthespace.database.Item.addZeroFirstItem(items[indexType].items)
+        return Item.addZeroFirstItem(items[indexType].items)
     }
 
     override fun onCleared() {

@@ -11,9 +11,9 @@ import com.fiz.battleinthespace.R
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
-import com.fiz.battleinthespace.feature_mainscreen.AccountViewModel
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModelFactory
+import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 import com.fiz.battleinthespace.ui.adapters.SectionsPagerAdapter
 import com.fiz.battleinthespace.ui.utils.ActivityContract
 

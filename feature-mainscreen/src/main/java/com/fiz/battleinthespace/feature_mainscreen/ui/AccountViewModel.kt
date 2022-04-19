@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen
+package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.app.Activity
 import android.content.Context
@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.fiz.battleinthespace.feature_mainscreen.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

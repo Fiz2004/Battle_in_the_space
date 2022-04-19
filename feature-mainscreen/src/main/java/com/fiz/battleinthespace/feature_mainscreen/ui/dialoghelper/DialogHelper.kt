@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.dialoghelper
+package com.fiz.battleinthespace.feature_mainscreen.ui.dialoghelper
 
 import android.app.Dialog
 import android.os.Bundle
@@ -6,9 +6,9 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.feature_mainscreen.AccountViewModel
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.SignDialogBinding
+import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
 
 
 class DialogHelper : DialogFragment() {

@@ -5,10 +5,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import com.fiz.battleinthespace.R
-import com.fiz.battleinthespace.feature_mainscreen.mission_selected.MissionSelectedFragment
-import com.fiz.battleinthespace.feature_mainscreen.options.OptionsFragment
-import com.fiz.battleinthespace.feature_mainscreen.space_station.SpaceStationFragment
-import com.fiz.battleinthespace.feature_mainscreen.statistics.StatisticsFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionSelectedFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.options.OptionsFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.space_station.SpaceStationFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.statistics.StatisticsFragment
 
 class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
     androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {

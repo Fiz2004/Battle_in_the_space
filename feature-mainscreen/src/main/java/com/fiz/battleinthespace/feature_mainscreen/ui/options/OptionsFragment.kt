@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.options
+package com.fiz.battleinthespace.feature_mainscreen.ui.options
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,12 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
-import com.fiz.battleinthespace.feature_mainscreen.AccountViewModel
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
-import com.fiz.battleinthespace.feature_mainscreen.dialoghelper.DialogHelper
+import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
+import com.fiz.battleinthespace.feature_mainscreen.ui.dialoghelper.DialogHelper
 import com.google.firebase.auth.FirebaseUser
 
 class OptionsFragment : Fragment() {

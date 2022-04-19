@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.statistics
+package com.fiz.battleinthespace.feature_mainscreen.ui.statistics
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentStatisticsBinding
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 
 class StatisticsFragment : Fragment() {
     private var _binding: FragmentStatisticsBinding? = null
