@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import androidx.fragment.app.activityViewModels
+import com.fiz.battleinthespace.core.App
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentSpaceStationBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
@@ -14,12 +14,10 @@ import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.ItemsAdapter
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.TypeItemsAdapter
 
-
 class SpaceStationFragment : Fragment() {
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory =
-            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
-        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
+    private val viewModel: MainViewModel by activityViewModels {
+        val app = requireActivity().application as App
+        MainViewModelFactory(app.playerRepository)
     }
 
     private var _binding: FragmentSpaceStationBinding? = null
@@ -55,6 +53,13 @@ class SpaceStationFragment : Fragment() {
             type.observe(viewLifecycleOwner) {
                 binding.stationRecycler.adapter =
                     if (it == 0)
+                        getTypeItemsAdapter()
+                    else
+                        getItemsAdapter()
+            }
+            players.observe(viewLifecycleOwner) {
+                binding.stationRecycler.adapter =
+                    if (viewModel.type.value == 0)
                         getTypeItemsAdapter()
                     else
                         getItemsAdapter()

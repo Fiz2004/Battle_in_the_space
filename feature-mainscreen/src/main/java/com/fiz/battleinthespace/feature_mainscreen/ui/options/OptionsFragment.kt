@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import com.fiz.battleinthespace.core.App
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
@@ -20,10 +19,9 @@ import com.google.firebase.auth.FirebaseUser
 class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory =
-            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
-        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
+    private val viewModel: MainViewModel by activityViewModels {
+        val app = requireActivity().application as App
+        MainViewModelFactory(app.playerRepository)
     }
 
     private val accountViewModel: AccountViewModel by activityViewModels()
@@ -77,27 +75,28 @@ class OptionsFragment : Fragment() {
             updateUI()
         }
 
-        binding.onePlayer.PlayersEditText.setText(viewModel.players?.get(0)?.name)
-        binding.twoPlayer.PlayersEditText.setText(viewModel.players?.get(1)?.name)
-        binding.threePlayer.PlayersEditText.setText(viewModel.players?.get(2)?.name)
-        binding.fourPlayer.PlayersEditText.setText(viewModel.players?.get(3)?.name)
+        binding.onePlayer.PlayersEditText.setText(viewModel.players.value?.get(0)?.name)
+        binding.twoPlayer.PlayersEditText.setText(viewModel.players.value?.get(1)?.name)
+        binding.threePlayer.PlayersEditText.setText(viewModel.players.value?.get(2)?.name)
+        binding.fourPlayer.PlayersEditText.setText(viewModel.players.value?.get(3)?.name)
 
         binding.onePlayer.PlayersEditText.addTextChangedListener {
-            viewModel.players?.get(0)?.name = binding.onePlayer.PlayersEditText.text.toString()
+            viewModel.players.value?.get(0)?.name =
+                binding.onePlayer.PlayersEditText.text.toString()
         }
 
         binding.twoPlayer.PlayersEditText.addTextChangedListener {
-            viewModel.players?.get(1)?.name =
+            viewModel.players.value?.get(1)?.name =
                 binding.twoPlayer.PlayersEditText.text.toString()
         }
 
         binding.threePlayer.PlayersEditText.addTextChangedListener {
-            viewModel.players?.get(2)?.name =
+            viewModel.players.value?.get(2)?.name =
                 binding.threePlayer.PlayersEditText.text.toString()
         }
 
         binding.fourPlayer.PlayersEditText.addTextChangedListener {
-            viewModel.players?.get(3)?.name =
+            viewModel.players.value?.get(3)?.name =
                 binding.fourPlayer.PlayersEditText.text.toString()
         }
 
@@ -111,19 +110,19 @@ class OptionsFragment : Fragment() {
         binding.fourPlayer.controllerPlayerSwitchCompat.isChecked =
             viewModel.getController(3) == true
         binding.onePlayer.controllerPlayerSwitchCompat.setOnCheckedChangeListener { compoundButton, b ->
-            viewModel.players?.get(0)?.controllerPlayer = b
+            viewModel.players.value?.get(0)?.controllerPlayer = b
             updateUI()
         }
         binding.twoPlayer.controllerPlayerSwitchCompat.setOnCheckedChangeListener { compoundButton, b ->
-            viewModel.players?.get(1)?.controllerPlayer = b
+            viewModel.players.value?.get(1)?.controllerPlayer = b
             updateUI()
         }
         binding.threePlayer.controllerPlayerSwitchCompat.setOnCheckedChangeListener { compoundButton, b ->
-            viewModel.players?.get(2)?.controllerPlayer = b
+            viewModel.players.value?.get(2)?.controllerPlayer = b
             updateUI()
         }
         binding.fourPlayer.controllerPlayerSwitchCompat.setOnCheckedChangeListener { compoundButton, b ->
-            viewModel.players?.get(3)?.controllerPlayer = b
+            viewModel.players.value?.get(3)?.controllerPlayer = b
             updateUI()
         }
 

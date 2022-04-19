@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import androidx.fragment.app.activityViewModels
+import com.fiz.battleinthespace.core.App
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentStatisticsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
@@ -15,10 +15,9 @@ class StatisticsFragment : Fragment() {
     private var _binding: FragmentStatisticsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory =
-            MainViewModelFactory(SharedPrefPlayerStorage(requireActivity().applicationContext))
-        ViewModelProvider(requireActivity(), viewModelFactory)[MainViewModel::class.java]
+    private val viewModel: MainViewModel by activityViewModels {
+        val app = requireActivity().application as App
+        MainViewModelFactory(app.playerRepository)
     }
 
     private lateinit var adapter: StatisticsAdapter
@@ -41,7 +40,7 @@ class StatisticsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.players?.let { adapter.setData(it) }
+        viewModel.players.value?.let { adapter.setData(it) }
     }
 
     override fun onDestroyView() {

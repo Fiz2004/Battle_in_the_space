@@ -2,51 +2,29 @@ package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.fiz.battleinthespace.database.*
-import com.fiz.battleinthespace.database.module.asPlayer
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
-import io.realm.Realm
-import io.realm.RealmChangeListener
 
 class MainViewModel(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
-    var players: List<Player>?
-
-    init {
-        val list = mutableListOf<Player>()
-        for (player in playerRepository.getPlayers()!!)
-            list.add(player.asPlayer())
-        players = list
-    }
+    var players: LiveData<List<Player>> = playerRepository.getPlayers(); private set
 
     private var countPlayer: Int = playerRepository.getCountPlayers()
 
-    private var realmListener: RealmChangeListener<Realm> = RealmChangeListener {
-        val list = mutableListOf<Player>()
-        for (player in playerRepository.getPlayers()!!)
-            list.add(player.asPlayer())
-        players = list
-    }
-
-    init {
-        playerRepository.databaseRealm.addChangeListener(realmListener)
-    }
-
-    var money = MutableLiveData(0); private set
+    var money = Transformations.map(players) { it[0].money }; private set
     var type = MutableLiveData(0); private set
 
 
     fun getItems(): List<TypeItems> {
-        return players?.get(0)?.items!!
+        return players.value?.get(0)?.items ?: listOf()
     }
 
     private fun changeItems(key: Int, type: Int, value: StateProduct) {
-        players?.get(0)?.items?.get(type)?.items?.get(key)?.state = value
+        val items = players.value?.get(0)?.items?.toMutableList() ?: return
+        items[type].items[key].state = value
+        playerRepository.save(players.value?.get(0)?.copy(items = items.toList()))
     }
 
     fun setCountPlayers(numberRadioButton: Int) {
@@ -54,13 +32,13 @@ class MainViewModel(
     }
 
     fun eventClickOnMission(value: Int) {
-        players?.get(0)?.mission = value
+        playerRepository.save(players.value?.get(0)?.copy(mission = value))
     }
 
     fun savePlayers() {
         playerRepository.saveCountPlayers(countPlayer)
         for (n in 0 until countPlayer)
-            playerRepository.updatePlayer(players?.get(n)!!)
+            playerRepository.updatePlayer(players.value?.get(n))
     }
 
     fun countPlayerLiveDataEquals(value: Int): Boolean {
@@ -89,10 +67,10 @@ class MainViewModel(
             controllerPlayer = false
         )
 
-        players?.get(0)?.controllerPlayer = true
-        players?.get(1)?.controllerPlayer = false
-        players?.get(2)?.controllerPlayer = false
-        players?.get(3)?.controllerPlayer = false
+        players.value?.get(0)?.controllerPlayer = true
+        players.value?.get(1)?.controllerPlayer = false
+        players.value?.get(2)?.controllerPlayer = false
+        players.value?.get(3)?.controllerPlayer = false
 
         val player = when (count) {
             1 -> player1
@@ -105,7 +83,7 @@ class MainViewModel(
     }
 
     fun getController(index: Int): Boolean {
-        return players?.get(index)?.controllerPlayer!!
+        return players.value?.get(index)?.controllerPlayer ?: false
     }
 
     fun addSaveInstanceState(outState: Bundle) {
@@ -114,7 +92,7 @@ class MainViewModel(
             countPlayer
         )
         for (n in 0 until 4) {
-            val value = players?.get(n)
+            val value = players.value?.get(n)
                 ?: throw Error("Не доступна LiveData playerListLiveData")
 
             outState.putString("name$n", value.name)
@@ -131,7 +109,7 @@ class MainViewModel(
     fun getDataForIntent(intent: Intent): Intent {
         intent.putExtra("countPlayers", countPlayer)
         for (n in 0 until 4) {
-            val value = players?.get(n)
+            val value = players.value?.get(n)
                 ?: throw Error("Не доступна LiveData playerListLiveData")
 
             intent.putExtra("name$n", value.name)
@@ -146,11 +124,13 @@ class MainViewModel(
         index: Int,
         indexType: Int
     ) {
-        val money = players?.get(0)?.money
+        val money = players.value?.get(0)?.money
         if (money != null) {
             if (money - getItems()[indexType].items[index].cost >= 0) {
-                players?.get(0)?.money =
-                    players?.get(0)?.money?.minus(getItems()[indexType].items[index].cost)!!
+                playerRepository.save(
+                    players.value?.get(0)
+                        ?.copy(money = players.value?.get(0)?.money?.minus(getItems()[indexType].items[index].cost)!!)
+                )
                 changeItems(index, indexType, StateProduct.BUY)
             }
         }
@@ -158,12 +138,12 @@ class MainViewModel(
 
     fun gameActivityFinish(intent: Intent) {
         val score = intent.getIntExtra("score", 0)
-        players?.get(0)?.money = players?.get(0)?.money?.plus(score)!!
+        players.value?.get(0)?.money = players.value?.get(0)?.money?.plus(score)!!
         savePlayers()
     }
 
     fun initPlayerIfFirstStart() {
-        if (players == null || players!!.isEmpty())
+        if (players.value == null || players.value!!.isEmpty())
             playerRepository.fillInitValue()
     }
 
@@ -190,26 +170,20 @@ class MainViewModel(
     fun getItemsWithZero(): List<Item> {
         val type = this.type.value ?: return listOf()
         val indexType = type - 1
-        val items = players?.get(0)?.items!!
+        val items = players.value?.get(0)?.items ?: listOf()
         return Item.addZeroFirstItem(items[indexType].items)
     }
 
     override fun onCleared() {
         super.onCleared()
-        playerRepository.databaseRealm.removeChangeListener { realmListener }
         playerRepository.close()
-    }
-
-    fun getMoney(): Int {
-        return players?.get(0)?.money ?: 0
     }
 }
 
-class MainViewModelFactory(sharedPrefPlayerStorage: SharedPrefPlayerStorage) :
+class MainViewModelFactory(private val playerRepository: PlayerRepository) :
     ViewModelProvider.Factory {
-    private val dataSource = PlayerRepository(sharedPrefPlayerStorage)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(dataSource) as T
+        return MainViewModel(playerRepository) as T
     }
 }

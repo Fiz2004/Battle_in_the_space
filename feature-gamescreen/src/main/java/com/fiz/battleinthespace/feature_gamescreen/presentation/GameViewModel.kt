@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.database.Player
 import com.fiz.battleinthespace.database.PlayerRepository
-import com.fiz.battleinthespace.database.module.asPlayer
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.GameScope
 import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame
@@ -19,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class GameViewModel(extras: Bundle, context: Context) :
+class GameViewModel(private val playerRepository: PlayerRepository, extras: Bundle) :
     ViewModel() {
     private val countPlayers = extras.getInt("countPlayers")
 
@@ -27,16 +25,20 @@ class GameViewModel(extras: Bundle, context: Context) :
 
     private var stategame: StateGame? = null
 
+    val pl = playerRepository.getPlayers()
+
     init {
-        for ((index, player) in PlayerRepository(SharedPrefPlayerStorage(context)).getPlayers()!!
-            .withIndex())
-            if (index < countPlayers)
-                players[index] = player.asPlayer()
         try {
             stategame = extras.getSerializable(StateGame::class.java.simpleName) as StateGame
         } catch (e: Exception) {
 
         }
+    }
+
+    fun initpl(play: List<Player>?) {
+        for ((index, player) in play?.withIndex()!!)
+            if (index < countPlayers)
+                players[index] = player
     }
 
     var gameScope: GameScope? = null
@@ -124,9 +126,12 @@ class GameViewModel(extras: Bundle, context: Context) :
 
 }
 
-class GameViewModelFactory(private val extras: Bundle, private val context: Context) :
+class GameViewModelFactory(
+    private val playerRepository: PlayerRepository,
+    private val extras: Bundle
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GameViewModel(extras, context) as T
+        return GameViewModel(playerRepository, extras) as T
     }
 }

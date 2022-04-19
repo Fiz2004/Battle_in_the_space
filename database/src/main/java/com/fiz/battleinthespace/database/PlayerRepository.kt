@@ -1,24 +1,15 @@
 package com.fiz.battleinthespace.database
 
+import androidx.lifecycle.LiveData
+import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.firebase.DBManager
 import com.fiz.battleinthespace.database.module.PlayerRealm
-import com.fiz.battleinthespace.database.realm.PlayerDatabaseRealm
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
-import io.realm.Realm
-import io.realm.RealmConfiguration
 
-private const val DATABASE_NAME = "BITS.realm"
-
-class PlayerRepository(private val sharedPrefPlayerStorage: SharedPrefPlayerStorage) {
-    private val config = RealmConfiguration.Builder()
-        .name(DATABASE_NAME)
-        .allowWritesOnUiThread(true)
-        .allowQueriesOnUiThread(true)
-        .build()
-
-    val databaseRealm: Realm = Realm.getInstance(config)
-
-    private val playersDAO = PlayerDatabaseRealm(databaseRealm)
+class PlayerRepository(
+    private val playersLocalDataSource: PlayersLocalDataSource,
+    private val sharedPrefPlayerStorage: SharedPrefPlayerStorage
+) {
 
     private val db = DBManager()
 
@@ -53,22 +44,28 @@ class PlayerRepository(private val sharedPrefPlayerStorage: SharedPrefPlayerStor
         return sharedPrefPlayerStorage.get()
     }
 
-    fun getPlayers(): List<PlayerRealm>? = playersDAO.getAll()
+    fun getPlayers(): LiveData<List<Player>> = playersLocalDataSource.getAll()
 
-    fun getPlayer(id: Int): PlayerRealm? = playersDAO.get(id)
+    fun getPlayer(id: Int): PlayerRealm? = playersLocalDataSource.get(id)
 
     private fun addPlayer(player: Player) {
-        playersDAO.addPlayer(player)
+        playersLocalDataSource.addPlayer(player)
         //Создает уникальный ключ
         val key = db.db.push().key
         db.add(player)
     }
 
-    fun updatePlayer(player: Player) {
-        playersDAO.update(player)
+    fun updatePlayer(player: Player?) {
+        if (player == null) return
+        playersLocalDataSource.update(player)
     }
 
     fun close() {
-        databaseRealm.close()
+        playersLocalDataSource.close()
+    }
+
+    fun save(player: Player?) {
+        if (player == null) return
+        playersLocalDataSource.save(player)
     }
 }

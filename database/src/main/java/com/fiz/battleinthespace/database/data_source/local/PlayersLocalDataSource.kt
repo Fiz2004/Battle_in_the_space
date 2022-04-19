@@ -1,13 +1,32 @@
-package com.fiz.battleinthespace.database.realm
+package com.fiz.battleinthespace.database.data_source.local
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.fiz.battleinthespace.database.LiveRealmResults
 import com.fiz.battleinthespace.database.Player
 import com.fiz.battleinthespace.database.module.ItemRealm
 import com.fiz.battleinthespace.database.module.PlayerRealm
 import com.fiz.battleinthespace.database.module.TypeItemsRealm
+import com.fiz.battleinthespace.database.module.asPlayer
 import io.realm.Realm
+import io.realm.RealmChangeListener
+import io.realm.RealmConfiguration
 import io.realm.kotlin.where
 
-class PlayerDatabaseRealm(private val databaseRealm: Realm) {
+
+private const val DATABASE_NAME = "BITS.realm"
+
+class PlayersLocalDataSource {
+    private val config = RealmConfiguration.Builder()
+        .name(DATABASE_NAME)
+        .allowWritesOnUiThread(true)
+        .allowQueriesOnUiThread(true)
+        .build()
+
+    private val databaseRealm: Realm = Realm.getInstance(config)
+
+    lateinit var localListener: RealmChangeListener<Realm>
+
     fun addPlayer(player: Player) {
         update(player)
     }
@@ -38,7 +57,7 @@ class PlayerDatabaseRealm(private val databaseRealm: Realm) {
             playerRealm.items.add(typeItem)
 
         }
-        databaseRealm.executeTransactionAsync {
+        databaseRealm.executeTransaction {
             it.insertOrUpdate(playerRealm)
         }
     }
@@ -53,12 +72,24 @@ class PlayerDatabaseRealm(private val databaseRealm: Realm) {
         }
     }
 
-    fun getAll(): List<PlayerRealm>? {
-        return databaseRealm.where<PlayerRealm>().findAll()
+    fun getAll(): LiveData<List<Player>> {
+        return Transformations.map(LiveRealmResults(databaseRealm.where<PlayerRealm>().findAll())) {
+            it?.map {
+                it.asPlayer()
+            }
+        }
     }
 
     fun getCount(): Int {
         val all = databaseRealm.where<PlayerRealm>().findAll()
         return all.size
+    }
+
+    fun close() {
+        databaseRealm.close()
+    }
+
+    fun save(player: Player) {
+        update(player)
     }
 }

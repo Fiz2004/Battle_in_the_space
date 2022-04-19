@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.fiz.battleinthespace.R
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
@@ -18,9 +16,9 @@ import com.fiz.battleinthespace.ui.adapters.SectionsPagerAdapter
 import com.fiz.battleinthespace.ui.utils.ActivityContract
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by lazy {
-        val viewModelFactory = MainViewModelFactory(SharedPrefPlayerStorage(applicationContext))
-        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    private val viewModel: MainViewModel by viewModels {
+        val app = (application as com.fiz.battleinthespace.core.App)
+        MainViewModelFactory(app.playerRepository)
     }
 
     private val accountViewModel: AccountViewModel by viewModels()
