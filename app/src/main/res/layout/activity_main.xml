@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    tools:context=".base.presentation.MainActivity">
+    tools:context="com.fiz.battleinthespace.ui.MainActivity">
 
 
     <androidx.viewpager2.widget.ViewPager2
@@ -37,7 +37,7 @@
         android:contentDescription="@string/fly"
         android:text="@string/fly"
         app:fabSize="auto"
-        app:icon="@drawable/fly" />
+        app:icon="@drawable/ic_fly" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/txtForRadioGroup"
+            style="@style/TextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/select_count_players_textview"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtForRadioGroup">
+
+            <RadioButton
+                android:id="@+id/onePlayers_RadioButton"
+                style="@style/RadioButtonStyle"
+                android:layout_weight="25" />
+
+            <RadioButton
+                android:id="@+id/twoPlayers_RadioButton"
+                style="@style/RadioButtonStyle"
+                android:layout_weight="25" />
+
+            <RadioButton
+                android:id="@+id/threePlayers_RadioButton"
+                style="@style/RadioButtonStyle"
+                android:layout_weight="25" />
+
+            <RadioButton
+                android:id="@+id/fourPlayers_RadioButton"
+                style="@style/RadioButtonStyle"
+                android:layout_weight="25" />
+        </RadioGroup>
+
+
+        <include
+            android:id="@+id/onePlayer"
+            layout="@layout/card_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
+
+        <include
+            android:id="@+id/twoPlayer"
+            layout="@layout/card_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/onePlayer" />
+
+        <include
+            android:id="@+id/threePlayer"
+            layout="@layout/card_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/twoPlayer" />
+
+        <include
+            android:id="@+id/fourPlayer"
+            layout="@layout/card_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/threePlayer" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

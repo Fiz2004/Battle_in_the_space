@@ -3,21 +3,21 @@
     <item
         android:id="@+id/page_1"
         android:enabled="true"
-        android:icon="@drawable/fly"
+        android:icon="@drawable/ic_fly"
         android:title="@string/title_mission_selection" />
     <item
         android:id="@+id/page_2"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_charging_station_24"
+        android:icon="@drawable/ic_charging_station"
         android:title="@string/title_space_station" />
     <item
         android:id="@+id/page_3"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_table_rows_24"
+        android:icon="@drawable/ic_table_rows"
         android:title="@string/title_statistics" />
     <item
         android:id="@+id/page_4"
         android:enabled="true"
-        android:icon="@drawable/ic_baseline_settings_24"
+        android:icon="@drawable/ic_settings"
         android:title="@string/title_options" />
 </menu>

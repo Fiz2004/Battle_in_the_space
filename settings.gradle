@@ -7,3 +7,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Battle in the space"
 include ':app'
+include ':feature-mainscreen'
+include ':feature-gamescreen'
+include ':database'
