@@ -4,13 +4,14 @@ import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.fiz.battleinthespace.database.Player
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemStatisticBinding
 
 const val ITEM_HEADER = 0
 const val ITEM_PLAYER = 1
 
 class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var data: List<com.fiz.battleinthespace.database.Player> = listOf()
+    private var data: List<Player> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -46,11 +47,11 @@ class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return data.size
     }
 
-    fun setData(players: List<com.fiz.battleinthespace.database.Player>) {
-        data = listOf(com.fiz.battleinthespace.database.Player()) + listOf(
-            com.fiz.battleinthespace.database.Player()
+    fun setData(players: List<Player>) {
+        data = listOf(Player()) + listOf(
+            Player()
         ) + listOf(players[0]) + listOf(
-            com.fiz.battleinthespace.database.Player()
+            Player()
         ) + listOf(
             players[1],
             players[2],
@@ -62,7 +63,7 @@ class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     class StatisticViewHolder(val binding: ListItemStatisticBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(player: com.fiz.battleinthespace.database.Player) {
+        fun bind(player: Player) {
             binding.statisticTextView.text = "${player.name}: ${player.money}"
         }
     }

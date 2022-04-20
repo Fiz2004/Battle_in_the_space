@@ -17,9 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class GameViewModel(private val playerRepository: PlayerRepository, extras: Bundle) :
+class GameViewModel(private val playerRepository: PlayerRepository, extras: Bundle?) :
     ViewModel() {
-    private val countPlayers = extras.getInt("countPlayers")
+    private val countPlayers = playerRepository.getCountPlayers()
 
     private val players: MutableList<Player> = MutableList(countPlayers) { Player() }
 
@@ -29,7 +29,7 @@ class GameViewModel(private val playerRepository: PlayerRepository, extras: Bund
 
     init {
         try {
-            stategame = extras.getSerializable(StateGame::class.java.simpleName) as StateGame
+            stategame = extras?.getSerializable(StateGame::class.java.simpleName) as StateGame
         } catch (e: Exception) {
 
         }
@@ -65,7 +65,6 @@ class GameViewModel(private val playerRepository: PlayerRepository, extras: Bund
                 gameScope?.display?.surface = gameSurfaceview
                 gameScope?.display?.viewPortUpdate()
                 gameScope?.running = true
-
             }
 
             if (stategame != null)
@@ -74,6 +73,33 @@ class GameViewModel(private val playerRepository: PlayerRepository, extras: Bund
     }
 
     fun gameThreadStop() {
+        val score1 = gameScope?.stateGame?.playerGames?.get(0)?.score ?: 0
+        val score2 = gameScope?.stateGame?.playerGames?.get(1)?.score ?: 0
+        val score3 = gameScope?.stateGame?.playerGames?.get(2)?.score ?: 0
+        val score4 = gameScope?.stateGame?.playerGames?.get(3)?.score ?: 0
+
+        viewModelScope.launch {
+            pl.value?.get(0)?.let {
+                playerRepository.save(
+                    it.copy(money = it.money + score1)
+                )
+            }
+            pl.value?.get(1)?.let {
+                playerRepository.save(
+                    it.copy(money = it.money + score2)
+                )
+            }
+            pl.value?.get(2)?.let {
+                playerRepository.save(
+                    it.copy(money = it.money + score3)
+                )
+            }
+            pl.value?.get(3)?.let {
+                playerRepository.save(
+                    it.copy(money = it.money + score4)
+                )
+            }
+        }
         var retry = true
         gameScope?.running = false
         while (retry) {
@@ -128,7 +154,7 @@ class GameViewModel(private val playerRepository: PlayerRepository, extras: Bund
 
 class GameViewModelFactory(
     private val playerRepository: PlayerRepository,
-    private val extras: Bundle
+    private val extras: Bundle?
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

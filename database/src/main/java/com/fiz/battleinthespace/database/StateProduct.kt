@@ -10,7 +10,7 @@ enum class StateProductRealm2(val stateProduct: String) {
     NONE("NONE"), BUY("BUY"), INSTALL("INSTALL"),
 }
 
-open class StateProductRealm : RealmObject {
+open class StateProductRealm : RealmObject() {
     private var _stateProduct: String = StateProduct.NONE.name
     var stateProduct: StateProduct
         get() = StateProduct.values().first { it.name == _stateProduct }

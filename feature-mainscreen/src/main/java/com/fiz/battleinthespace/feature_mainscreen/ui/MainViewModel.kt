@@ -1,104 +1,66 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.*
-import com.fiz.battleinthespace.database.*
+import com.fiz.battleinthespace.database.Item
+import com.fiz.battleinthespace.database.PlayerRepository
+import com.fiz.battleinthespace.database.StateProduct
+import com.fiz.battleinthespace.database.TypeItems
+import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
-    var players: LiveData<List<Player>> = playerRepository.getPlayers(); private set
+    init {
+        if (playerRepository.isFirstLaunch())
+            viewModelScope.launch {
+                playerRepository.initFirstLaunchPlayers()
+            }
+    }
 
-    private var countPlayer: Int = playerRepository.getCountPlayers()
+    var players = playerRepository.getPlayers(); private set
+    var player = Transformations.map(players) { it[0] }; private set
+
+    var countPlayer = MutableLiveData(playerRepository.getCountPlayers()); private set
 
     var money = Transformations.map(players) { it[0].money }; private set
     var type = MutableLiveData(0); private set
 
 
     fun getItems(): List<TypeItems> {
-        return players.value?.get(0)?.items ?: listOf()
+        val player = player.value ?: return listOf()
+
+        return player.items
     }
 
     private fun changeItems(key: Int, type: Int, value: StateProduct) {
-        val items = players.value?.get(0)?.items?.toMutableList() ?: return
+        val player = player.value ?: return
+
+        val items = player.items.toMutableList()
         items[type].items[key].state = value
-        playerRepository.save(players.value?.get(0)?.copy(items = items.toList()))
+
+        viewModelScope.launch {
+            playerRepository.save(player.copy(items = items.toList()))
+        }
     }
 
     fun setCountPlayers(numberRadioButton: Int) {
-        countPlayer = numberRadioButton
+        playerRepository.saveCountPlayers(numberRadioButton)
+        countPlayer.postValue(numberRadioButton)
     }
 
-    fun eventClickOnMission(value: Int) {
-        playerRepository.save(players.value?.get(0)?.copy(mission = value))
-    }
+    fun clickOnMission(value: Int) {
+        val player = player.value ?: return
 
-    fun savePlayers() {
-        playerRepository.saveCountPlayers(countPlayer)
-        for (n in 0 until countPlayer)
-            playerRepository.updatePlayer(players.value?.get(n))
-    }
-
-    fun countPlayerLiveDataEquals(value: Int): Boolean {
-        return countPlayer == value
-    }
-
-    fun countPlayerLiveDataCompare(value: Int): Boolean {
-        return countPlayer >= value
-    }
-
-    fun onClickReset(count: Int) {
-        val player1 = Player(id = 0, name = "Player 1")
-        val player2 = Player(
-            id = 1,
-            name = "Player 2",
-            controllerPlayer = false
-        )
-        val player3 = Player(
-            id = 2,
-            name = "Player 3",
-            controllerPlayer = false
-        )
-        val player4 = Player(
-            id = 3,
-            name = "Player 4",
-            controllerPlayer = false
-        )
-
-        players.value?.get(0)?.controllerPlayer = true
-        players.value?.get(1)?.controllerPlayer = false
-        players.value?.get(2)?.controllerPlayer = false
-        players.value?.get(3)?.controllerPlayer = false
-
-        val player = when (count) {
-            1 -> player1
-            2 -> player2
-            3 -> player3
-            else -> player4
+        viewModelScope.launch {
+            playerRepository.save(player.copy(mission = value))
         }
-
-        playerRepository.updatePlayer(player)
     }
 
-    fun getController(index: Int): Boolean {
-        return players.value?.get(index)?.controllerPlayer ?: false
-    }
-
-    fun addSaveInstanceState(outState: Bundle) {
-        outState.putInt(
-            "countPlayers",
-            countPlayer
-        )
-        for (n in 0 until 4) {
-            val value = players.value?.get(n)
-                ?: throw Error("Не доступна LiveData playerListLiveData")
-
-            outState.putString("name$n", value.name)
-            outState.putBoolean("playerControllerPlayer$n", value.controllerPlayer)
-            outState.putInt("mission$n", value.mission)
-//            outState.putString("items$n", PlayerTypeConverters().fromItems(value.items))
+    fun onClickReset() {
+        viewModelScope.launch {
+            playerRepository.initFirstLaunchPlayers()
         }
     }
 
@@ -107,7 +69,6 @@ class MainViewModel(
     }
 
     fun getDataForIntent(intent: Intent): Intent {
-        intent.putExtra("countPlayers", countPlayer)
         for (n in 0 until 4) {
             val value = players.value?.get(n)
                 ?: throw Error("Не доступна LiveData playerListLiveData")
@@ -115,7 +76,6 @@ class MainViewModel(
             intent.putExtra("name$n", value.name)
             intent.putExtra("playerControllerPlayer$n", value.controllerPlayer)
             intent.putExtra("mission$n", value.mission)
-//            intent.putExtra("items$n", PlayerTypeConverters().fromItems(value.items))
         }
         return intent
     }
@@ -124,27 +84,19 @@ class MainViewModel(
         index: Int,
         indexType: Int
     ) {
-        val money = players.value?.get(0)?.money
-        if (money != null) {
-            if (money - getItems()[indexType].items[index].cost >= 0) {
+        val player = player.value ?: return
+
+        val balance = player.money - getItems()[indexType].items[index].cost
+
+        if (balance >= 0) {
+            viewModelScope.launch {
                 playerRepository.save(
-                    players.value?.get(0)
-                        ?.copy(money = players.value?.get(0)?.money?.minus(getItems()[indexType].items[index].cost)!!)
+                    player.copy(money = balance)
                 )
-                changeItems(index, indexType, StateProduct.BUY)
             }
+
+            changeItems(index, indexType, StateProduct.BUY)
         }
-    }
-
-    fun gameActivityFinish(intent: Intent) {
-        val score = intent.getIntExtra("score", 0)
-        players.value?.get(0)?.money = players.value?.get(0)?.money?.plus(score)!!
-        savePlayers()
-    }
-
-    fun initPlayerIfFirstStart() {
-        if (players.value == null || players.value!!.isEmpty())
-            playerRepository.fillInitValue()
     }
 
     fun clickItems(position: Int) {
@@ -170,13 +122,33 @@ class MainViewModel(
     fun getItemsWithZero(): List<Item> {
         val type = this.type.value ?: return listOf()
         val indexType = type - 1
-        val items = players.value?.get(0)?.items ?: listOf()
+        val items = player.value?.items ?: listOf()
         return Item.addZeroFirstItem(items[indexType].items)
     }
 
     override fun onCleared() {
         super.onCleared()
         playerRepository.close()
+    }
+
+    fun nameChanged(index: Int, newName: String) {
+        val players = players.value ?: return
+
+        viewModelScope.launch {
+            playerRepository.save(
+                players[index].copy(name = newName)
+            )
+        }
+    }
+
+    fun changeControllerPlayer(index: Int, isChecked: Boolean) {
+        val players = players.value ?: return
+
+        viewModelScope.launch {
+            playerRepository.save(
+                players[index].copy(controllerPlayer = isChecked)
+            )
+        }
     }
 }
 

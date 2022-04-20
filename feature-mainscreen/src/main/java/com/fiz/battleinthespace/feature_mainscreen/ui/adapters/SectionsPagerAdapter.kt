@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
-import com.fiz.battleinthespace.R
+import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionSelectedFragment
 import com.fiz.battleinthespace.feature_mainscreen.ui.options.OptionsFragment
 import com.fiz.battleinthespace.feature_mainscreen.ui.space_station.SpaceStationFragment

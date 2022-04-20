@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentMissionSelectedBinding
+import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.NestedSectionsPagerAdapter
@@ -19,8 +19,8 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as com.fiz.battleinthespace.App
-        MainViewModelFactory(app.playerRepository)
+        val app = requireActivity().application as ApplicationFeatureMainScreen
+        MainViewModelFactory(app.getRepositoryFeatureMainScreen())
     }
 
     override fun onCreateView(
@@ -51,7 +51,7 @@ class MissionSelectedFragment : Fragment() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                viewModel.eventClickOnMission(position)
+                viewModel.clickOnMission(position)
                 binding.viewpagerMission.currentItem = position
             }
         })

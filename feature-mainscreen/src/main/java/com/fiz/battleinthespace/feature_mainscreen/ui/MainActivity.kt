@@ -3,7 +3,7 @@ package com.fiz.battleinthespace.feature_mainscreen.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.viewModels
+import androidx.activity.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.fiz.battleinthespace.database.PlayerRepository
@@ -13,24 +13,20 @@ import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdap
 import com.fiz.battleinthespace.feature_mainscreen.ui.utils.ActivityContract
 
 interface ApplicationFeatureMainScreen {
-    fun getRepository(): PlayerRepository
+    fun getRepositoryFeatureMainScreen(): PlayerRepository
     fun getIntentForNextScreen(): Intent
 }
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         val app = (application as ApplicationFeatureMainScreen)
-        MainViewModelFactory(app.getRepository())
+        MainViewModelFactory(app.getRepositoryFeatureMainScreen())
     }
 
     private val accountViewModel: AccountViewModel by viewModels()
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
-    }
-
-    private val gameActivityLauncher = registerForActivityResult(ActivityContract()) { result ->
-        result?.let { viewModel.gameActivityFinish(result) }
     }
 
     private val googleSignInActivityLauncher =
@@ -52,8 +48,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        viewModel.initPlayerIfFirstStart()
-
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
         binding.viewpager.adapter = pagerAdapter
     }
@@ -73,9 +67,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.flyFab.setOnClickListener {
-            viewModel.savePlayers()
             val intent = (application as ApplicationFeatureMainScreen).getIntentForNextScreen()
-            gameActivityLauncher.launch(viewModel.getDataForIntent(intent))
+            startActivity(intent)
         }
     }
 
@@ -85,16 +78,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewModel.savePlayers()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.addSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
     }
 }
 

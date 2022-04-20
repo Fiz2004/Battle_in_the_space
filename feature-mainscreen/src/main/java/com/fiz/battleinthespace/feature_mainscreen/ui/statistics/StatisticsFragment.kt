@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentStatisticsBinding
+import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 
@@ -16,11 +16,11 @@ class StatisticsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as com.fiz.battleinthespace.App
-        MainViewModelFactory(app.playerRepository)
+        val app = requireActivity().application as ApplicationFeatureMainScreen
+        MainViewModelFactory(app.getRepositoryFeatureMainScreen())
     }
 
-    private lateinit var adapter: StatisticsAdapter
+    private val adapter: StatisticsAdapter by lazy { StatisticsAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,23 +28,20 @@ class StatisticsFragment : Fragment() {
     ): View {
         _binding = FragmentStatisticsBinding.inflate(inflater, container, false)
 
-        initUI()
+        binding.statisticsRecyclerView.adapter = adapter
 
         return binding.root
-    }
-
-    private fun initUI() {
-        adapter = StatisticsAdapter()
-        binding.statisticsRecyclerView.adapter = adapter
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.players.value?.let { adapter.setData(it) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.players.observe(viewLifecycleOwner) {
+            adapter.setData(it)
+        }
     }
 }

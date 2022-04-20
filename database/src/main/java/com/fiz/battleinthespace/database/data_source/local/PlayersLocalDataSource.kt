@@ -1,5 +1,8 @@
 package com.fiz.battleinthespace.database.data_source.local
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.fiz.battleinthespace.database.LiveRealmResults
 import com.fiz.battleinthespace.database.Player
 import com.fiz.battleinthespace.database.module.ItemRealm
 import com.fiz.battleinthespace.database.module.PlayerRealm
@@ -7,26 +10,25 @@ import com.fiz.battleinthespace.database.module.TypeItemsRealm
 import com.fiz.battleinthespace.database.module.asPlayer
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.query
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import io.realm.kotlin.where
 
 
 private const val DATABASE_NAME = "BITS.realm"
 
 class PlayersLocalDataSource {
-    private val config = RealmConfiguration.Builder(schema = setOf(PlayerRealm::class))
+    private val config = RealmConfiguration.Builder()
         .name(DATABASE_NAME)
-        .deleteRealmIfMigrationNeeded()
+        .allowWritesOnUiThread(true)
+        .allowQueriesOnUiThread(true)
         .build()
 
-    private val databaseRealm: Realm = Realm.open(config)
+    private val databaseRealm: Realm = Realm.getInstance(config)
 
-    suspend fun addPlayer(player: Player) {
+    fun addPlayer(player: Player) {
         update(player)
     }
 
-    suspend fun update(player: Player) {
+    fun update(player: Player) {
         val playerRealm = PlayerRealm()
         playerRealm.id = player.id
         playerRealm.name = player.name
@@ -52,31 +54,33 @@ class PlayersLocalDataSource {
             playerRealm.items.add(typeItem)
 
         }
-        databaseRealm.write {
-            copyToRealm(playerRealm)
+        databaseRealm.executeTransaction {
+            it.insertOrUpdate(playerRealm)
         }
     }
 
-    fun get(id: Int): Player {
-        return databaseRealm.query<PlayerRealm>("id==$0", id).first().find()?.asPlayer() ?: Player()
+    fun get(id: Int): Player? {
+        return databaseRealm.where<PlayerRealm>().equalTo("id", id).findFirst()?.asPlayer()
     }
 
-    suspend fun clear() {
-        databaseRealm.write {
-            val playerAll = query<PlayerRealm>().find()
-            delete(playerAll)
+    fun clear() {
+        databaseRealm.executeTransactionAsync {
+            it.deleteAll()
         }
     }
 
-    fun getAll(): Flow<List<Player>> {
-        return flow {
-            databaseRealm.query<PlayerRealm>()
-                .asFlow().collect { emit(it.list.map { it.asPlayer() }) }
+    private val all = LiveRealmResults(databaseRealm.where<PlayerRealm>().findAll())
+
+    fun getAll(): LiveData<List<Player>> {
+        return Transformations.map(all) {
+            it?.map {
+                it.asPlayer()
+            }
         }
     }
 
     fun getCount(): Int {
-        val all = databaseRealm.query<PlayerRealm>().find()
+        val all = databaseRealm.where<PlayerRealm>().findAll()
         return all.size
     }
 
@@ -84,7 +88,7 @@ class PlayersLocalDataSource {
         databaseRealm.close()
     }
 
-    suspend fun save(player: Player) {
+    fun save(player: Player) {
         update(player)
     }
 }

@@ -1,20 +1,26 @@
 package com.fiz.battleinthespace.feature_gamescreen.presentation
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.fiz.battleinthespace.App
+import com.fiz.battleinthespace.database.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.Display
 import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame
 
+interface ApplicationFeatureGameScreen {
+    fun getRepositoryFeatureGameScreen(): PlayerRepository
+}
+
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private val viewModel: GameViewModel by viewModels {
-        GameViewModelFactory((application as com.fiz.battleinthespace.App).playerRepository, extras)
+        GameViewModelFactory(
+            (application as ApplicationFeatureGameScreen).getRepositoryFeatureGameScreen(),
+            extras
+        )
     }
 
     private val binding: ActivityGameBinding by lazy {
@@ -24,13 +30,13 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private var isGameSurfaceViewReady = false
     private var isInformationSurfaceViewReady = false
 
-    private lateinit var extras: Bundle
+    private var extras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        extras = intent.extras ?: return
+        extras = intent.extras
 
         binding.newGameGameButton.setOnClickListener {
             viewModel.clickNewGameButton()
@@ -72,10 +78,6 @@ class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     }
 
     private fun finishActivity() {
-        val data = Intent()
-        val score = viewModel.gameScope?.stateGame?.playerGames?.get(0)?.score
-        data.putExtra("score", score)
-        setResult(RESULT_OK, data)
         viewModel.gameThreadStop()
         finish()
     }
