@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.core.App
+import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentMissionSelectedBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
-import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
+import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.NestedSectionsPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MissionSelectedFragment : Fragment() {
@@ -19,7 +19,7 @@ class MissionSelectedFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as App
+        val app = requireActivity().application as com.fiz.battleinthespace.App
         MainViewModelFactory(app.playerRepository)
     }
 
@@ -29,11 +29,11 @@ class MissionSelectedFragment : Fragment() {
     ): View {
         _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
 
-        val pagerAdapter = SectionsPagerAdapter(this)
+        val pagerAdapter = NestedSectionsPagerAdapter(this)
         binding.viewpagerMission.adapter = pagerAdapter
 
         TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
-            tab.text = resources.getText(SectionsPagerAdapter.getTitle(position))
+            tab.text = resources.getText(NestedSectionsPagerAdapter.getTitle(position))
         }.attach()
 
         return binding.root

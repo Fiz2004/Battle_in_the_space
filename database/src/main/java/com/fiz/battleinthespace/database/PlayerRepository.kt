@@ -1,10 +1,9 @@
 package com.fiz.battleinthespace.database
 
-import androidx.lifecycle.LiveData
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.firebase.DBManager
-import com.fiz.battleinthespace.database.module.PlayerRealm
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import kotlinx.coroutines.flow.Flow
 
 class PlayerRepository(
     private val playersLocalDataSource: PlayersLocalDataSource,
@@ -13,7 +12,7 @@ class PlayerRepository(
 
     private val db = DBManager()
 
-    fun fillInitValue() {
+    suspend fun fillInitValue() {
         val player1 = Player(id = 0, name = "Player 1")
         val player2 = Player(
             id = 1,
@@ -44,18 +43,18 @@ class PlayerRepository(
         return sharedPrefPlayerStorage.get()
     }
 
-    fun getPlayers(): LiveData<List<Player>> = playersLocalDataSource.getAll()
+    fun getPlayers(): Flow<List<Player>> = playersLocalDataSource.getAll()
 
-    fun getPlayer(id: Int): PlayerRealm? = playersLocalDataSource.get(id)
+    fun getPlayer(id: Int): Player = playersLocalDataSource.get(id)
 
-    private fun addPlayer(player: Player) {
+    private suspend fun addPlayer(player: Player) {
         playersLocalDataSource.addPlayer(player)
         //Создает уникальный ключ
         val key = db.db.push().key
         db.add(player)
     }
 
-    fun updatePlayer(player: Player?) {
+    suspend fun updatePlayer(player: Player?) {
         if (player == null) return
         playersLocalDataSource.update(player)
     }
@@ -64,7 +63,7 @@ class PlayerRepository(
         playersLocalDataSource.close()
     }
 
-    fun save(player: Player?) {
+    suspend fun save(player: Player?) {
         if (player == null) return
         playersLocalDataSource.save(player)
     }

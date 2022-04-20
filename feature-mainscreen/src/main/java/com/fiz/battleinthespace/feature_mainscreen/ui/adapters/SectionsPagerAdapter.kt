@@ -1,29 +1,37 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
+import android.content.Context
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.fiz.battleinthespace.feature_mainscreen.R
-import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionDestroyMeteoriteFragment
-import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionDestroySpaceShipsFragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import com.fiz.battleinthespace.R
+import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionSelectedFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.options.OptionsFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.space_station.SpaceStationFragment
+import com.fiz.battleinthespace.feature_mainscreen.ui.statistics.StatisticsFragment
 
-class SectionsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
+    androidx.viewpager2.adapter.FragmentStateAdapter(fm, lc) {
     override fun getItemCount(): Int {
-        return 2
+        return 4
     }
 
     override fun createFragment(position: Int): Fragment {
-        val fragment = when (position) {
-            0 -> MissionDestroyMeteoriteFragment()
-            else -> MissionDestroySpaceShipsFragment()
+        return when (position) {
+            0 -> MissionSelectedFragment()
+            1 -> SpaceStationFragment()
+            2 -> StatisticsFragment()
+            else -> OptionsFragment()
         }
-        return fragment
     }
 
     companion object {
-        fun getTitle(position: Int): Int {
+        fun getTitle(context: Context, position: Int): CharSequence {
             return when (position) {
-                0 -> R.string.mission_destroy_meteorites
-                else -> R.string.mission_destroy_spaceships
+                0 -> context.resources.getText(R.string.title_mission_selection)
+                1 -> context.resources.getText(R.string.title_space_station)
+                2 -> context.resources.getText(R.string.title_statistics)
+                else -> context.resources.getText(R.string.title_options)
             }
         }
     }

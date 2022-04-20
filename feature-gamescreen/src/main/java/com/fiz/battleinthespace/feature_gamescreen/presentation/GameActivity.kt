@@ -6,7 +6,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.fiz.battleinthespace.core.App
+import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.Display
@@ -14,7 +14,7 @@ import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private val viewModel: GameViewModel by viewModels {
-        GameViewModelFactory((application as App).playerRepository, extras)
+        GameViewModelFactory((application as com.fiz.battleinthespace.App).playerRepository, extras)
     }
 
     private val binding: ActivityGameBinding by lazy {

@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.ui.utils
+package com.fiz.battleinthespace.feature_mainscreen.ui.utils
 
 import android.content.Context
 import android.content.Intent

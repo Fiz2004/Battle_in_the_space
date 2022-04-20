@@ -7,16 +7,17 @@ import com.fiz.battleinthespace.database.StateProduct
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import io.realm.realmListOf
 
 
-open class PlayerRealm : RealmObject() {
+class PlayerRealm : RealmObject {
     @PrimaryKey
     var id: Int = 0
     var name: String = "Player"
     var controllerPlayer: Boolean = true
     var mission: Int = 0
     var money: Int = 1000
-    var items: RealmList<TypeItemsRealm> = RealmList()
+    var items: RealmList<TypeItemsRealm> = realmListOf()
 }
 
 fun PlayerRealm.asPlayer(): Player {

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.core.App
+import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
@@ -20,7 +20,7 @@ class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
     private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as App
+        val app = requireActivity().application as com.fiz.battleinthespace.App
         MainViewModelFactory(app.playerRepository)
     }
 

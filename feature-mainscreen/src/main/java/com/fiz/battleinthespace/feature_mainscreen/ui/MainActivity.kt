@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.ui
+package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,19 +6,21 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.R
-import com.fiz.battleinthespace.databinding.ActivityMainBinding
-import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
-import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
-import com.fiz.battleinthespace.ui.adapters.SectionsPagerAdapter
-import com.fiz.battleinthespace.ui.utils.ActivityContract
+import com.fiz.battleinthespace.database.PlayerRepository
+import com.fiz.battleinthespace.feature_mainscreen.R
+import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
+import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
+import com.fiz.battleinthespace.feature_mainscreen.ui.utils.ActivityContract
+
+interface ApplicationFeatureMainScreen {
+    fun getRepository(): PlayerRepository
+    fun getIntentForNextScreen(): Intent
+}
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
-        val app = (application as com.fiz.battleinthespace.core.App)
-        MainViewModelFactory(app.playerRepository)
+        val app = (application as ApplicationFeatureMainScreen)
+        MainViewModelFactory(app.getRepository())
     }
 
     private val accountViewModel: AccountViewModel by viewModels()
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.flyFab.setOnClickListener {
             viewModel.savePlayers()
-            val intent = Intent(this, GameActivity::class.java)
+            val intent = (application as ApplicationFeatureMainScreen).getIntentForNextScreen()
             gameActivityLauncher.launch(viewModel.getDataForIntent(intent))
         }
     }

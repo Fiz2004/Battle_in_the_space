@@ -1,13 +1,15 @@
-package com.fiz.battleinthespace.core
+package com.fiz.battleinthespace.app
 
 import android.app.Application
+import android.content.Intent
 import com.fiz.battleinthespace.database.PlayerRepository
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
+import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.google.android.material.color.DynamicColors
-import io.realm.Realm
 
-class App : Application() {
+class App : Application(), ApplicationFeatureMainScreen {
     private val playersLocalDataSource: PlayersLocalDataSource by lazy {
         PlayersLocalDataSource()
     }
@@ -19,6 +21,13 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         DynamicColors.applyToActivitiesIfAvailable(this)
-        Realm.init(this)
+    }
+
+    override fun getRepository(): PlayerRepository {
+        return playerRepository
+    }
+
+    override fun getIntentForNextScreen(): Intent {
+        return Intent(this, GameActivity::class.java)
     }
 }

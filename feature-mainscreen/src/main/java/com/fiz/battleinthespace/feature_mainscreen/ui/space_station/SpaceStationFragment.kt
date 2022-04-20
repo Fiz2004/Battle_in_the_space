@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.core.App
+import com.fiz.battleinthespace.App
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentSpaceStationBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
@@ -16,7 +16,7 @@ import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.TypeItemsAdapter
 
 class SpaceStationFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as App
+        val app = requireActivity().application as com.fiz.battleinthespace.App
         MainViewModelFactory(app.playerRepository)
     }
 
