@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.activity.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.database.PlayerRepository
+import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter

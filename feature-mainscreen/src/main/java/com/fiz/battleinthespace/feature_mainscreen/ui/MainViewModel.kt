@@ -2,10 +2,10 @@ package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.content.Intent
 import androidx.lifecycle.*
-import com.fiz.battleinthespace.database.Item
-import com.fiz.battleinthespace.database.PlayerRepository
-import com.fiz.battleinthespace.database.StateProduct
-import com.fiz.battleinthespace.database.TypeItems
+import com.fiz.battleinthespace.database.models.Item
+import com.fiz.battleinthespace.database.models.StateProduct
+import com.fiz.battleinthespace.database.models.TypeItems
+import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(

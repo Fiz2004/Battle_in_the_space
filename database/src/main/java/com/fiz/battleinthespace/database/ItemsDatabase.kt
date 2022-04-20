@@ -1,5 +1,9 @@
 package com.fiz.battleinthespace.database
 
+import com.fiz.battleinthespace.database.models.Item
+import com.fiz.battleinthespace.database.models.StateProduct
+import com.fiz.battleinthespace.database.models.TypeItems
+
 class ItemsDatabase {
     companion object {
         fun getStartItems(): List<TypeItems> {

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.battleinthespace.database.TypeItems
+import com.fiz.battleinthespace.database.models.TypeItems
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemTypeItemsBinding
 
 class TypeItemsAdapter(

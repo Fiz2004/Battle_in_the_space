@@ -1,7 +1,7 @@
 package com.fiz.battleinthespace.database.data_source.network
 
-import com.fiz.battleinthespace.database.Player
 import com.fiz.battleinthespace.database.firebase.DBManager
+import com.fiz.battleinthespace.database.models.Player
 
 class PlayersRemoteDataSource {
     private val db = DBManager()

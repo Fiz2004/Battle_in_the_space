@@ -5,7 +5,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.fiz.battleinthespace.database.PlayerRepository
+import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.Display

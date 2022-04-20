@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.media.SoundPool
 import android.util.SparseIntArray
 import android.view.SurfaceView
-import com.fiz.battleinthespace.database.Player
+import com.fiz.battleinthespace.database.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.ListActors
 import kotlin.math.min

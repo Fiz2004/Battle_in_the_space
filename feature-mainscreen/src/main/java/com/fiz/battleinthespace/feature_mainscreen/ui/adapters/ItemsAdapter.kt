@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.battleinthespace.database.Item
-import com.fiz.battleinthespace.database.StateProduct
+import com.fiz.battleinthespace.database.models.Item
+import com.fiz.battleinthespace.database.models.StateProduct
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemItemBinding
 import com.google.android.material.color.MaterialColors

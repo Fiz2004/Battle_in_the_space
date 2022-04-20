@@ -2,9 +2,9 @@ package com.fiz.battleinthespace.app
 
 import android.app.Application
 import android.content.Intent
-import com.fiz.battleinthespace.database.PlayerRepository
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
-import com.fiz.battleinthespace.database.storage.SharedPrefPlayerStorage
+import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
+import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.presentation.ApplicationFeatureGameScreen
 import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
 import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
@@ -30,11 +30,11 @@ class App : Application(), ApplicationFeatureMainScreen, ApplicationFeatureGameS
         return playerRepository
     }
 
-    override fun getIntentForNextScreen(): Intent {
-        return Intent(this, GameActivity::class.java)
-    }
-
     override fun getRepositoryFeatureGameScreen(): PlayerRepository {
         return playerRepository
+    }
+
+    override fun getIntentForNextScreen(): Intent {
+        return Intent(this, GameActivity::class.java)
     }
 }

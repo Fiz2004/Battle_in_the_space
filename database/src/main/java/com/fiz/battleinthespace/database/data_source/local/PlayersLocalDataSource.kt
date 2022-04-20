@@ -2,12 +2,12 @@ package com.fiz.battleinthespace.database.data_source.local
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.fiz.battleinthespace.database.LiveRealmResults
-import com.fiz.battleinthespace.database.Player
-import com.fiz.battleinthespace.database.module.ItemRealm
-import com.fiz.battleinthespace.database.module.PlayerRealm
-import com.fiz.battleinthespace.database.module.TypeItemsRealm
-import com.fiz.battleinthespace.database.module.asPlayer
+import com.fiz.battleinthespace.database.entity.ItemRealm
+import com.fiz.battleinthespace.database.entity.PlayerRealm
+import com.fiz.battleinthespace.database.entity.TypeItemsRealm
+import com.fiz.battleinthespace.database.entity.asPlayer
+import com.fiz.battleinthespace.database.models.Player
+import com.fiz.battleinthespace.database.utils.LiveRealmResults
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.kotlin.where

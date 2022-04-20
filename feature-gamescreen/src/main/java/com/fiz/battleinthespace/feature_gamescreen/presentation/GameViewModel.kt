@@ -7,8 +7,8 @@ import android.view.SurfaceView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.fiz.battleinthespace.database.Player
-import com.fiz.battleinthespace.database.PlayerRepository
+import com.fiz.battleinthespace.database.models.Player
+import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.GameScope
 import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.battleinthespace.database.Player
+import com.fiz.battleinthespace.database.models.Player
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemStatisticBinding
 
 const val ITEM_HEADER = 0

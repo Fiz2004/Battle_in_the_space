@@ -1,6 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import com.fiz.battleinthespace.database.Player
+import com.fiz.battleinthespace.database.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.ListActors
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.PlayerGame
 import java.io.Serializable
