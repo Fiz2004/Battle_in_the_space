@@ -6,21 +6,28 @@ import android.widget.Toast
 import androidx.activity.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.database.repositories.PlayerRepository
+import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
+import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.feature_mainscreen.R
+import com.fiz.battleinthespace.feature_mainscreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
 import com.fiz.battleinthespace.feature_mainscreen.ui.utils.ActivityContract
 
 interface ApplicationFeatureMainScreen {
-    fun getRepositoryFeatureMainScreen(): PlayerRepository
+    fun getPlayersLocalDataSourceFeatureMainScreen(): PlayersLocalDataSource
+    fun getSharedPrefPlayerStorageFeatureMainScreen(): SharedPrefPlayerStorage
     fun getIntentForNextScreen(): Intent
 }
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         val app = (application as ApplicationFeatureMainScreen)
-        MainViewModelFactory(app.getRepositoryFeatureMainScreen())
+        val playerRepository = PlayerRepositoryImpl(
+            app.getPlayersLocalDataSourceFeatureMainScreen(),
+            app.getSharedPrefPlayerStorageFeatureMainScreen()
+        )
+        MainViewModelFactory(playerRepository)
     }
 
     private val accountViewModel: AccountViewModel by viewModels()

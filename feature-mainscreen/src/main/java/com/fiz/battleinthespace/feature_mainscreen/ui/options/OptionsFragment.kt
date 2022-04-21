@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.fiz.battleinthespace.common.setVisible
 import com.fiz.battleinthespace.feature_mainscreen.R
+import com.fiz.battleinthespace.feature_mainscreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
@@ -25,7 +26,11 @@ class OptionsFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels {
         val app = requireActivity().application as ApplicationFeatureMainScreen
-        MainViewModelFactory(app.getRepositoryFeatureMainScreen())
+        val playerRepository = PlayerRepositoryImpl(
+            app.getPlayersLocalDataSourceFeatureMainScreen(),
+            app.getSharedPrefPlayerStorageFeatureMainScreen()
+        )
+        MainViewModelFactory(playerRepository)
     }
 
     private val accountViewModel: AccountViewModel by activityViewModels()

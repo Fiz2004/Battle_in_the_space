@@ -5,20 +5,28 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.fiz.battleinthespace.database.repositories.PlayerRepository
+import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
+import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.feature_gamescreen.R
+import com.fiz.battleinthespace.feature_gamescreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.Display
 import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame
 
 interface ApplicationFeatureGameScreen {
-    fun getRepositoryFeatureGameScreen(): PlayerRepository
+    fun getPlayersLocalDataSourceFeatureGameScreen(): PlayersLocalDataSource
+    fun getSharedPrefPlayerStorageFeatureGameScreen(): SharedPrefPlayerStorage
 }
 
 class GameActivity : AppCompatActivity(), Display.Companion.Listener {
     private val viewModel: GameViewModel by viewModels {
+        val app = (application as ApplicationFeatureGameScreen)
+        val playerRepository = PlayerRepositoryImpl(
+            app.getPlayersLocalDataSourceFeatureGameScreen(),
+            app.getSharedPrefPlayerStorageFeatureGameScreen()
+        )
         GameViewModelFactory(
-            (application as ApplicationFeatureGameScreen).getRepositoryFeatureGameScreen(),
+            playerRepository,
             extras
         )
     }

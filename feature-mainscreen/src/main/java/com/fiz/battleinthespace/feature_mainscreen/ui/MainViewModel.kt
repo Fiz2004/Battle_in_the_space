@@ -1,11 +1,10 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui
 
-import android.content.Intent
 import androidx.lifecycle.*
 import com.fiz.battleinthespace.database.models.Item
 import com.fiz.battleinthespace.database.models.StateProduct
 import com.fiz.battleinthespace.database.models.TypeItems
-import com.fiz.battleinthespace.database.repositories.PlayerRepository
+import com.fiz.battleinthespace.feature_mainscreen.domain.PlayerRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -41,7 +40,7 @@ class MainViewModel(
         items[type].items[key].state = value
 
         viewModelScope.launch {
-            playerRepository.save(player.copy(items = items.toList()))
+            playerRepository.savePlayer(player.copy(items = items.toList()))
         }
     }
 
@@ -54,7 +53,7 @@ class MainViewModel(
         val player = player.value ?: return
 
         viewModelScope.launch {
-            playerRepository.save(player.copy(mission = value))
+            playerRepository.savePlayer(player.copy(mission = value))
         }
     }
 
@@ -68,18 +67,6 @@ class MainViewModel(
         type.postValue(value)
     }
 
-    fun getDataForIntent(intent: Intent): Intent {
-        for (n in 0 until 4) {
-            val value = players.value?.get(n)
-                ?: throw Error("Не доступна LiveData playerListLiveData")
-
-            intent.putExtra("name$n", value.name)
-            intent.putExtra("playerControllerPlayer$n", value.controllerPlayer)
-            intent.putExtra("mission$n", value.mission)
-        }
-        return intent
-    }
-
     private fun buyItem(
         index: Int,
         indexType: Int
@@ -90,7 +77,7 @@ class MainViewModel(
 
         if (balance >= 0) {
             viewModelScope.launch {
-                playerRepository.save(
+                playerRepository.savePlayer(
                     player.copy(money = balance)
                 )
             }
@@ -126,16 +113,12 @@ class MainViewModel(
         return Item.addZeroFirstItem(items[indexType].items)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        playerRepository.close()
-    }
-
     fun nameChanged(index: Int, newName: String) {
         val players = players.value ?: return
+        if (players[index].name == newName) return
 
         viewModelScope.launch {
-            playerRepository.save(
+            playerRepository.savePlayer(
                 players[index].copy(name = newName)
             )
         }
@@ -145,7 +128,7 @@ class MainViewModel(
         val players = players.value ?: return
 
         viewModelScope.launch {
-            playerRepository.save(
+            playerRepository.savePlayer(
                 players[index].copy(controllerPlayer = isChecked)
             )
         }

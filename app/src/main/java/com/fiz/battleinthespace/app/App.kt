@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Intent
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
-import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.presentation.ApplicationFeatureGameScreen
 import com.fiz.battleinthespace.feature_gamescreen.presentation.GameActivity
 import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
@@ -16,8 +15,8 @@ class App : Application(), ApplicationFeatureMainScreen, ApplicationFeatureGameS
         PlayersLocalDataSource()
     }
 
-    private val playerRepository: PlayerRepository by lazy {
-        PlayerRepository(playersLocalDataSource, SharedPrefPlayerStorage(applicationContext))
+    private val sharedPrefPlayerStorage: SharedPrefPlayerStorage by lazy {
+        SharedPrefPlayerStorage(applicationContext)
     }
 
     override fun onCreate() {
@@ -26,12 +25,25 @@ class App : Application(), ApplicationFeatureMainScreen, ApplicationFeatureGameS
         Realm.init(this)
     }
 
-    override fun getRepositoryFeatureMainScreen(): PlayerRepository {
-        return playerRepository
+    override fun onTerminate() {
+        super.onTerminate()
+        playersLocalDataSource.close()
     }
 
-    override fun getRepositoryFeatureGameScreen(): PlayerRepository {
-        return playerRepository
+    override fun getPlayersLocalDataSourceFeatureMainScreen(): PlayersLocalDataSource {
+        return playersLocalDataSource
+    }
+
+    override fun getPlayersLocalDataSourceFeatureGameScreen(): PlayersLocalDataSource {
+        return playersLocalDataSource
+    }
+
+    override fun getSharedPrefPlayerStorageFeatureMainScreen(): SharedPrefPlayerStorage {
+        return sharedPrefPlayerStorage
+    }
+
+    override fun getSharedPrefPlayerStorageFeatureGameScreen(): SharedPrefPlayerStorage {
+        return sharedPrefPlayerStorage
     }
 
     override fun getIntentForNextScreen(): Intent {

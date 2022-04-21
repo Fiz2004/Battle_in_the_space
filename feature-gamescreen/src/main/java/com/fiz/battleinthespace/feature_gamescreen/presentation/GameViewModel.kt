@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.database.models.Player
-import com.fiz.battleinthespace.database.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.GameScope
+import com.fiz.battleinthespace.feature_gamescreen.domain.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.domain.StateGame
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -149,7 +149,6 @@ class GameViewModel(private val playerRepository: PlayerRepository, extras: Bund
             MotionEvent.ACTION_MOVE -> gameScope?.controllers?.get(0)?.move(event)
         }
     }
-
 }
 
 class GameViewModelFactory(

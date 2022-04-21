@@ -1,49 +1,39 @@
-package com.fiz.battleinthespace.database.repositories
+package com.fiz.battleinthespace.feature_mainscreen.data.repositories
 
 import androidx.lifecycle.LiveData
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.database.models.Player
+import com.fiz.battleinthespace.feature_mainscreen.domain.PlayerRepository
 
-class PlayerRepository(
+class PlayerRepositoryImpl(
     private val playersLocalDataSource: PlayersLocalDataSource,
     private val sharedPrefPlayerStorage: SharedPrefPlayerStorage
-) {
-    fun saveCountPlayers(count: Int): Boolean {
+) : PlayerRepository {
+    override fun saveCountPlayers(count: Int): Boolean {
         return sharedPrefPlayerStorage.saveCountPlayers(count)
     }
 
-    fun getCountPlayers(): Int {
+    override fun getCountPlayers(): Int {
         return sharedPrefPlayerStorage.getCountPlayers()
     }
 
-    fun getPlayers(): LiveData<List<Player>> = playersLocalDataSource.getAll()
+    override fun getPlayers(): LiveData<List<Player>> = playersLocalDataSource.getAll()
 
-    fun getPlayer(id: Int): Player? = playersLocalDataSource.get(id)
-
-    private suspend fun addPlayer(player: Player) {
+    private fun addPlayer(player: Player) {
         playersLocalDataSource.addPlayer(player)
     }
 
-    suspend fun updatePlayer(player: Player?) {
-        if (player == null) return
-        playersLocalDataSource.update(player)
-    }
-
-    fun close() {
-        playersLocalDataSource.close()
-    }
-
-    suspend fun save(player: Player?) {
+    override suspend fun savePlayer(player: Player?) {
         if (player == null) return
         playersLocalDataSource.save(player)
     }
 
-    fun isFirstLaunch(): Boolean {
+    override fun isFirstLaunch(): Boolean {
         return sharedPrefPlayerStorage.loadIsFirstLaunch()
     }
 
-    suspend fun initFirstLaunchPlayers() {
+    override suspend fun initFirstLaunchPlayers() {
         val player1 = Player(id = 0, name = "Player 1")
         val player2 = Player(
             id = 1,
