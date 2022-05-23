@@ -18,7 +18,9 @@ private const val DIVISION_BY_SCREEN = 11
 class Display(
     surfaceWidth: Int, surfaceHeight: Int,
     private var stateGame: GameState,
-    val bitmapRepository: BitmapRepository
+    val bitmapRepository: BitmapRepository,
+    private val leftLocationOnScreen: Int,
+    private val topLocationOnScreen: Int
 ) {
 
     private val paint: Paint = Paint()
@@ -38,9 +40,7 @@ class Display(
     fun render(
         stateGame: GameState,
         canvas: Canvas,
-        controller: Controller,
-        leftLocationOnScreen: Int,
-        topLocationOnScreen: Int
+        controller: Controller
     ) {
         this.stateGame = stateGame
         this.canvas = canvas
@@ -264,18 +264,18 @@ class Display(
 
         val maxTextWidth = getMaxTextWidth(paintFont)
 
-        for (n in 0 until stateGame.players.size) {
+        for (n in 0 until stateGame.level.players.size) {
             paintFont.textSize = textSize
             paintFont.textAlign = Paint.Align.LEFT
             paintFont.color = getColor(n)
             canvasInfo.drawText(
-                stateGame.players[n].name,
+                stateGame.level.players[n].name,
                 0F,
                 baseTextSize + (textSize * (n + 1)),
                 paintFont
             )
 
-            for (k in 0 until stateGame.players[n].life)
+            for (k in 0 until stateGame.level.players[n].life)
                 canvasInfo.drawBitmap(
                     bitmapRepository.bmpSpaceshipLife[n], rectSrc,
                     RectF(
@@ -288,7 +288,7 @@ class Display(
                 )
 
             canvasInfo.drawText(
-                stateGame.players[n].score.toString(),
+                stateGame.level.players[n].score.toString(),
                 (maxTextWidth + bmplife * 2).toFloat(),
                 baseTextSize + textSize * (n + 1),
                 paintFont
@@ -315,7 +315,7 @@ class Display(
 
     private fun getMaxTextWidth(paintFont: Paint): Int {
         var result = 0
-        for (namePlayer in stateGame.players) {
+        for (namePlayer in stateGame.level.players) {
             val mTextBoundRect = Rect(0, 0, 0, 0)
             paintFont.getTextBounds(namePlayer.name, 0, namePlayer.name.length, mTextBoundRect)
             val textWidth = mTextBoundRect.width()

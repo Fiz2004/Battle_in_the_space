@@ -51,7 +51,7 @@ abstract class MoveableActor(
             field = Vec(x, y)
         }
 
-    open fun update(deltaTime: Double, width: Double, height: Double) {
+    open fun update(deltaTime: Double, width: Int, height: Int) {
         center += speed * deltaTime
 
         if (center.x > width)

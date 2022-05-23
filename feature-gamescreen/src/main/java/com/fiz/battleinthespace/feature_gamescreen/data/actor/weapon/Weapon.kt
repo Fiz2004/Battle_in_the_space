@@ -5,7 +5,7 @@ import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import kotlin.math.sqrt
 
-open abstract class Weapon(
+abstract class Weapon(
     center: Vec,
 
     speed: Vec,
@@ -25,7 +25,7 @@ open abstract class Weapon(
 
     open var roadLengthMax: Double = 6.0
 
-    override fun update(deltaTime: Double, width: Double, height: Double) {
+    override fun update(deltaTime: Double, width: Int, height: Int) {
         super.update(deltaTime, width, height)
         roadLength += sqrt(speed.sumPow2()) * deltaTime
     }

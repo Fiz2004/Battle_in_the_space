@@ -46,7 +46,7 @@ class Missile(
         }
     }
 
-    override fun update(deltaTime: Double, width: Double, height: Double) {
+    override fun update(deltaTime: Double, width: Int, height: Int) {
         super.update(deltaTime, width, height)
         roadLength += sqrt(speed.sumPow2()) * deltaTime
     }

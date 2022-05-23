@@ -66,18 +66,11 @@ class GameActivity : AppCompatActivity() {
                         val now = System.currentTimeMillis()
                         val fps = (1000 / (now - prevTime)).toInt()
 
-                        val a = IntArray(2)
-                        binding.gameGameSurfaceview.getLocationOnScreen(a)
-                        val left = a[0]
-                        val top = a[1]
-
                         binding.gameGameSurfaceview.holder.lockCanvas()?.let {
                             display.render(
                                 gameState,
                                 it,
-                                gameState.controllers[0],
-                                left,
-                                top
+                                gameState.controllers[0]
                             )
                             binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
@@ -87,10 +80,11 @@ class GameActivity : AppCompatActivity() {
                             binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
 
-                        binding.pauseGameButton.text = if (gameState.status == "pause")
-                            resources.getString(R.string.resume_game_button)
-                        else
-                            resources.getString(R.string.pause_game_button)
+                        binding.pauseGameButton.text =
+                            if (gameState.status == GameState.Companion.StatusCurrentGame.Pause)
+                                resources.getString(R.string.resume_game_button)
+                            else
+                                resources.getString(R.string.pause_game_button)
 
                         prevTime = now
 
@@ -131,11 +125,20 @@ class GameActivity : AppCompatActivity() {
     inner class GameSurfaceView : SurfaceHolder.Callback {
         override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
             isGameSurfaceViewReady = true
+
+
+            val a = IntArray(2)
+            binding.gameGameSurfaceview.getLocationOnScreen(a)
+            val left = a[0]
+            val top = a[1]
+
             display = Display(
                 binding.gameGameSurfaceview.width,
                 binding.gameGameSurfaceview.height,
                 viewModel.gameState.value,
-                bitmapRepository
+                bitmapRepository,
+                left,
+                top
             )
             startGame()
         }

@@ -6,7 +6,7 @@ import kotlin.math.ceil
 
 class Viewport(
     surfaceWidth: Int, surfaceHeight: Int,
-    stateGameWidth: Double, stateGameHeight: Double, sizeUnit: Float
+    stateGameWidth: Int, stateGameHeight: Int, sizeUnit: Float
 ) {
     var left: Double = 0.0
     var top: Double = 0.0
@@ -14,8 +14,8 @@ class Viewport(
     val width: Double = (surfaceWidth / sizeUnit).toDouble()
     val height: Double = (surfaceHeight / sizeUnit).toDouble()
 
-    private val levelWidth: Double = stateGameWidth
-    private val levelHeight: Double = stateGameHeight
+    private val levelWidth: Int = stateGameWidth
+    private val levelHeight: Int = stateGameHeight
 
     private val marginX: Float = surfaceWidth / sizeUnit / 2
     private val marginY: Float = surfaceHeight / sizeUnit / 2
@@ -32,7 +32,7 @@ class Viewport(
 
     fun update(stateGame: GameState) {
         val spaceship =
-            stateGame.level.listActors.spaceShips[stateGame.players.indexOf(stateGame.players.find { it.main })]
+            stateGame.level.listActors.spaceShips[stateGame.level.players.indexOf(stateGame.level.players.find { it.main })]
         val center = spaceship.center
 
         left = center.x - marginX

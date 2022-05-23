@@ -7,9 +7,9 @@ object Physics {
     var width: Double = 0.0
     var height: Double = 0.0
 
-    fun createWorld(width: Double, height: Double) {
-        Physics.width = width
-        Physics.height = height
+    fun createWorld(width: Int, height: Int) {
+        Physics.width = width.toDouble()
+        Physics.height = height.toDouble()
     }
 
     fun overlap(

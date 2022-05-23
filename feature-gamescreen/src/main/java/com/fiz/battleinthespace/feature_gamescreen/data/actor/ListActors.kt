@@ -5,13 +5,14 @@ import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Collision
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import java.io.Serializable
 
 
 class ListActors(
-    val width: Double,
-    val height: Double,
-    var players: MutableList<Player>
-) {
+    val width: Int,
+    val height: Int,
+    private var players: MutableList<Player>
+) : Serializable {
 
     var actors: MutableList<MoveableActor> = mutableListOf()
         get() {
@@ -29,21 +30,22 @@ class ListActors(
 
     private var lineSpaceShipsOnRespawn: MutableList<SpaceShip> = mutableListOf()
 
+    // 4 Для равномерного распредления по игровому миру
     private var respawns: MutableList<Respawn> = mutableListOf(
         Respawn(
-            Vec(width / 4, height / 4),
+            Vec(width / 4.0, height / 4.0),
             angle = 45.0
         ),
         Respawn(
-            Vec(width - width / 4, height / 4),
+            Vec(width - width / 4.0, height / 4.0),
             angle = 135.0
         ),
         Respawn(
-            Vec(width / 4, height - height / 4),
+            Vec(width / 4.0, height - height / 4.0),
             angle = 315.0
         ),
         Respawn(
-            Vec(width - width / 4, height - height / 4),
+            Vec(width - width / 4.0, height - height / 4.0),
             angle = 225.0
         )
     )
@@ -64,8 +66,8 @@ class ListActors(
     ) {
         var x = 0
         while (true) {
-            val dx = (0 until width.toInt()).shuffled().first().toDouble()
-            val dy = (0 until height.toInt()).shuffled().first().toDouble()
+            val dx = (0 until width).shuffled().first().toDouble()
+            val dy = (0 until height).shuffled().first().toDouble()
             if (isCreateMeteoriteWithoutOverlap(dx, dy, playSound))
                 return
             x += 1

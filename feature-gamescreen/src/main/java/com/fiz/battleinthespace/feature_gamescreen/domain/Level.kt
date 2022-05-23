@@ -8,58 +8,42 @@ import com.fiz.battleinthespace.feature_gamescreen.data.repositories.NUMBER_BITM
 import java.io.Serializable
 
 class Level(
-    val width: Double,
-    val height: Double,
-    private var countPlayers: Int = 4,
+    val width: Int,
+    val height: Int,
     private var countMeteorites: Int,
     var players: MutableList<Player>,
-    playSound: (Int) -> Unit
+    private var countPlayers: Int = players.size,
+    var ai: MutableList<AI?>,
+    val playSound: (Int) -> Unit,
+    var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
+    var listActors: ListActors = ListActors(width, height, players)
 ) : Serializable {
-
-    var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
-
-    var listActors = ListActors(width, height, players)
 
     init {
         Physics.createWorld(width, height)
-        newRound(playSound)
-    }
-
-    private fun newRound(playSound: (Int) -> Unit) {
-        createBackgrounds()
-        createActors(playSound)
-        updatePlayers()
-    }
-
-    private fun createBackgrounds() {
-        for (n in 0 until height.toInt()) {
-            val row: MutableList<Int> = mutableListOf()
-            for (k in 0 until width.toInt())
-                row += (0 until NUMBER_BITMAP_BACKGROUND).shuffled().first()
-            backgrounds += row
-        }
-    }
-
-    private fun createActors(playSound: (Int) -> Unit) {
-        listActors.createSpaceShips(countPlayers)
-        listActors.createMeteorites(countMeteorites, playSound)
-    }
-
-    private fun updatePlayers() {
-        for (player in players)
-            player.newRound()
+        newRound()
     }
 
     fun update(
-        controller: List<Controller>,
+        controllers: List<Controller>,
         deltaTime: Double,
-        playSound: (Int) -> Unit
     ): Boolean {
-        for ((index, spaceShip) in listActors.spaceShips.withIndex()) {
-            spaceShip.moveRotate(deltaTime, controller[index].angle.toDouble())
-            spaceShip.moveForward(deltaTime, controller[index])
 
-            if (controller[index].isCanFire(deltaTime)) {
+        for ((index, player) in players.withIndex()) {
+            if (ai[index] != null && !player.main) {
+                ai[index]?.update(
+                    index,
+                    controllers[index],
+                    this
+                )
+            }
+        }
+
+        for ((index, spaceShip) in listActors.spaceShips.withIndex()) {
+            spaceShip.moveRotate(deltaTime, controllers[index].angle.toDouble())
+            spaceShip.moveForward(deltaTime, controllers[index])
+
+            if (controllers[index].isCanFire(deltaTime)) {
                 if (spaceShip.inGame) {
                     listActors.bullets += Weapon.create(
                         listActors.spaceShips,
@@ -84,6 +68,37 @@ class Level(
             return false
 
         return true
+    }
+
+    private fun newRound() {
+        createBackgrounds()
+        createActors()
+        updatePlayers()
+    }
+
+    private fun createBackgrounds() {
+        for (n in 0 until height) {
+            val row: MutableList<Int> = mutableListOf()
+            for (k in 0 until width)
+                row += (0 until NUMBER_BITMAP_BACKGROUND).shuffled().first()
+            backgrounds += row
+        }
+    }
+
+    private fun createActors() {
+        listActors.createSpaceShips(countPlayers)
+        listActors.createMeteorites(countMeteorites, playSound)
+    }
+
+    private fun updatePlayers() {
+        for (player in players)
+            player.newRound()
+    }
+
+    fun newGame() {
+        for (player in players)
+            player.newGame()
+        players[0].main = true
     }
 
 }
