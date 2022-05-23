@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BattleInTheSpace">
         <activity
-            android:name=".feature_gamescreen.presentation.GameActivity"
+            android:name=".feature_gamescreen.ui.GameActivity"
             android:exported="false" />
         <activity
             android:name=".feature_mainscreen.ui.MainActivity"

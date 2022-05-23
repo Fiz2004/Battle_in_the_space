@@ -7,11 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.feature_mainscreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentMissionSelectedBinding
-import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.NestedSectionsPagerAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -19,14 +16,7 @@ class MissionSelectedFragment : Fragment() {
     private var _binding: FragmentMissionSelectedBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as ApplicationFeatureMainScreen
-        val playerRepository = PlayerRepositoryImpl(
-            app.getPlayersLocalDataSourceFeatureMainScreen(),
-            app.getSharedPrefPlayerStorageFeatureMainScreen()
-        )
-        MainViewModelFactory(playerRepository)
-    }
+    private val viewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

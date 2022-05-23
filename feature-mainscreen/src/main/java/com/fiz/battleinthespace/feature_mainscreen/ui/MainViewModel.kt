@@ -1,13 +1,19 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui
 
-import androidx.lifecycle.*
-import com.fiz.battleinthespace.database.models.Item
-import com.fiz.battleinthespace.database.models.StateProduct
-import com.fiz.battleinthespace.database.models.TypeItems
-import com.fiz.battleinthespace.feature_mainscreen.domain.PlayerRepository
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fiz.battleinthespace.domain.models.Item
+import com.fiz.battleinthespace.domain.models.StateProduct
+import com.fiz.battleinthespace.domain.models.TypeItems
+import com.fiz.battleinthespace.domain.repositories.PlayerRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
@@ -132,13 +138,5 @@ class MainViewModel(
                 players[index].copy(controllerPlayer = isChecked)
             )
         }
-    }
-}
-
-class MainViewModelFactory(private val playerRepository: PlayerRepository) :
-    ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MainViewModel(playerRepository) as T
     }
 }

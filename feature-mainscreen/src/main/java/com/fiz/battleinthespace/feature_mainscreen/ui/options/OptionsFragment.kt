@@ -10,12 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.fiz.battleinthespace.common.setVisible
 import com.fiz.battleinthespace.feature_mainscreen.R
-import com.fiz.battleinthespace.feature_mainscreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModelFactory
 import com.fiz.battleinthespace.feature_mainscreen.ui.dialoghelper.DialogHelper
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
@@ -24,14 +21,7 @@ import com.google.firebase.auth.FirebaseUser
 class OptionsFragment : Fragment() {
     private val dialogHelper by lazy { DialogHelper() }
 
-    private val viewModel: MainViewModel by activityViewModels {
-        val app = requireActivity().application as ApplicationFeatureMainScreen
-        val playerRepository = PlayerRepositoryImpl(
-            app.getPlayersLocalDataSourceFeatureMainScreen(),
-            app.getSharedPrefPlayerStorageFeatureMainScreen()
-        )
-        MainViewModelFactory(playerRepository)
-    }
+    private val viewModel: MainViewModel by activityViewModels()
 
     private val accountViewModel: AccountViewModel by activityViewModels()
 

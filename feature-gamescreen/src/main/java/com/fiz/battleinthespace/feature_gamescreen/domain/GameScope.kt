@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.media.SoundPool
 import android.util.SparseIntArray
 import android.view.SurfaceView
-import com.fiz.battleinthespace.database.models.Player
+import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.ListActors
 import kotlin.math.min
@@ -65,7 +65,7 @@ class GameScope(
         soundPool.play(soundMap.get(numberSound), 1F, 1F, 1, 0, 1F)
     }
 
-    suspend fun run() {
+    fun run() {
         while (running) {
             if (!pause) {
                 AIUpdate()

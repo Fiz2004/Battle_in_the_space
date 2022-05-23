@@ -1,7 +1,7 @@
 package com.fiz.battleinthespace.feature_gamescreen.data.actor
 
-import com.fiz.battleinthespace.database.models.Player
-import com.fiz.battleinthespace.database.models.StateProduct
+import com.fiz.battleinthespace.domain.models.Player
+import com.fiz.battleinthespace.domain.models.StateProduct
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
 
 

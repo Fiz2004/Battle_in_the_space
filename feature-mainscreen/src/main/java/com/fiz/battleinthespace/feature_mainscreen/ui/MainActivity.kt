@@ -3,32 +3,22 @@ package com.fiz.battleinthespace.feature_mainscreen.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
-import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.feature_mainscreen.R
-import com.fiz.battleinthespace.feature_mainscreen.data.repositories.PlayerRepositoryImpl
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
 import com.fiz.battleinthespace.feature_mainscreen.ui.utils.ActivityContract
+import dagger.hilt.android.AndroidEntryPoint
 
 interface ApplicationFeatureMainScreen {
-    fun getPlayersLocalDataSourceFeatureMainScreen(): PlayersLocalDataSource
-    fun getSharedPrefPlayerStorageFeatureMainScreen(): SharedPrefPlayerStorage
     fun getIntentForNextScreen(): Intent
 }
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels {
-        val app = (application as ApplicationFeatureMainScreen)
-        val playerRepository = PlayerRepositoryImpl(
-            app.getPlayersLocalDataSourceFeatureMainScreen(),
-            app.getSharedPrefPlayerStorageFeatureMainScreen()
-        )
-        MainViewModelFactory(playerRepository)
-    }
+    private val viewModel: MainViewModel by viewModels()
 
     private val accountViewModel: AccountViewModel by viewModels()
 
