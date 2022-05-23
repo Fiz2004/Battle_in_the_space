@@ -1,9 +1,10 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
+import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.ListActors
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.PlayerGame
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.data.repositories.NUMBER_BITMAP_BACKGROUND
 import java.io.Serializable
 
 class Level(
@@ -11,28 +12,22 @@ class Level(
     val height: Double,
     private var countPlayers: Int = 4,
     private var countMeteorites: Int,
-    var playerGames: MutableList<PlayerGame>
-) : Serializable, ListActors.CallBacks {
-
-    private lateinit var callbacks: ListActors.CallBacks
-
-    fun setCallBacks(callbacks: ListActors.CallBacks) {
-        this.callbacks = callbacks
-    }
+    var players: MutableList<Player>,
+    playSound: (Int) -> Unit
+) : Serializable {
 
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf()
 
-    var listActors = ListActors(width, height, playerGames)
+    var listActors = ListActors(width, height, players)
 
     init {
-        listActors.setCallBacks(this)
         Physics.createWorld(width, height)
-        newRound()
+        newRound(playSound)
     }
 
-    private fun newRound() {
+    private fun newRound(playSound: (Int) -> Unit) {
         createBackgrounds()
-        createActors()
+        createActors(playSound)
         updatePlayers()
     }
 
@@ -45,36 +40,38 @@ class Level(
         }
     }
 
-    private fun createActors() {
+    private fun createActors(playSound: (Int) -> Unit) {
         listActors.createSpaceShips(countPlayers)
-        listActors.createMeteorites(countMeteorites)
+        listActors.createMeteorites(countMeteorites, playSound)
     }
 
     private fun updatePlayers() {
-        for (player in playerGames)
+        for (player in players)
             player.newRound()
     }
 
     fun update(
-        controller: Array<Controller>,
+        controller: List<Controller>,
         deltaTime: Double,
+        playSound: (Int) -> Unit
     ): Boolean {
-        for (spaceShip in listActors.spaceShips) {
-            spaceShip.moveRotate(deltaTime, spaceShip.playerGame.controller.angle.toDouble())
-            spaceShip.moveForward(deltaTime, spaceShip.playerGame.controller)
+        for ((index, spaceShip) in listActors.spaceShips.withIndex()) {
+            spaceShip.moveRotate(deltaTime, controller[index].angle.toDouble())
+            spaceShip.moveForward(deltaTime, controller[index])
 
-            if (spaceShip.playerGame.controller.isCanFire(deltaTime)) {
+            if (controller[index].isCanFire(deltaTime)) {
                 if (spaceShip.inGame) {
                     listActors.bullets += Weapon.create(
                         listActors.spaceShips,
-                        spaceShip.playerGame.number,
-                        spaceShip.playerGame.weapon)
-                    callbacks.playSound(1)
+                        spaceShip.player.number,
+                        spaceShip.player.weapon
+                    )
+                    playSound(1)
                 }
             }
         }
 
-        listActors.update(deltaTime)
+        listActors.update(deltaTime, playSound)
 
         listActors.listAnimationDestroy.forEach {
             it.timeShow -= deltaTime
@@ -83,7 +80,7 @@ class Level(
             it.timeShow > 0
         }.toMutableList()
 
-        if (playerGames.none { it.life > 0 } || listActors.meteorites.isEmpty())
+        if (players.none { it.life > 0 } || listActors.meteorites.isEmpty())
             return false
 
         return true

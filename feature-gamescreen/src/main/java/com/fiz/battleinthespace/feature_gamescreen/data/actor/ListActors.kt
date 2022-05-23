@@ -1,5 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.data.actor
 
+import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Collision
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
@@ -9,18 +10,8 @@ import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 class ListActors(
     val width: Double,
     val height: Double,
-    var playerGames: MutableList<PlayerGame>
+    var players: MutableList<Player>
 ) {
-
-    interface CallBacks {
-        fun playSound(numberSound: Int) {}
-    }
-
-    private lateinit var callbacks: ListActors.CallBacks
-
-    fun setCallBacks(callbacks: ListActors.CallBacks) {
-        this.callbacks = callbacks
-    }
 
     var actors: MutableList<MoveableActor> = mutableListOf()
         get() {
@@ -59,65 +50,72 @@ class ListActors(
 
     fun createSpaceShips(countPlayers: Int) {
         for (n in 0 until countPlayers)
-            spaceShips += SpaceShip(respawns[n], playerGame = playerGames[n])
+            spaceShips += SpaceShip(respawns[n], playerGame = players[n])
     }
 
-    fun createMeteorites(countMeteorites: Int) {
+    fun createMeteorites(countMeteorites: Int, playSound: (Int) -> Unit) {
         meteorites.clear()
         for (n in 0 until countMeteorites)
-            createMeteorite()
+            createMeteorite(playSound)
     }
 
-    private fun createMeteorite() {
+    private fun createMeteorite(
+        playSound: (Int) -> Unit
+    ) {
         var x = 0
         while (true) {
             val dx = (0 until width.toInt()).shuffled().first().toDouble()
             val dy = (0 until height.toInt()).shuffled().first().toDouble()
-            if (isCreateMeteoriteWithoutOverlap(dx, dy))
+            if (isCreateMeteoriteWithoutOverlap(dx, dy, playSound))
                 return
             x += 1
             if (x > 1000) throw Error("Превышено время ожидания функции createMeteorite")
         }
     }
 
-    private fun isCreateMeteoriteWithoutOverlap(x: Double, y: Double): Boolean {
+    private fun isCreateMeteoriteWithoutOverlap(
+        x: Double, y: Double,
+        playSound: (Int) -> Unit
+    ): Boolean {
         val newMeteorite = Meteorite.createNew(x, y)
 
-        if (meteorites.any { overlap(newMeteorite, it) })
+        if (meteorites.any { overlap(newMeteorite, it, playSound) })
             return false
 
-        if (respawns.any { overlap(newMeteorite, it) })
+        if (respawns.any { overlap(newMeteorite, it, playSound) })
             return false
 
         meteorites.add(newMeteorite)
         return true
     }
 
-    fun update(deltaTime: Double) {
-        updateSpaceShips(deltaTime)
-        updateBullets(deltaTime)
-        updateMeteorites(deltaTime)
+    fun update(deltaTime: Double, playSound: (Int) -> Unit) {
+        updateSpaceShips(deltaTime, playSound)
+        updateBullets(deltaTime, playSound)
+        updateMeteorites(deltaTime, playSound)
     }
 
-    private fun updateSpaceShips(deltaTime: Double) {
+    private fun updateSpaceShips(deltaTime: Double, playSound: (Int) -> Unit) {
         for (spaceShip in spaceShips.filter { it.inGame })
             spaceShip.update(deltaTime, width, height)
 
-        lineSpaceShipsOnRespawn = lineSpaceShipsOnRespawn.filterNot { isCanRespawn(deltaTime)(it) }.toMutableList()
+        lineSpaceShipsOnRespawn =
+            lineSpaceShipsOnRespawn.filterNot { isCanRespawn(deltaTime, playSound)(it) }
+                .toMutableList()
 
-        findAllCollisionSpaceShipsSpaceShipsAndKickback()
+        findAllCollisionSpaceShipsSpaceShipsAndKickback(playSound)
     }
 
-    private fun isCanRespawn(deltaTime: Double): (SpaceShip) -> Boolean {
+    private fun isCanRespawn(deltaTime: Double, playSound: (Int) -> Unit): (SpaceShip) -> Boolean {
         return fun(spaceShip: SpaceShip): Boolean {
-            return spaceShip.isCanRespawnFromTime(deltaTime) && isRespawnFree(spaceShip)
+            return spaceShip.isCanRespawnFromTime(deltaTime) && isRespawnFree(spaceShip, playSound)
         }
     }
 
-    private fun isRespawnFree(currentSpaceShip: SpaceShip): Boolean {
+    private fun isRespawnFree(currentSpaceShip: SpaceShip, playSound: (Int) -> Unit): Boolean {
         val numberPlayer = spaceShips.indexOf(currentSpaceShip)
-        if (playerGames[numberPlayer].life > 0) {
-            val respawn = respawns.find(::findFreeRespawn)
+        if (players[numberPlayer].life > 0) {
+            val respawn = respawns.find { findFreeRespawn(it, playSound) }
             if (respawn != null) {
                 spaceShips[numberPlayer].respawn(respawn)
                 return true
@@ -126,40 +124,40 @@ class ListActors(
         return false
     }
 
-    private fun findFreeRespawn(respawn: Respawn): Boolean {
-        if (spaceShips.filter { it.inGame }.any { overlap(it, respawn) })
+    private fun findFreeRespawn(respawn: Respawn, playSound: (Int) -> Unit): Boolean {
+        if (spaceShips.filter { it.inGame }.any { overlap(it, respawn, playSound) })
             return false
 
-        if (bullets.any { overlap(it, respawn) })
+        if (bullets.any { overlap(it, respawn, playSound) })
             return false
 
-        if (meteorites.any { overlap(it, respawn) })
+        if (meteorites.any { overlap(it, respawn, playSound) })
             return false
 
         return true
     }
 
-    private fun findAllCollisionSpaceShipsSpaceShipsAndKickback() {
+    private fun findAllCollisionSpaceShipsSpaceShipsAndKickback(playSound: (Int) -> Unit) {
         createCombinations(spaceShips.filter { it.inGame })
-            .filter { overlap(it.first, it.second) }
+            .filter { overlap(it.first, it.second, playSound) }
             .forEach { kickback(it.first, it.second) }
     }
 
-    private fun updateBullets(deltaTime: Double) {
+    private fun updateBullets(deltaTime: Double, playSound: (Int) -> Unit) {
         if (bullets.isNotEmpty()) {
             for (bullet in bullets)
                 bullet.update(deltaTime, width, height)
 
-            findCollisionSpaceShipsBulletsAndKickbackAndMarkThem()
-            findCollisionBulletBulletAndMarkThem()
+            findCollisionSpaceShipsBulletsAndKickbackAndMarkThem(playSound)
+            findCollisionBulletBulletAndMarkThem(playSound)
 
             destroyBullets()
         }
     }
 
-    private fun findCollisionSpaceShipsBulletsAndKickbackAndMarkThem() {
+    private fun findCollisionSpaceShipsBulletsAndKickbackAndMarkThem(playSound: (Int) -> Unit) {
         bullets.filter { bullet ->
-            val spaceShipsIsCollisionBullet = getSpaceShipsIsCollision(bullet)
+            val spaceShipsIsCollisionBullet = getSpaceShipsIsCollision(bullet, playSound)
             spaceShipsIsCollisionBullet.forEach { spaceShip ->
                 kickback(spaceShip, bullet)
                 bullet.inGame = false
@@ -168,15 +166,18 @@ class ListActors(
         }
     }
 
-    private fun getSpaceShipsIsCollision(bullet: Weapon): List<SpaceShip> {
+    private fun getSpaceShipsIsCollision(
+        bullet: Weapon,
+        playSound: (Int) -> Unit
+    ): List<SpaceShip> {
         return spaceShips.filterIndexed { indexSpaceShip, spaceShip ->
-            overlap(spaceShip, bullet) && bullet.player != indexSpaceShip
+            overlap(spaceShip, bullet, playSound) && bullet.player != indexSpaceShip
         }
     }
 
-    private fun findCollisionBulletBulletAndMarkThem() {
+    private fun findCollisionBulletBulletAndMarkThem(playSound: (Int) -> Unit) {
         createCombinations(bullets)
-            .filter { overlap(it.first, it.second) }
+            .filter { overlap(it.first, it.second, playSound) }
             .forEach {
                 it.first.inGame = false
                 it.second.inGame = false
@@ -184,28 +185,28 @@ class ListActors(
 
     }
 
-    private fun updateMeteorites(deltaTime: Double) {
+    private fun updateMeteorites(deltaTime: Double, playSound: (Int) -> Unit) {
         meteorites.forEach { meteorite -> meteorite.update(deltaTime, width, height) }
 
-        findCombinationsMeteoritesMetioritesOverlapAndKickback()
+        findCombinationsMeteoritesMetioritesOverlapAndKickback(playSound)
 
-        val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite()
+        val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite(playSound)
         addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite)
 
         val mapMeteoritesDestroyAndAngle: MutableMap<Meteorite, Double> =
-            getTotalMapMeteoritesDestroyAndAngle(spaceShipsIsCollisionMeteorite)
+            getTotalMapMeteoritesDestroyAndAngle(spaceShipsIsCollisionMeteorite, playSound)
 
         mapMeteoritesDestroyAndAngle.forEach {
-            createThreeMeteorites(it.key, it.value)
+            createThreeMeteorites(it.key, it.value, playSound)
             meteorites.remove(it.key)
         }
 
         destroyBullets()
     }
 
-    private fun findCombinationsMeteoritesMetioritesOverlapAndKickback() {
+    private fun findCombinationsMeteoritesMetioritesOverlapAndKickback(playSound: (Int) -> Unit) {
         createCombinations(meteorites)
-            .filter { overlap(it.first, it.second) }
+            .filter { overlap(it.first, it.second, playSound) }
             .forEach { kickback(it.first, it.second) }
     }
 
@@ -219,53 +220,54 @@ class ListActors(
         }.toMutableList()
     }
 
-    private fun getSpaceShipsIsCollisionMeteorite(): List<SpaceShip> {
+    private fun getSpaceShipsIsCollisionMeteorite(playSound: (Int) -> Unit): List<SpaceShip> {
         val result = mutableListOf<SpaceShip>()
         meteorites.forEach { meteorite ->
             result += spaceShips.filter { it.inGame }
-                .filter { spaceShip -> overlap(spaceShip, meteorite) }
+                .filter { spaceShip -> overlap(spaceShip, meteorite, playSound) }
         }
         return result
     }
 
     private fun addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite: List<SpaceShip>) {
         spaceShipsIsCollisionMeteorite.forEach { spaceShip ->
-            playerGames[spaceShips.indexOf(spaceShip)].life -= 1
+            players[spaceShips.indexOf(spaceShip)].life -= 1
             spaceShip.inGame = false
-            if (playerGames[spaceShips.indexOf(spaceShip)].life > 0)
+            if (players[spaceShips.indexOf(spaceShip)].life > 0)
                 lineSpaceShipsOnRespawn.add(spaceShip)
             listAnimationDestroy.add(SpaceShipAnimationDestroy(spaceShip))
         }
     }
 
     private fun getTotalMapMeteoritesDestroyAndAngle(
-        spaceShipsIsCollisionMeteorite: List<SpaceShip>
+        spaceShipsIsCollisionMeteorite: List<SpaceShip>, playSound: (Int) -> Unit
     ): MutableMap<Meteorite, Double> {
         val result: MutableMap<Meteorite, Double> = mutableMapOf()
         meteorites.forEach { meteorite ->
             result += getMapMeteoritesDestroyAndAngleOnCollisionBulletsFor(
-                meteorite
+                meteorite, playSound
             )
         }
 
         meteorites.forEach { meteorite ->
             result += getMapMeteoritesDestroyAndAngleOnCollisionSpaceShipsFor(
                 spaceShipsIsCollisionMeteorite,
-                meteorite
+                meteorite,
+                playSound
             )
         }
         return result
     }
 
     private fun getMapMeteoritesDestroyAndAngleOnCollisionBulletsFor(
-        meteorite: Meteorite
+        meteorite: Meteorite, playSound: (Int) -> Unit
     ): MutableMap<Meteorite, Double> {
         val result = mutableMapOf<Meteorite, Double>()
 
-        bullets.filter { bullet -> overlap(bullet, meteorite) }.forEach { bullet ->
+        bullets.filter { bullet -> overlap(bullet, meteorite, playSound) }.forEach { bullet ->
             meteorite.inGame = false
             bullet.inGame = false
-            playerGames[bullet.player].score += meteorite.viewSize + 1
+            players[bullet.player].score += meteorite.viewSize + 1
             result[meteorite] = bullet.angle
         }
         return result
@@ -273,11 +275,17 @@ class ListActors(
 
     private fun getMapMeteoritesDestroyAndAngleOnCollisionSpaceShipsFor(
         spaceShipsIsCollisionMeteorite: List<SpaceShip>,
-        meteorite: Meteorite
+        meteorite: Meteorite, playSound: (Int) -> Unit
     ): MutableMap<Meteorite, Double> {
         val result = mutableMapOf<Meteorite, Double>()
 
-        spaceShipsIsCollisionMeteorite.filter { spaceShip -> overlap(spaceShip, meteorite) }
+        spaceShipsIsCollisionMeteorite.filter { spaceShip ->
+            overlap(
+                spaceShip,
+                meteorite,
+                playSound
+            )
+        }
             .forEach { spaceShip ->
                 result[meteorite] = spaceShip.angle
             }
@@ -287,7 +295,8 @@ class ListActors(
 
     private fun createThreeMeteorites(
         meteoriteDestroy: Meteorite,
-        angleDestroy: Double
+        angleDestroy: Double,
+        playSound: (Int) -> Unit
     ) {
         if (meteoriteDestroy.viewSize + 1 > 3)
             return
@@ -295,18 +304,19 @@ class ListActors(
         for (angle in (0 until 360) step 120) {
             val newMeteorite = meteoriteDestroy.createMeteorite(angleDestroy, angle.toDouble())
 
-            if (!meteorites.filter { it != meteoriteDestroy }.any { overlap(it, newMeteorite) })
+            if (!meteorites.filter { it != meteoriteDestroy }
+                    .any { overlap(it, newMeteorite, playSound) })
                 meteorites.add(newMeteorite)
         }
     }
 
-    private fun overlap(actor1: Actor, actor2: Actor): Boolean {
+    private fun overlap(actor1: Actor, actor2: Actor, playSound: (Int) -> Unit): Boolean {
         val result = Physics.overlapCircle(
             actor1.center, actor1.size,
             actor2.center, actor2.size
         )
         if (result)
-            callbacks.playSound(0)
+            playSound(0)
         return result
     }
 

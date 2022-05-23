@@ -1,43 +1,47 @@
-package com.fiz.battleinthespace.feature_gamescreen.domain
+package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.content.Context
 import android.graphics.*
-import android.util.Log
-import android.view.SurfaceView
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.Actor
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
+import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
 import kotlin.math.*
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
-
-const val NUMBER_BITMAP_BACKGROUND = 8
 
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 
 private const val DIVISION_BY_SCREEN = 11
 
 class Display(
-    var surface: SurfaceView,
-    private var stateGame: StateGame,
-    private val context: Context,
-) : BitmapLoad(context) {
+    surfaceWidth: Int, surfaceHeight: Int,
+    private var stateGame: GameState,
+    val bitmapRepository: BitmapRepository
+) {
 
     private val paint: Paint = Paint()
     private lateinit var canvas: Canvas
     private lateinit var canvasInfo: Canvas
-    private lateinit var listener: Listener
 
-    private var sizeUnit: Float = min(surface.width, surface.height).toFloat() / DIVISION_BY_SCREEN
+    private var sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
 
-    private var viewport = Viewport(surface, stateGame, sizeUnit)
+    private var viewport = Viewport(
+        surfaceWidth,
+        surfaceHeight,
+        stateGame.level.width,
+        stateGame.level.height,
+        sizeUnit
+    )
 
-    fun viewPortUpdate() {
-        viewport = Viewport(surface, stateGame, sizeUnit)
-    }
-
-    fun render(stateGame: StateGame, controller: Controller, canvas: Canvas) {
+    fun render(
+        stateGame: GameState,
+        canvas: Canvas,
+        controller: Controller,
+        leftLocationOnScreen: Int,
+        topLocationOnScreen: Int
+    ) {
         this.stateGame = stateGame
         this.canvas = canvas
 
@@ -45,7 +49,7 @@ class Display(
         drawBackground()
         drawActors()
         drawAnimationDestroys()
-        drawJoystick(controller)
+        drawJoystick(controller, leftLocationOnScreen, topLocationOnScreen)
         drawHelper()
     }
 
@@ -59,7 +63,7 @@ class Display(
 
         val rectSrc = Rect(
             0, 0,
-            bmpBackground[0].width, bmpBackground[0].height
+            bitmapRepository.bmpBackground[0].width, bitmapRepository.bmpBackground[0].height
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
@@ -76,7 +80,12 @@ class Display(
                     yStartDst + sizeUnit
                 )
 
-                canvas.drawBitmap(bmpBackground[background], rectSrc, rectDst, paint)
+                canvas.drawBitmap(
+                    bitmapRepository.bmpBackground[background],
+                    rectSrc,
+                    rectDst,
+                    paint
+                )
             }
     }
 
@@ -129,20 +138,19 @@ class Display(
         }
     }
 
-    private fun drawJoystick(controller: Controller) {
+    private fun drawJoystick(
+        controller: Controller,
+        leftLocationOnScreen: Int,
+        topLocationOnScreen: Int
+    ) {
         val paintFont = Paint()
         paintFont.color = Color.RED
         paintFont.style = Paint.Style.STROKE
         paintFont.alpha = 80
         paintFont.strokeWidth = 6F
 
-        val a = IntArray(2)
-        surface.getLocationOnScreen(a)
-        val left = a[0]
-        val top = a[1]
-
-        var cx = controller.leftSide.point.x.toFloat() - left
-        var cy = controller.leftSide.point.y.toFloat() - top
+        var cx = controller.leftSide.point.x.toFloat() - leftLocationOnScreen
+        var cy = controller.leftSide.point.y.toFloat() - topLocationOnScreen
         if (controller.leftSide.touch) {
             canvas.drawCircle(
                 cx,
@@ -169,13 +177,13 @@ class Display(
 
     //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
     private fun drawHelper() {
-        val mainSpaceship = stateGame.level.listActors.spaceShips.filter { it.playerGame.main }
+        val mainSpaceship = stateGame.level.listActors.spaceShips.filter { it.player.main }
         if (mainSpaceship.isNotEmpty()) {
-            stateGame.level.listActors.spaceShips.filter { it.inGame && !it.playerGame.main }
+            stateGame.level.listActors.spaceShips.filter { it.inGame && !it.player.main }
                 .forEach {
                     if (viewport.getAllPoints(it).size == 0) {
                         val paintFont = Paint()
-                        paintFont.color = getColor(it.playerGame.number)
+                        paintFont.color = getColor(it.player.number)
                         paintFont.style = Paint.Style.FILL
                         paintFont.alpha = 80
                         paintFont.strokeWidth = 30F
@@ -221,14 +229,12 @@ class Display(
         }
     }
 
-    fun renderInfo(stateGame: StateGame, canvasInfo: Canvas, FPS: Int) {
+    fun renderInfo(stateGame: GameState, canvasInfo: Canvas, FPS: Int) {
         this.stateGame = stateGame
         this.canvasInfo = canvasInfo
 
         drawInfo(FPS)
 
-        listener = context as Listener
-        listener.pauseButtonClick(stateGame.status)
     }
 
     private fun drawInfo(FPS: Int) {
@@ -241,7 +247,7 @@ class Display(
         val paintFont = Paint()
         val rectSrc = Rect(
             0, 0,
-            bmpSpaceshipLife[0].width, bmpSpaceshipLife[0].height
+            bitmapRepository.bmpSpaceshipLife[0].width, bitmapRepository.bmpSpaceshipLife[0].height
         )
 
         val baseTextSize = minCharacteristic / 6F
@@ -258,20 +264,20 @@ class Display(
 
         val maxTextWidth = getMaxTextWidth(paintFont)
 
-        for (n in 0 until stateGame.countPlayers) {
+        for (n in 0 until stateGame.players.size) {
             paintFont.textSize = textSize
             paintFont.textAlign = Paint.Align.LEFT
             paintFont.color = getColor(n)
             canvasInfo.drawText(
-                stateGame.name[n],
+                stateGame.players[n].name,
                 0F,
                 baseTextSize + (textSize * (n + 1)),
                 paintFont
             )
 
-            for (k in 0 until stateGame.playerGames[n].life)
+            for (k in 0 until stateGame.players[n].life)
                 canvasInfo.drawBitmap(
-                    bmpSpaceshipLife[n], rectSrc,
+                    bitmapRepository.bmpSpaceshipLife[n], rectSrc,
                     RectF(
                         maxTextWidth + bmplife * (k - 1).toFloat(),
                         baseTextSize + textSize * n,
@@ -282,14 +288,13 @@ class Display(
                 )
 
             canvasInfo.drawText(
-                stateGame.playerGames[n].score.toString(),
+                stateGame.players[n].score.toString(),
                 (maxTextWidth + bmplife * 2).toFloat(),
                 baseTextSize + textSize * (n + 1),
                 paintFont
             )
         }
 
-        Log.d("AAA", FPS.toString())
         canvasInfo.drawText(
             FPS.toString(),
             0F,
@@ -310,19 +315,14 @@ class Display(
 
     private fun getMaxTextWidth(paintFont: Paint): Int {
         var result = 0
-        for (namePlayer in stateGame.name) {
+        for (namePlayer in stateGame.players) {
             val mTextBoundRect = Rect(0, 0, 0, 0)
-            paintFont.getTextBounds(namePlayer, 0, namePlayer.length, mTextBoundRect)
+            paintFont.getTextBounds(namePlayer.name, 0, namePlayer.name.length, mTextBoundRect)
             val textWidth = mTextBoundRect.width()
             result = max(textWidth, result)
         }
         return result
     }
 
-    companion object {
-        interface Listener {
-            fun pauseButtonClick(status: String)
-        }
-    }
 }
 

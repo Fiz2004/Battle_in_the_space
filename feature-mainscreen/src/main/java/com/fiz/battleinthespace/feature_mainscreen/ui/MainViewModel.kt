@@ -24,7 +24,7 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    var players = playerRepository.getPlayers(); private set
+    var players = playerRepository.getObservePlayers(); private set
     var player = Transformations.map(players) { it[0] }; private set
 
     var countPlayer = MutableLiveData(playerRepository.getCountPlayers()); private set

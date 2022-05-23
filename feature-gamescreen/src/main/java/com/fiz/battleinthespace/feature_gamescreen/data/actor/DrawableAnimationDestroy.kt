@@ -3,7 +3,7 @@ package com.fiz.battleinthespace.feature_gamescreen.data.actor
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.domain.Display
+import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 
 interface DrawableAnimationDestroy : Drawable {
     var timeShowMax: Double
@@ -22,7 +22,7 @@ class BulletAnimationDestroy(
     constructor(weapon: Weapon) : this(Vec(weapon.center), weapon.angle, weapon.size, 1.0)
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bmpBulletDestroy[frame]
+        return display.bitmapRepository.bmpBulletDestroy[frame]
     }
 }
 
@@ -37,7 +37,7 @@ class SpaceShipAnimationDestroy(
     constructor(spaceShip: SpaceShip) : this(Vec(spaceShip.center), spaceShip.angle, spaceShip.size, 1.5)
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bmpSpaceshipDestroy[frame]
+        return display.bitmapRepository.bmpSpaceshipDestroy[frame]
     }
 }
 

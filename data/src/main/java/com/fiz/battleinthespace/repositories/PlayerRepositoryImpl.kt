@@ -26,7 +26,10 @@ class PlayerRepositoryImpl @Inject constructor(
         return sharedPrefPlayerStorage.getCountPlayers()
     }
 
-    override fun getPlayers(): LiveData<List<Player>> = playersLocalDataSource.getAll()
+    override fun getObservePlayers(): LiveData<List<Player>> =
+        playersLocalDataSource.getObserveAll()
+
+    override fun getPlayers(): List<Player> = playersLocalDataSource.getAll()
 
     private fun addPlayer(player: Player) {
         playersLocalDataSource.addPlayer(player)

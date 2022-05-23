@@ -8,7 +8,9 @@ interface PlayerRepository {
 
     fun getCountPlayers(): Int
 
-    fun getPlayers(): LiveData<List<Player>>
+    fun getObservePlayers(): LiveData<List<Player>>
+
+    fun getPlayers(): List<Player>
 
     suspend fun savePlayer(player: Player?)
 

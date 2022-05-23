@@ -1,38 +1,30 @@
-package com.fiz.battleinthespace.feature_gamescreen.domain
+package com.fiz.battleinthespace.feature_gamescreen.data.repositories
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.fiz.battleinthespace.feature_gamescreen.R
+import com.fiz.battleinthespace.feature_gamescreen.ui.NUMBER_BITMAP_METEORITE_OPTION
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
+private const val NUMBER_IMAGES_FIGURE = 5
+
+const val NUMBER_BITMAP_BACKGROUND = 8
+private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_METEORITE_LEVEL = 4
 private const val NUMBER_BITMAP_SPACESHIP = 4
+
 private const val NUMBER_BITMAP_SPACESHIP_LIFE = 4
 
-private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
+@Singleton
+class BitmapRepository @Inject constructor(@ApplicationContext context: Context) {
 
-open class BitmapLoad(private val context: Context) {
-    val bmpBackground: Array<Bitmap> by lazy(::initBmpBackground)
-    val bmpWeapon: Array<Bitmap> by lazy(::initBmpWeapon)
-    private fun initBmpWeapon(): Array<Bitmap> {
-        var result: Array<Bitmap> = emptyArray()
-        result += BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
-        result += BitmapFactory.decodeResource(context.resources, R.drawable.double_bullet)
-        result += BitmapFactory.decodeResource(context.resources, R.drawable.missile)
-        result += BitmapFactory.decodeResource(context.resources, R.drawable.ball)
-        return result
-    }
-
-    val bmpBulletDestroy: Array<Bitmap> by lazy(::initBmpBulletDestroy)
-    val bmpMeteorites: Array<Array<Bitmap>> by lazy(::initBmpMeteorite)
-    val bmpSpaceship: Array<Bitmap> by lazy(::initBmpSpaceship)
-    val bmpSpaceshipFly: Array<Bitmap> by lazy(::initBmpSpaceshipFly)
-    val bmpSpaceshipDestroy: Array<Bitmap> by lazy(::initBmpSpaceshipDestroy)
-    val bmpSpaceshipLife: Array<Bitmap> by lazy(::initBmpSpaceshipLife)
-    private fun initBmpBackground(): Array<Bitmap> {
-        var result: Array<Bitmap> = emptyArray()
+    val bmpBackground: List<Bitmap> by lazy {
+        val result: MutableList<Bitmap> = mutableListOf()
         for (i in 1..NUMBER_BITMAP_BACKGROUND)
             result += BitmapFactory.decodeResource(
                 context.resources, context.resources.getIdentifier(
@@ -40,22 +32,32 @@ open class BitmapLoad(private val context: Context) {
                     "drawable", context.packageName
                 )
             )
-        return result
+        result
     }
 
-    private fun initBmpBulletDestroy(): Array<Bitmap> {
-        val temp: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.bullet_destroy)
-        var result: Array<Bitmap> = emptyArray()
+    val bmpWeapon: List<Bitmap> by lazy {
+        val result: MutableList<Bitmap> = mutableListOf()
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.bullet)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.double_bullet)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.missile)
+        result += BitmapFactory.decodeResource(context.resources, R.drawable.ball)
+        result
+    }
+
+    val bmpBulletDestroy: List<Bitmap> by lazy {
+        val temp: Bitmap =
+            BitmapFactory.decodeResource(context.resources, R.drawable.bullet_destroy)
+        val result: MutableList<Bitmap> = mutableListOf()
         val size = temp.width / NUMBER_BITMAP_BULLET_DESTROY
         for (i in 0 until NUMBER_BITMAP_BULLET_DESTROY)
             result += Bitmap.createBitmap(temp, i * size, 0, size, size)
-        return result
+        result
     }
 
-    private fun initBmpMeteorite(): Array<Array<Bitmap>> {
-        var result: Array<Array<Bitmap>> = emptyArray()
+    val bmpMeteorites: List<List<Bitmap>> by lazy {
+        val result: MutableList<MutableList<Bitmap>> = mutableListOf()
         for (i in 1..NUMBER_BITMAP_METEORITE_OPTION) {
-            var row: Array<Bitmap> = emptyArray()
+            val row: MutableList<Bitmap> = mutableListOf()
             for (j in 1..NUMBER_BITMAP_METEORITE_LEVEL)
                 row += BitmapFactory.decodeResource(
                     context.resources, context.resources.getIdentifier(
@@ -65,11 +67,11 @@ open class BitmapLoad(private val context: Context) {
                 )
             result += row
         }
-        return result
+        result
     }
 
-    private fun initBmpSpaceship(): Array<Bitmap> {
-        var result: Array<Bitmap> = emptyArray()
+    val bmpSpaceship: List<Bitmap> by lazy {
+        val result: MutableList<Bitmap> = mutableListOf()
         for (i in 1..NUMBER_BITMAP_SPACESHIP)
             result += BitmapFactory.decodeResource(
                 context.resources, context.resources.getIdentifier(
@@ -77,11 +79,11 @@ open class BitmapLoad(private val context: Context) {
                     "drawable", context.packageName
                 )
             )
-        return result
+        result
     }
 
-    private fun initBmpSpaceshipFly(): Array<Bitmap> {
-        var result: Array<Bitmap> = emptyArray()
+    val bmpSpaceshipFly: List<Bitmap> by lazy {
+        val result: MutableList<Bitmap> = mutableListOf()
         for (i in 1..NUMBER_BITMAP_SPACESHIP)
             result += BitmapFactory.decodeResource(
                 context.resources, context.resources.getIdentifier(
@@ -89,20 +91,21 @@ open class BitmapLoad(private val context: Context) {
                     "drawable", context.packageName
                 )
             )
-        return result
+        result
     }
 
-    private fun initBmpSpaceshipDestroy(): Array<Bitmap> {
-        val temp: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.spaceship_destroy)
+    val bmpSpaceshipDestroy: List<Bitmap> by lazy {
+        val temp: Bitmap =
+            BitmapFactory.decodeResource(context.resources, R.drawable.spaceship_destroy)
         val size = temp.width / NUMBER_BITMAP_SPACESHIP_DESTROY
-        var result: Array<Bitmap> = emptyArray()
+        val result: MutableList<Bitmap> = mutableListOf()
         for (i in 0 until NUMBER_BITMAP_SPACESHIP_DESTROY)
             result += Bitmap.createBitmap(temp, i * size, 0, size, size)
-        return result
+        result
     }
 
-    private fun initBmpSpaceshipLife(): Array<Bitmap> {
-        var result: Array<Bitmap> = emptyArray()
+    val bmpSpaceshipLife: List<Bitmap> by lazy {
+        val result: MutableList<Bitmap> = mutableListOf()
         for (i in 1..NUMBER_BITMAP_SPACESHIP_LIFE)
             result += BitmapFactory.decodeResource(
                 context.resources, context.resources.getIdentifier(
@@ -110,6 +113,6 @@ open class BitmapLoad(private val context: Context) {
                     "drawable", context.packageName
                 )
             )
-        return result
+        result
     }
 }

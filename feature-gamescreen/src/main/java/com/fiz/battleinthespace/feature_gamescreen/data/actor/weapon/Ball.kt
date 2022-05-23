@@ -3,7 +3,7 @@ package com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.domain.Display
+import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -51,6 +51,6 @@ class Ball(
     }
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bmpWeapon[3]
+        return display.bitmapRepository.bmpWeapon[3]
     }
 }

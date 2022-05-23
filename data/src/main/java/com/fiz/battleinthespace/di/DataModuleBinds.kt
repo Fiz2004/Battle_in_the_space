@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_mainscreen.di
+package com.fiz.battleinthespace.di
 
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
 import com.fiz.battleinthespace.repositories.PlayerRepositoryImpl
@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataModule {
+abstract class DataModuleBinds {
 
     @Binds
     abstract fun bindPlayerRepository(playerRepository: PlayerRepositoryImpl): PlayerRepository

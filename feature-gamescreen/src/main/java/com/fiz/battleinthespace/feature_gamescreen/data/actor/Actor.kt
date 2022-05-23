@@ -2,7 +2,7 @@ package com.fiz.battleinthespace.feature_gamescreen.data.actor
 
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.domain.Display
+import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 
 interface Drawable {
     var center: Vec

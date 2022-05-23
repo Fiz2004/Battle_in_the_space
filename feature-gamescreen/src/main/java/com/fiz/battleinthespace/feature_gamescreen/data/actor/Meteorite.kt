@@ -2,8 +2,8 @@ package com.fiz.battleinthespace.feature_gamescreen.data.actor
 
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.domain.Display
-import com.fiz.battleinthespace.feature_gamescreen.domain.NUMBER_BITMAP_METEORITE_OPTION
+import com.fiz.battleinthespace.feature_gamescreen.ui.Display
+import com.fiz.battleinthespace.feature_gamescreen.ui.NUMBER_BITMAP_METEORITE_OPTION
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -68,6 +68,6 @@ class Meteorite(
     }
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bmpMeteorites[view][viewSize]
+        return display.bitmapRepository.bmpMeteorites[view][viewSize]
     }
 }

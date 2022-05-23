@@ -1,9 +1,10 @@
 package com.fiz.battleinthespace.feature_gamescreen.data.actor
 
 import android.graphics.Bitmap
+import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.domain.Display
+import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sign
@@ -25,14 +26,15 @@ class SpaceShip(
 
     inGame: Boolean = true,
     var isFly: Boolean = false,
-    val playerGame: PlayerGame
+    val player: Player
 ) : MoveableActor(
     center, speed, angle, size, inGame, SPEED_MAX
 ) {
-    constructor (respawn: Respawn, playerGame: PlayerGame) : this(
-        Vec(respawn.center),
-        playerGame = playerGame,
-        angle = respawn.angle)
+    constructor (respawn: Respawn, playerGame: Player) : this(
+        center = Vec(respawn.center),
+        player = playerGame,
+        angle = respawn.angle
+    )
 
     private var timeRespawn: Double = TIME_RESPAWN_MIN
 
@@ -89,9 +91,9 @@ class SpaceShip(
 
     override fun getBitmap(display: Display): Bitmap {
         return if (isFly)
-            display.bmpSpaceshipFly[playerGame.number]
+            display.bitmapRepository.bmpSpaceshipFly[player.number]
         else
-            display.bmpSpaceship[playerGame.number]
+            display.bitmapRepository.bmpSpaceship[player.number]
 
     }
 

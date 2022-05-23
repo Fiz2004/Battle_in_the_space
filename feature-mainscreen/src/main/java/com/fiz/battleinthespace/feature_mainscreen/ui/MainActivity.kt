@@ -19,7 +19,6 @@ interface ApplicationFeatureMainScreen {
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
-
     private val accountViewModel: AccountViewModel by viewModels()
 
     private val binding: ActivityMainBinding by lazy {

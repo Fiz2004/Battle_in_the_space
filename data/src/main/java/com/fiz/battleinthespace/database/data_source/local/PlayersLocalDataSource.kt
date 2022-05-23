@@ -62,12 +62,18 @@ class PlayersLocalDataSource @Inject constructor(private val databaseRealm: Real
 
     private val all = LiveRealmResults(databaseRealm.where<PlayerRealm>().findAll())
 
-    fun getAll(): LiveData<List<Player>> {
+    fun getObserveAll(): LiveData<List<Player>> {
         return Transformations.map(all) {
             it?.map {
                 it.asPlayer()
             }
         }
+    }
+
+    fun getAll(): List<Player> {
+        return all.value?.map {
+            it.asPlayer()
+        } ?: listOf()
     }
 
     fun getCount(): Int {

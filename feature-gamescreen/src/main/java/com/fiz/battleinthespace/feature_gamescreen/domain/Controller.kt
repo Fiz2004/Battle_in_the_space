@@ -1,8 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import android.content.Context
 import android.view.MotionEvent
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.PlayerGame
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -10,7 +8,7 @@ import kotlin.math.atan2
 class Controller(
     var fire: Boolean = false,
     var power: Float = 0F,
-    context: Context,
+    scaledDensity: Float,
     _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F
 ) {
@@ -23,7 +21,7 @@ class Controller(
     val leftSide = Side()
     val rightSide = Side()
 
-    val widthJoystick = 50F * context.resources.displayMetrics.scaledDensity
+    val widthJoystick = 50F * scaledDensity
 
     var angle: Float = _angle
         set(value) {
@@ -38,11 +36,6 @@ class Controller(
 
     private var timeBetweenFireMin = _timeBetweenFireMin
     private var timeLastFire: Double = 0.0
-    lateinit var playerGame: PlayerGame
-
-    fun linkPlayer(playerGame: PlayerGame) {
-        this.playerGame = playerGame
-    }
 
     fun isCanFire(deltaTime: Double): Boolean {
         if (!fire) return false
