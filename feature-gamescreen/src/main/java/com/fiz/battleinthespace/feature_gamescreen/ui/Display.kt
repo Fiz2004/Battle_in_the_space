@@ -17,7 +17,7 @@ private const val DIVISION_BY_SCREEN = 11
 
 class Display(
     surfaceWidth: Int, surfaceHeight: Int,
-    private var stateGame: GameState,
+    private var stateGame: ViewState,
     val bitmapRepository: BitmapRepository,
     private val leftLocationOnScreen: Int,
     private val topLocationOnScreen: Int
@@ -32,13 +32,13 @@ class Display(
     private var viewport = Viewport(
         surfaceWidth,
         surfaceHeight,
-        stateGame.level.width,
-        stateGame.level.height,
+        stateGame.gameState.width,
+        stateGame.gameState.height,
         sizeUnit
     )
 
     fun render(
-        stateGame: GameState,
+        stateGame: ViewState,
         canvas: Canvas,
         controller: Controller
     ) {
@@ -69,7 +69,7 @@ class Display(
             for (k in yStart until yEnd) {
                 val x = Physics.changeCoorIfBorderTop(n.toDouble(), Physics.width)
                 val y = Physics.changeCoorIfBorderTop(k.toDouble(), Physics.height)
-                val background = stateGame.level.backgrounds[x.toInt()][y.toInt()]
+                val background = stateGame.gameState.backgrounds[x.toInt()][y.toInt()]
 
                 val xStartDst = (n - viewport.left).toFloat() * sizeUnit
                 val yStartDst = (k - viewport.top).toFloat() * sizeUnit
@@ -90,7 +90,7 @@ class Display(
     }
 
     private fun drawActors() {
-        for (actor in stateGame.level.listActors.actors) {
+        for (actor in stateGame.gameState.listActors.actors) {
             if (actor is SpaceShip)
                 if (!actor.inGame)
                     continue
@@ -130,7 +130,7 @@ class Display(
     }
 
     private fun drawAnimationDestroys() {
-        for (animationDestroy in stateGame.level.listActors.listAnimationDestroy) {
+        for (animationDestroy in stateGame.gameState.listActors.listAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
@@ -177,9 +177,9 @@ class Display(
 
     //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
     private fun drawHelper() {
-        val mainSpaceship = stateGame.level.listActors.spaceShips.filter { it.player.main }
+        val mainSpaceship = stateGame.gameState.listActors.spaceShips.filter { it.player.main }
         if (mainSpaceship.isNotEmpty()) {
-            stateGame.level.listActors.spaceShips.filter { it.inGame && !it.player.main }
+            stateGame.gameState.listActors.spaceShips.filter { it.inGame && !it.player.main }
                 .forEach {
                     if (viewport.getAllPoints(it).size == 0) {
                         val paintFont = Paint()
@@ -204,8 +204,8 @@ class Display(
                     }
                 }
 
-            if (stateGame.level.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
-                stateGame.level.listActors.meteorites.forEach {
+            if (stateGame.gameState.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
+                stateGame.gameState.listActors.meteorites.forEach {
                     val paintFont = Paint()
                     paintFont.color = Color.RED
                     paintFont.style = Paint.Style.FILL
@@ -229,7 +229,7 @@ class Display(
         }
     }
 
-    fun renderInfo(stateGame: GameState, canvasInfo: Canvas, FPS: Int) {
+    fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
         this.stateGame = stateGame
         this.canvasInfo = canvasInfo
 
@@ -256,7 +256,7 @@ class Display(
         paintFont.color = Color.WHITE
         paintFont.textAlign = Paint.Align.CENTER
         canvasInfo.drawText(
-            "Round ${stateGame.round}",
+            "Round ${stateGame.gameState.round}",
             canvasInfo.width / 2F,
             baseTextSize,
             paintFont
@@ -264,18 +264,18 @@ class Display(
 
         val maxTextWidth = getMaxTextWidth(paintFont)
 
-        for (n in 0 until stateGame.level.players.size) {
+        for (n in 0 until stateGame.gameState.players.size) {
             paintFont.textSize = textSize
             paintFont.textAlign = Paint.Align.LEFT
             paintFont.color = getColor(n)
             canvasInfo.drawText(
-                stateGame.level.players[n].name,
+                stateGame.gameState.players[n].name,
                 0F,
                 baseTextSize + (textSize * (n + 1)),
                 paintFont
             )
 
-            for (k in 0 until stateGame.level.players[n].life)
+            for (k in 0 until stateGame.gameState.players[n].life)
                 canvasInfo.drawBitmap(
                     bitmapRepository.bmpSpaceshipLife[n], rectSrc,
                     RectF(
@@ -288,7 +288,7 @@ class Display(
                 )
 
             canvasInfo.drawText(
-                stateGame.level.players[n].score.toString(),
+                stateGame.gameState.players[n].score.toString(),
                 (maxTextWidth + bmplife * 2).toFloat(),
                 baseTextSize + textSize * (n + 1),
                 paintFont
@@ -315,7 +315,7 @@ class Display(
 
     private fun getMaxTextWidth(paintFont: Paint): Int {
         var result = 0
-        for (namePlayer in stateGame.level.players) {
+        for (namePlayer in stateGame.gameState.players) {
             val mTextBoundRect = Rect(0, 0, 0, 0)
             paintFont.getTextBounds(namePlayer.name, 0, namePlayer.name.length, mTextBoundRect)
             val textWidth = mTextBoundRect.width()

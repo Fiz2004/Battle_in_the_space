@@ -37,7 +37,7 @@ class GameActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val loadStateGame =
-            savedInstanceState?.getSerializable(GameState::class.java.simpleName) as? GameState
+            savedInstanceState?.getSerializable(ViewState::class.java.simpleName) as? ViewState
         viewModel.loadState(loadStateGame)
 
         binding.gameGameSurfaceview.holder.addCallback(GameSurfaceView())
@@ -61,7 +61,7 @@ class GameActivity : AppCompatActivity() {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    viewModel.gameState.collectLatest { gameState ->
+                    viewModel.viewState.collectLatest { gameState ->
 
                         val now = System.currentTimeMillis()
                         val fps = (1000 / (now - prevTime)).toInt()
@@ -81,7 +81,7 @@ class GameActivity : AppCompatActivity() {
                         }
 
                         binding.pauseGameButton.text =
-                            if (gameState.status == GameState.Companion.StatusCurrentGame.Pause)
+                            if (gameState.status == ViewState.Companion.StatusCurrentGame.Pause)
                                 resources.getString(R.string.resume_game_button)
                             else
                                 resources.getString(R.string.pause_game_button)
@@ -116,8 +116,8 @@ class GameActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putSerializable(
-            GameState::class.java.simpleName,
-            viewModel.gameState.value
+            ViewState::class.java.simpleName,
+            viewModel.viewState.value
         )
         super.onSaveInstanceState(outState)
     }
@@ -135,7 +135,7 @@ class GameActivity : AppCompatActivity() {
             display = Display(
                 binding.gameGameSurfaceview.width,
                 binding.gameGameSurfaceview.height,
-                viewModel.gameState.value,
+                viewModel.viewState.value,
                 bitmapRepository,
                 left,
                 top

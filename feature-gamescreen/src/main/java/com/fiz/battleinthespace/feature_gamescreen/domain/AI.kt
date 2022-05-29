@@ -9,14 +9,14 @@ import kotlin.math.min
 
 class AI : Serializable {
 
-    fun update(index: Int, controller: Controller, level: Level) {
+    fun update(index: Int, controller: Controller, game: Game) {
         controller.fire = true
-        val spaceship = level.listActors.spaceShips[index]
+        val spaceship = game.listActors.spaceShips[index]
         val center = spaceship.center
-        if (level.listActors.meteorites.isNotEmpty()) {
-            var minDistanceMeteorite: Meteorite = level.listActors.meteorites.first()
-            var minDistance: Double = max(level.width.toDouble(), level.height.toDouble())
-            for (meteorite in level.listActors.meteorites) {
+        if (game.listActors.meteorites.isNotEmpty()) {
+            var minDistanceMeteorite: Meteorite = game.listActors.meteorites.first()
+            var minDistance: Double = max(game.width.toDouble(), game.height.toDouble())
+            for (meteorite in game.listActors.meteorites) {
                 val distance = Physics.findDistance(center, meteorite.center)
                 if (distance < minDistance) {
                     minDistance = distance
@@ -28,12 +28,12 @@ class AI : Serializable {
 
             val indexWeapon = spaceship.player.weapon
             if (minDistance > Weapon.create(
-                    level.listActors.spaceShips,
+                    game.listActors.spaceShips,
                     index,
                     indexWeapon
                 ).roadLengthMax
             )
-                controller.power = min((level.width / minDistance).toFloat(), 1F)
+                controller.power = min((game.width / minDistance).toFloat(), 1F)
             else
                 controller.power = 0F
         }

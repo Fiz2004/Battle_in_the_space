@@ -30,9 +30,9 @@ class Viewport(
         levelHeight * countViewportYOnScreen
     }
 
-    fun update(stateGame: GameState) {
+    fun update(stateGame: ViewState) {
         val spaceship =
-            stateGame.level.listActors.spaceShips[stateGame.level.players.indexOf(stateGame.level.players.find { it.main })]
+            stateGame.gameState.listActors.spaceShips[stateGame.gameState.players.indexOf(stateGame.gameState.players.find { it.main })]
         val center = spaceship.center
 
         left = center.x - marginX

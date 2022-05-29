@@ -9,7 +9,7 @@ import com.fiz.battleinthespace.domain.repositories.PlayerRepository
 import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.AI
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.domain.Level
+import com.fiz.battleinthespace.feature_gamescreen.domain.Game
 import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,18 +26,23 @@ class GameViewModel @Inject constructor(
     private val soundUseCase: SoundUseCase,
     @ApplicationContext context: Context
 ) : ViewModel() {
+    private val countPlayers = playerRepository.getCountPlayers()
 
-    var gameState = MutableStateFlow(run {
-        val countPlayers = playerRepository.getCountPlayers()
+    private val players = run {
 
-        val players = mutableListOf<Player>()
+        val result = mutableListOf<Player>()
 
         for ((index, player) in playerRepository.getPlayers().withIndex())
             if (index < countPlayers)
-                players.add(player.copy(number = index))
+                result.add(player.copy(number = index))
+        result
+    }
 
-        val round = 1
+    private val controllers: List<Controller> =
+        List(players.size) { Controller(scaledDensity = context.resources.displayMetrics.scaledDensity) }
 
+
+    private val game: Game = run {
         val ai = mutableListOf<AI?>()
 
         for (n in 0 until players.size)
@@ -46,23 +51,23 @@ class GameViewModel @Inject constructor(
             else
                 ai.add(null)
 
+        Game(20, 20, 0, players, ai = ai, playSound = ::playSound)
+    }
 
-        val gameState = GameState(
-            controllers = List(players.size) { Controller(scaledDensity = context.resources.displayMetrics.scaledDensity) },
-            round = round,
-            status = GameState.Companion.StatusCurrentGame.Playing,
-            level = Level(20, 20, round, players, ai = ai, playSound = ::playSound),
+    var viewState = MutableStateFlow(
+        ViewState(
+            controllers = controllers,
+            gameState = game.getState(),
+            status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
         )
-        gameState.newGame()
-        gameState
-    })
+    )
         private set
 
     private var job: Job? = null
 
-    fun loadState(gameState: GameState?) {
-        this.gameState.value = gameState ?: return
+    fun loadState(viewState: ViewState?) {
+        this.viewState.value = viewState ?: return
     }
 
     fun startGame() {
@@ -80,8 +85,10 @@ class GameViewModel @Inject constructor(
             val deltaTime = min(now - lastTime, mSecFromFPS60).toInt() / 1000.0
             if (deltaTime == 0.0) continue
 
-            gameState.value = gameState.value.update(deltaTime)
-                .copy(changed = !gameState.value.changed)
+            game.update(viewState.value.controllers, deltaTime)
+
+            viewState.value = viewState.value.update(deltaTime, game)
+                .copy(changed = !viewState.value.changed)
 
             lastTime = now
         }
@@ -97,7 +104,7 @@ class GameViewModel @Inject constructor(
         for ((index, player) in playerRepository.getPlayers().withIndex())
             if (index < countPlayers) {
                 players.add(player.copy(number = index))
-                score.add(gameState.value.level.players[index].score)
+                score.add(game.players[index].score)
             }
 
         val pl = playerRepository.getPlayers()
@@ -119,13 +126,13 @@ class GameViewModel @Inject constructor(
     }
 
     fun clickNewGameButton() {
-        gameState.value = gameState.value
-            .copy(status = GameState.Companion.StatusCurrentGame.NewGame)
+        viewState.value = viewState.value
+            .copy(status = ViewState.Companion.StatusCurrentGame.NewGame)
     }
 
     fun clickPauseGameButton() {
-        gameState.value = gameState.value
-            .copy(status = gameState.value.clickPause())
+        viewState.value = viewState.value
+            .copy(status = viewState.value.clickPause())
 
     }
 
@@ -145,20 +152,22 @@ class GameViewModel @Inject constructor(
 
         when (event.actionMasked) {
             // первое касание
-            MotionEvent.ACTION_DOWN -> gameState.value.controllers[0]
+            MotionEvent.ACTION_DOWN -> controllers[0]
                 .down(touchLeftSide, point, pointerId)
             // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> gameState.value.controllers[0]
+            MotionEvent.ACTION_POINTER_DOWN -> controllers[0]
                 .pointerDown(touchLeftSide, point, pointerId)
             // прерывание последнего касания
-            MotionEvent.ACTION_UP -> gameState.value.controllers[0].up()
+            MotionEvent.ACTION_UP -> controllers[0].up()
             // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> gameState.value.controllers[0].powerUp(event)
+            MotionEvent.ACTION_POINTER_UP -> controllers[0].powerUp(event)
             // движение
-            MotionEvent.ACTION_MOVE -> gameState.value.controllers[0].move(event)
+            MotionEvent.ACTION_MOVE -> controllers[0].move(event)
         }
-        gameState.value = gameState.value
-            .copy(changed = !gameState.value.changed)
+        viewState.value = viewState.value
+            .copy(
+                changed = !viewState.value.changed
+            )
     }
 
     private fun playSound(numberSound: Int) {
