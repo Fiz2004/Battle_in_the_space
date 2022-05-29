@@ -1,8 +1,9 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.Meteorite
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.game.Game
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.game.models.Meteorite
+import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
 import java.io.Serializable
 import kotlin.math.max
 import kotlin.math.min

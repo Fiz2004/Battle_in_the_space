@@ -1,19 +1,20 @@
-package com.fiz.battleinthespace.feature_gamescreen.domain
+package com.fiz.battleinthespace.feature_gamescreen.game
 
 import com.fiz.battleinthespace.domain.models.Player
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.ListActors
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.NUMBER_BITMAP_BACKGROUND
-import com.fiz.battleinthespace.feature_gamescreen.ui.GameState
+import com.fiz.battleinthespace.feature_gamescreen.domain.AI
+import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.game.models.ListActors
+import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
 import java.io.Serializable
 
 class Game(
     val width: Int,
     val height: Int,
-    private var round: Int = 0,
+    var round: Int = 0,
     var players: MutableList<Player>,
-    private var countPlayers: Int = players.size,
+    var countPlayers: Int = players.size,
     var ai: MutableList<AI?>,
     val playSound: (Int) -> Unit,
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
@@ -111,20 +112,6 @@ class Game(
         for (player in players)
             player.newGame()
         players[0].main = true
-    }
-
-    fun getState(): GameState {
-        return GameState(
-            width,
-            height,
-            round,
-            players,
-            countPlayers,
-            ai,
-            playSound,
-            backgrounds,
-            listActors
-        )
     }
 
     fun getStatus(): Boolean {

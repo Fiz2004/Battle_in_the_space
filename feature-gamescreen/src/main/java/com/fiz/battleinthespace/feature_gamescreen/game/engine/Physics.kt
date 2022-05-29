@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.engine
+package com.fiz.battleinthespace.feature_gamescreen.game.engine
 
 import kotlin.math.*
 
@@ -99,7 +99,7 @@ object Physics {
         }
     }
 
-    fun changeCoorIfBorderTop(center: Double, border: Double): Double {
+    fun changeCoordinateIfBorderTop(center: Double, border: Double): Double {
         return when {
             (center < 0.0) -> center + border
             (center >= border) -> center - border

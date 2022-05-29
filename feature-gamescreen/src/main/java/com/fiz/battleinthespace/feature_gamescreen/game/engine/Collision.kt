@@ -1,6 +1,6 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.engine
+package com.fiz.battleinthespace.feature_gamescreen.game.engine
 
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.MoveableActor
+import com.fiz.battleinthespace.feature_gamescreen.game.models.MoveableActor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt

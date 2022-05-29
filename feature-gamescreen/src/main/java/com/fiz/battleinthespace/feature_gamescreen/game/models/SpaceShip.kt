@@ -1,9 +1,9 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor
+package com.fiz.battleinthespace.feature_gamescreen.game.models
 
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.domain.models.Player
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 import kotlin.math.abs
 import kotlin.math.cos

@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.domain.AI
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.domain.Game
 import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
+import com.fiz.battleinthespace.feature_gamescreen.game.Game
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -57,7 +57,7 @@ class GameViewModel @Inject constructor(
     var viewState = MutableStateFlow(
         ViewState(
             controllers = controllers,
-            gameState = game.getState(),
+            gameState = GameState.getStateFromGame(game),
             status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
         )
@@ -88,7 +88,10 @@ class GameViewModel @Inject constructor(
             game.update(viewState.value.controllers, deltaTime)
 
             viewState.value = viewState.value.update(deltaTime, game)
-                .copy(changed = !viewState.value.changed)
+                .copy(
+                    gameState = GameState.getStateFromGame(game),
+                    changed = !viewState.value.changed
+                )
 
             lastTime = now
         }

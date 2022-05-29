@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.engine
+package com.fiz.battleinthespace.feature_gamescreen.game.engine
 
 import kotlin.math.cos
 import kotlin.math.sin

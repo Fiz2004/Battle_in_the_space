@@ -1,8 +1,8 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon
+package com.fiz.battleinthespace.feature_gamescreen.game.models.weapon
 
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.MoveableActor
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.models.MoveableActor
+import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShip
 import kotlin.math.sqrt
 
 abstract class Weapon(

@@ -1,7 +1,7 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.domain.Game
+import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import java.io.Serializable
 
 private const val SecTimeForRestartForEndGame = 1.0

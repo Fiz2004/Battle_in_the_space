@@ -1,7 +1,7 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor
+package com.fiz.battleinthespace.feature_gamescreen.game.models
 
 import android.graphics.Bitmap
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 
 interface Drawable {

@@ -1,7 +1,8 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
 import android.view.MotionEvent
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import java.io.Serializable
 import kotlin.math.abs
 import kotlin.math.atan2
 
@@ -11,8 +12,8 @@ class Controller(
     scaledDensity: Float,
     _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F
-) {
-    class Side {
+) : Serializable {
+    class Side : Serializable {
         var point: Vec = Vec(0.0, 0.0)
         var touch: Boolean = false
         var ID: Int = 0

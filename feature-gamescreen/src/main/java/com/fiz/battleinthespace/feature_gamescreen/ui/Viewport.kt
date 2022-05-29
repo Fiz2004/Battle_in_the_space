@@ -1,7 +1,7 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.Actor
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.models.Actor
 import kotlin.math.ceil
 
 class Viewport(
@@ -32,7 +32,7 @@ class Viewport(
 
     fun update(stateGame: ViewState) {
         val spaceship =
-            stateGame.gameState.listActors.spaceShips[stateGame.gameState.players.indexOf(stateGame.gameState.players.find { it.main })]
+            stateGame.gameState.spaceShips[stateGame.gameState.players.indexOf(stateGame.gameState.players.find { it.main })]
         val center = spaceship.center
 
         left = center.x - marginX

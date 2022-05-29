@@ -1,12 +1,12 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import android.graphics.*
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.Actor
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.models.Actor
+import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShip
 import kotlin.math.*
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
@@ -17,15 +17,13 @@ private const val DIVISION_BY_SCREEN = 11
 
 class Display(
     surfaceWidth: Int, surfaceHeight: Int,
-    private var stateGame: ViewState,
+    stateGame: ViewState,
     val bitmapRepository: BitmapRepository,
     private val leftLocationOnScreen: Int,
     private val topLocationOnScreen: Int
 ) {
 
     private val paint: Paint = Paint()
-    private lateinit var canvas: Canvas
-    private lateinit var canvasInfo: Canvas
 
     private var sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
 
@@ -42,18 +40,15 @@ class Display(
         canvas: Canvas,
         controller: Controller
     ) {
-        this.stateGame = stateGame
-        this.canvas = canvas
-
         viewport.update(stateGame)
-        drawBackground()
-        drawActors()
-        drawAnimationDestroys()
-        drawJoystick(controller, leftLocationOnScreen, topLocationOnScreen)
-        drawHelper()
+        drawBackground(stateGame, canvas)
+        drawActors(stateGame, canvas)
+        drawAnimationDestroys(stateGame, canvas)
+        drawJoystick(controller, leftLocationOnScreen, topLocationOnScreen, canvas)
+        drawHelper(stateGame, canvas)
     }
 
-    private fun drawBackground() {
+    private fun drawBackground(stateGame: ViewState, canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
 
         val xStart = floor(viewport.left).toInt()
@@ -67,8 +62,8 @@ class Display(
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
-                val x = Physics.changeCoorIfBorderTop(n.toDouble(), Physics.width)
-                val y = Physics.changeCoorIfBorderTop(k.toDouble(), Physics.height)
+                val x = Physics.changeCoordinateIfBorderTop(n.toDouble(), Physics.width)
+                val y = Physics.changeCoordinateIfBorderTop(k.toDouble(), Physics.height)
                 val background = stateGame.gameState.backgrounds[x.toInt()][y.toInt()]
 
                 val xStartDst = (n - viewport.left).toFloat() * sizeUnit
@@ -89,18 +84,18 @@ class Display(
             }
     }
 
-    private fun drawActors() {
-        for (actor in stateGame.gameState.listActors.actors) {
+    private fun drawActors(stateGame: ViewState, canvas: Canvas) {
+        for (actor in stateGame.gameState.actors) {
             if (actor is SpaceShip)
                 if (!actor.inGame)
                     continue
-            drawActor(actor, actor.getBitmap(this))
+            drawActor(actor, actor.getBitmap(this), canvas)
         }
     }
 
-    private fun drawActor(actor: Actor, bmp: Bitmap) {
+    private fun drawActor(actor: Actor, bmp: Bitmap, canvas: Canvas) {
         for (point in viewport.getAllPoints(actor))
-            drawFrame(bmp, point.x, point.y, actor.size, actor.angle)
+            drawFrame(bmp, point.x, point.y, actor.size, actor.angle, canvas)
     }
 
     private fun drawFrame(
@@ -109,6 +104,7 @@ class Display(
         y: Double,
         size: Double,
         angle: Double = 0.0,
+        canvas: Canvas
     ) {
         canvas.save()
         canvas.translate(x.toFloat() * sizeUnit, y.toFloat() * sizeUnit)
@@ -129,19 +125,25 @@ class Display(
         canvas.restore()
     }
 
-    private fun drawAnimationDestroys() {
-        for (animationDestroy in stateGame.gameState.listActors.listAnimationDestroy) {
+    private fun drawAnimationDestroys(stateGame: ViewState, canvas: Canvas) {
+        for (animationDestroy in stateGame.gameState.listAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            drawActor(animationDestroy as Actor, animationDestroy.getBitmap(this))
+            if (animationDestroy.frame == 3) {
+                var a = 1
+                a += 1
+                println(a)
+            }
+            drawActor(animationDestroy as Actor, animationDestroy.getBitmap(this), canvas)
         }
     }
 
     private fun drawJoystick(
         controller: Controller,
         leftLocationOnScreen: Int,
-        topLocationOnScreen: Int
+        topLocationOnScreen: Int,
+        canvas: Canvas
     ) {
         val paintFont = Paint()
         paintFont.color = Color.RED
@@ -176,10 +178,10 @@ class Display(
     }
 
     //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
-    private fun drawHelper() {
-        val mainSpaceship = stateGame.gameState.listActors.spaceShips.filter { it.player.main }
+    private fun drawHelper(stateGame: ViewState, canvas: Canvas) {
+        val mainSpaceship = stateGame.gameState.spaceShips.filter { it.player.main }
         if (mainSpaceship.isNotEmpty()) {
-            stateGame.gameState.listActors.spaceShips.filter { it.inGame && !it.player.main }
+            stateGame.gameState.spaceShips.filter { it.inGame && !it.player.main }
                 .forEach {
                     if (viewport.getAllPoints(it).size == 0) {
                         val paintFont = Paint()
@@ -204,8 +206,8 @@ class Display(
                     }
                 }
 
-            if (stateGame.gameState.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
-                stateGame.gameState.listActors.meteorites.forEach {
+            if (stateGame.gameState.meteorites.all { (viewport.getAllPoints(it).size == 0) })
+                stateGame.gameState.meteorites.forEach {
                     val paintFont = Paint()
                     paintFont.color = Color.RED
                     paintFont.style = Paint.Style.FILL
@@ -230,14 +232,11 @@ class Display(
     }
 
     fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
-        this.stateGame = stateGame
-        this.canvasInfo = canvasInfo
-
-        drawInfo(FPS)
+        drawInfo(stateGame, canvasInfo, FPS)
 
     }
 
-    private fun drawInfo(FPS: Int) {
+    private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
         val width = canvasInfo.width
         val height = canvasInfo.height
         val minCharacteristic = min(width, height)
@@ -262,7 +261,7 @@ class Display(
             paintFont
         )
 
-        val maxTextWidth = getMaxTextWidth(paintFont)
+        val maxTextWidth = getMaxTextWidth(stateGame, paintFont)
 
         for (n in 0 until stateGame.gameState.players.size) {
             paintFont.textSize = textSize
@@ -313,7 +312,7 @@ class Display(
         else -> Color.WHITE
     }
 
-    private fun getMaxTextWidth(paintFont: Paint): Int {
+    private fun getMaxTextWidth(stateGame: ViewState, paintFont: Paint): Int {
         var result = 0
         for (namePlayer in stateGame.gameState.players) {
             val mTextBoundRect = Rect(0, 0, 0, 0)

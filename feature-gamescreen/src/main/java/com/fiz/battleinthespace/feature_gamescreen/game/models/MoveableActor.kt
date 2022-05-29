@@ -1,7 +1,7 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor
+package com.fiz.battleinthespace.feature_gamescreen.game.models
 
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.cross
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.cross
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sign

@@ -1,8 +1,8 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon
+package com.fiz.battleinthespace.feature_gamescreen.game.models.weapon
 
 import android.graphics.Bitmap
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.SpaceShip
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShip
 import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 import kotlin.math.cos
 import kotlin.math.sin
@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 
 private const val SPEED_MAX: Double = 4.0
 
-class TwoBullet(
+class OneBullet(
     center: Vec,
 
     speed: Vec,
@@ -29,7 +29,6 @@ class TwoBullet(
     override var roadLengthMax = 6.0
 
     companion object {
-
         fun create(spaceShips: MutableList<SpaceShip>, player: Int): Weapon {
             val spaceship = spaceShips[player]
             val center = Vec(
@@ -42,8 +41,8 @@ class TwoBullet(
             )
             val angle = spaceship.angle
             val roadLength = 0.0
-            val size = 0.2
-            return TwoBullet(center, speed, angle, size, true, roadLength, player)
+            val size = 0.1
+            return OneBullet(center, speed, angle, size, true, roadLength, player)
         }
     }
 
@@ -53,6 +52,6 @@ class TwoBullet(
     }
 
     override fun getBitmap(display: Display): Bitmap {
-        return display.bitmapRepository.bmpWeapon[1]
+        return display.bitmapRepository.bmpWeapon[0]
     }
 }

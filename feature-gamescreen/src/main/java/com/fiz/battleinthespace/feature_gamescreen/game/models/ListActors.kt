@@ -1,10 +1,10 @@
-package com.fiz.battleinthespace.feature_gamescreen.data.actor
+package com.fiz.battleinthespace.feature_gamescreen.game.models
 
 import com.fiz.battleinthespace.domain.models.Player
-import com.fiz.battleinthespace.feature_gamescreen.data.actor.weapon.Weapon
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Collision
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.data.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Collision
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
 import java.io.Serializable
 
 
@@ -51,6 +51,7 @@ class ListActors(
     )
 
     fun createSpaceShips(countPlayers: Int) {
+        spaceShips.clear()
         for (n in 0 until countPlayers)
             spaceShips += SpaceShip(respawns[n], playerGame = players[n])
     }
