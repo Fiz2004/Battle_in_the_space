@@ -177,5 +177,9 @@ class GameViewModel @Inject constructor(
         soundUseCase.play(numberSound)
     }
 
+    fun setDisplay(display: Display) {
+        GameState.setDisplay(display)
+    }
+
 
 }

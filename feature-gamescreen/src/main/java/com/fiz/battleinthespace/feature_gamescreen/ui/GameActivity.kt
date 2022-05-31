@@ -12,6 +12,7 @@ import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,7 +58,7 @@ class GameActivity : AppCompatActivity() {
 
         var prevTime = System.currentTimeMillis()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
@@ -140,6 +141,9 @@ class GameActivity : AppCompatActivity() {
                 left,
                 top
             )
+
+            viewModel.setDisplay(display)
+
             startGame()
         }
 
