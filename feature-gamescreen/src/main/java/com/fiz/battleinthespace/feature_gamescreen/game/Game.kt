@@ -16,23 +16,19 @@ class Game(
     var players: MutableList<Player>,
     var countPlayers: Int = players.size,
     var ai: MutableList<AI?>,
-    val playSound: (Int) -> Unit,
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
     var listActors: ListActors = ListActors(width, height, players)
 ) : Serializable {
 
-    var currentStatus: Boolean = true
-
     init {
         Physics.createWorld(width, height)
-        newGame()
-        newRound()
     }
 
     fun update(
         controllers: List<Controller>,
         deltaTime: Double,
-    ) {
+        playSound: (Int) -> Unit,
+    ): Boolean {
 
         for ((index, player) in players.withIndex()) {
             if (ai[index] != null && !player.main) {
@@ -62,29 +58,36 @@ class Game(
 
         listActors.update(deltaTime, playSound)
 
-        listActors.listAnimationDestroy.forEach {
+        listActors.bulletsAnimationDestroy.forEach {
             it.timeShow -= deltaTime
         }
-        listActors.listAnimationDestroy = listActors.listAnimationDestroy.filter {
+        listActors.bulletsAnimationDestroy = listActors.bulletsAnimationDestroy.filter {
+            it.timeShow > 0
+        }.toMutableList()
+
+        listActors.spaceShipsAnimationDestroy.forEach {
+            it.timeShow -= deltaTime
+        }
+        listActors.spaceShipsAnimationDestroy = listActors.spaceShipsAnimationDestroy.filter {
             it.timeShow > 0
         }.toMutableList()
 
         if (players.none { it.life > 0 } || listActors.meteorites.isEmpty()) {
             if (round + 1 == 11)
-                currentStatus = false
+                return false
 
-            newRound()
+            newRound(playSound)
         }
 
-        currentStatus = true
+        return true
     }
 
-    fun newRound() {
+    private fun newRound(playSound: (Int) -> Unit) {
         round += 1
         val countMeteorites = round
 
         createBackgrounds()
-        createActors(countMeteorites)
+        createActors(countMeteorites, playSound)
         updatePlayers()
     }
 
@@ -97,7 +100,7 @@ class Game(
         }
     }
 
-    private fun createActors(countMeteorites: Int) {
+    private fun createActors(countMeteorites: Int, playSound: (Int) -> Unit) {
         listActors.createSpaceShips(countPlayers)
         listActors.createMeteorites(countMeteorites, playSound)
     }
@@ -107,15 +110,11 @@ class Game(
             player.newRound()
     }
 
-    fun newGame() {
+    fun newGame(playSound: (Int) -> Unit) {
         round = 0
         for (player in players)
             player.newGame()
         players[0].main = true
+        newRound(playSound)
     }
-
-    fun getStatus(): Boolean {
-        return currentStatus
-    }
-
 }

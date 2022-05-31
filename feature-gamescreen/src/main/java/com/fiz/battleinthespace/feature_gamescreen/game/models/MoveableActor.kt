@@ -13,7 +13,7 @@ abstract class MoveableActor(
     size: Double,
     var inGame: Boolean = true,
     private var speedMax: Double
-) : Actor(center, angle, size), Drawable {
+) : Actor(center, angle, size), Drawable, java.io.Serializable {
     var angleSpeed: Double = 0.0
 
     // Устанавливается по форме

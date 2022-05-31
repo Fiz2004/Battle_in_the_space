@@ -1,31 +1,39 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.content.Context
-import android.view.MotionEvent
+import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
-import com.fiz.battleinthespace.feature_gamescreen.domain.AI
-import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
+import com.fiz.battleinthespace.feature_gamescreen.domain.*
 import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlin.math.max
 import kotlin.math.min
 
-private const val mSecFromFPS60 = ((1.0 / 60.0) * 1000.0).toLong()
+private const val mSEC_FOR_FPS_60 = ((1.0 / 60.0) * 1000.0).toLong()
+
+const val WIDTH_WORLD = 20
+const val HEIGHT_WORLD = 20
+
+private const val DIVISION_BY_SCREEN = 11
+
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val playerRepository: PlayerRepository,
-    private val soundUseCase: SoundUseCase,
-    @ApplicationContext context: Context
+    private val getGameStateFromGame: GetGameStateFromGame,
+    private val soundUseCase: SoundUseCase
 ) : ViewModel() {
+
+    private var isGameSurfaceViewReady = false
+
+    private var isInformationSurfaceViewReady = false
+
     private val countPlayers = playerRepository.getCountPlayers()
 
     private val players = run {
@@ -39,10 +47,15 @@ class GameViewModel @Inject constructor(
     }
 
     private val controllers: List<Controller> =
-        List(players.size) { Controller(scaledDensity = context.resources.displayMetrics.scaledDensity) }
+        List(players.size) { Controller() }
 
+    private var job: Job? = null
 
-    private val game: Game = run {
+    var getControllerState: GetControllerState =
+        GetControllerState(0, 0, 0f)
+        private set
+
+    var game: Game = run {
         val ai = mutableListOf<AI?>()
 
         for (n in 0 until players.size)
@@ -51,26 +64,96 @@ class GameViewModel @Inject constructor(
             else
                 ai.add(null)
 
-        Game(20, 20, 0, players, ai = ai, playSound = ::playSound)
+        Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players, ai = ai)
+    }
+        private set
+
+    init {
+        game.newGame(::playSound)
     }
 
     var viewState = MutableStateFlow(
         ViewState(
             controllers = controllers,
-            gameState = GameState.getStateFromGame(game),
+            controllerState = getControllerState(controllers[0]),
+            gameState = getGameStateFromGame(game),
             status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
         )
     )
         private set
 
-    private var job: Job? = null
-
-    fun loadState(viewState: ViewState?) {
-        this.viewState.value = viewState ?: return
+    fun loadState(game: Game?, viewStatus: ViewState.Companion.StatusCurrentGame?) {
+        this.game = game ?: return
+        this.viewState.value = this.viewState.value.copy(
+            status = viewStatus ?: return
+        )
     }
 
-    fun startGame() {
+
+    fun gameSurfaceChanged(
+        surfaceWidth: Int,
+        surfaceHeight: Int,
+        leftLocationOnScreen: Int,
+        topLocationOnScreen: Int,
+        widthJoystick: Float
+    ) {
+
+        val sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
+
+        getGameStateFromGame.setViewport(
+            surfaceWidth,
+            surfaceHeight,
+            WIDTH_WORLD,
+            HEIGHT_WORLD,
+            sizeUnit
+        )
+
+        getControllerState = GetControllerState(
+            leftLocationOnScreen,
+            topLocationOnScreen,
+            widthJoystick
+        )
+
+        isGameSurfaceViewReady = true
+        ifAllSurfaceReadyWhenStartGame()
+    }
+
+    fun informationSurfaceChanged(
+        infoWidth: Int,
+        infoHeight: Int,
+    ) {
+        val minCharacteristic = min(infoWidth, infoHeight)
+        val bmpLife = minCharacteristic / 3 / 3
+        val baseTextSize = minCharacteristic / 6F
+        val textSize = baseTextSize * 0.75F
+        val maxTextNameWidth = getMaxTextWidth(game.players, textSize)
+
+        getGameStateFromGame.setInfo(
+            infoWidth, infoHeight, bmpLife, baseTextSize, maxTextNameWidth
+        )
+
+        isInformationSurfaceViewReady = true
+        ifAllSurfaceReadyWhenStartGame()
+    }
+
+    private fun getMaxTextWidth(players: MutableList<Player>, textSize: Float): Int {
+        var result = 0
+        val paint = Paint()
+        paint.textSize = textSize
+        for (namePlayer in players) {
+            val textWidth = paint.measureText(namePlayer.name).toInt()
+            result = max(textWidth, result)
+        }
+        return result
+    }
+
+    private fun ifAllSurfaceReadyWhenStartGame() {
+        if (isGameSurfaceViewReady && isInformationSurfaceViewReady)
+            startGame()
+    }
+
+    private fun startGame() {
         viewModelScope.launch(Dispatchers.Default) {
             job?.cancelAndJoin()
             job = viewModelScope.launch(Dispatchers.Default, block = gameLoop())
@@ -82,35 +165,68 @@ class GameViewModel @Inject constructor(
 
         while (isActive) {
             val now = System.currentTimeMillis()
-            val deltaTime = min(now - lastTime, mSecFromFPS60).toInt() / 1000.0
+            val deltaTime = min(now - lastTime, mSEC_FOR_FPS_60).toInt() / 1000.0
             if (deltaTime == 0.0) continue
 
-            game.update(viewState.value.controllers, deltaTime)
-
-            viewState.value = viewState.value.update(deltaTime, game)
-                .copy(
-                    gameState = GameState.getStateFromGame(game),
-                    changed = !viewState.value.changed
-                )
+            update(deltaTime)
 
             lastTime = now
         }
     }
 
+    private fun update(deltaTime: Double) {
+
+        if (viewState.value.status == ViewState.Companion.StatusCurrentGame.Pause)
+            return
+
+        if (viewState.value.timeToRestart < 0 || viewState.value.status == ViewState.Companion.StatusCurrentGame.NewGame) {
+            game.newGame(::playSound)
+            viewState.value = viewState.value
+                .copy(
+                    gameState = getGameStateFromGame(game),
+                    status = ViewState.Companion.StatusCurrentGame.Playing,
+                    timeToRestart = SecTimeForRestartForEndGame,
+                )
+        }
+
+
+        val status = if (viewState.value.timeToRestart == SecTimeForRestartForEndGame)
+            game.update(viewState.value.controllers, deltaTime, ::playSound)
+        else
+            false
+
+        if (!status) {
+            val newTimeToRestart = viewState.value.timeToRestart - deltaTime
+            viewState.value = viewState.value
+                .copy(
+                    timeToRestart = newTimeToRestart,
+                )
+            return
+        }
+
+        viewState.value = viewState.value
+            .copy(
+                gameState = getGameStateFromGame(game),
+            )
+
+    }
+
     fun gameStop() {
+        isGameSurfaceViewReady = false
+        isInformationSurfaceViewReady = false
 
         val countPlayers = playerRepository.getCountPlayers()
 
         val players = mutableListOf<Player>()
         val score = mutableListOf<Int>()
 
-        for ((index, player) in playerRepository.getPlayers().withIndex())
+        val pl = playerRepository.getPlayers()
+
+        for ((index, player) in pl.withIndex())
             if (index < countPlayers) {
                 players.add(player.copy(number = index))
                 score.add(game.players[index].score)
             }
-
-        val pl = playerRepository.getPlayers()
 
         viewModelScope.launch {
             for (index in playerRepository.getPlayers().indices)
@@ -124,6 +240,7 @@ class GameViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.Default) {
                 job?.cancelAndJoin()
+                job = null
             }
         }
     }
@@ -135,47 +252,66 @@ class GameViewModel @Inject constructor(
 
     fun clickPauseGameButton() {
         viewState.value = viewState.value
-            .copy(status = viewState.value.clickPause())
+            .copy(status = viewState.value.getStatusPauseOrPlaying())
 
     }
 
-    fun onTouch(event: MotionEvent, left: Int, top: Int, width: Int, height: Int) {
-        val pointerIndex = event.actionIndex
-        val pointerId = event.getPointerId(pointerIndex)
+    fun firstTouchDown(pointerId: Int, point: Vec, left: Int, top: Int, width: Int, height: Int) {
+        val touchMoveSide = point.x > left && point.x < left + width
+                && point.y > top && point.y < top + height
 
-        val point =
-            Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
+        controllers[0]
+            .down(touchMoveSide, point, pointerId)
 
-        var touchLeftSide = false
-        if (point.x > left && point.x < left + width
-            && point.y > top && point.y < top + height
-        )
-            touchLeftSide = true
-
-
-        when (event.actionMasked) {
-            // первое касание
-            MotionEvent.ACTION_DOWN -> controllers[0]
-                .down(touchLeftSide, point, pointerId)
-            // последующие касания
-            MotionEvent.ACTION_POINTER_DOWN -> controllers[0]
-                .pointerDown(touchLeftSide, point, pointerId)
-            // прерывание последнего касания
-            MotionEvent.ACTION_UP -> controllers[0].up()
-            // прерывания касаний
-            MotionEvent.ACTION_POINTER_UP -> controllers[0].powerUp(event)
-            // движение
-            MotionEvent.ACTION_MOVE -> controllers[0].move(event)
-        }
         viewState.value = viewState.value
             .copy(
-                changed = !viewState.value.changed
+                controllerState = getControllerState(controllers[0])
+            )
+    }
+
+    fun nextTouchDown(pointerId: Int, point: Vec, left: Int, top: Int, width: Int, height: Int) {
+
+        val touchMoveSide = point.x > left && point.x < left + width
+                && point.y > top && point.y < top + height
+
+        controllers[0]
+            .pointerDown(touchMoveSide, point, pointerId)
+
+        viewState.value = viewState.value
+            .copy(
+                controllerState = getControllerState(controllers[0])
+            )
+    }
+
+    fun lastTouchUp() {
+        controllers[0].up()
+
+        viewState.value = viewState.value
+            .copy(
+                controllerState = getControllerState(controllers[0])
+            )
+    }
+
+    fun beforeTouchUp(pointIndex: Int) {
+        controllers[0].powerUp(pointIndex)
+
+        viewState.value = viewState.value
+            .copy(
+                controllerState = getControllerState(controllers[0])
+            )
+    }
+
+    fun moveTouch(pointUp: Vec) {
+        controllers[0].move(pointUp)
+
+        viewState.value = viewState.value
+            .copy(
+                controllerState = getControllerState(controllers[0])
             )
     }
 
     private fun playSound(numberSound: Int) {
         soundUseCase.play(numberSound)
     }
-
 
 }

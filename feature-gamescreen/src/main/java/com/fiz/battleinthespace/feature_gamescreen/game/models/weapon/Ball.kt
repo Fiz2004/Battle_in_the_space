@@ -24,7 +24,7 @@ class Ball(
     player: Int
 ) : Weapon(
     center, speed, angle, size, inGame, roadLength, player, SPEED_MAX
-) {
+), java.io.Serializable {
     override var roadLengthMax = 12.0
 
     companion object {
@@ -52,5 +52,9 @@ class Ball(
 
     override fun getBitmap(display: Display): Bitmap {
         return display.bitmapRepository.bmpWeapon[3]
+    }
+
+    override fun getType(): Int {
+        return 3
     }
 }

@@ -6,7 +6,7 @@ data class Item(
     val imageId: Int,
     val cost: Int,
     var state: StateProduct
-) {
+) : java.io.Serializable {
     companion object {
         fun addZeroFirstItem(items: List<Item>): List<Item> {
             val result = mutableListOf<Item>()

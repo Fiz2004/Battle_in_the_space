@@ -8,12 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.fiz.battleinthespace.feature_gamescreen.R
-import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
+import com.fiz.battleinthespace.feature_gamescreen.domain.WIDTH_JOYSTICK_DEFAULT
+import com.fiz.battleinthespace.feature_gamescreen.game.Game
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,22 +27,27 @@ class GameActivity : AppCompatActivity() {
         ActivityGameBinding.inflate(layoutInflater)
     }
 
-    private var isGameSurfaceViewReady = false
-    private var isInformationSurfaceViewReady = false
-
-    lateinit var display: Display
-
     @Inject
-    lateinit var bitmapRepository: BitmapRepository
+    lateinit var display: Display
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val loadStateGame =
-            savedInstanceState?.getSerializable(ViewState::class.java.simpleName) as? ViewState
-        viewModel.loadState(loadStateGame)
+        init(savedInstanceState)
+        bindListeners()
+        collectFlows()
+    }
 
+    private fun init(savedInstanceState: Bundle?) {
+        val loadGame =
+            savedInstanceState?.getSerializable(Game::class.java.simpleName) as? Game
+        val viewStatus =
+            savedInstanceState?.getSerializable(ViewState.Companion.StatusCurrentGame::class.java.simpleName) as? ViewState.Companion.StatusCurrentGame
+        viewModel.loadState(loadGame, viewStatus)
+    }
+
+    private fun bindListeners() {
         binding.gameGameSurfaceview.holder.addCallback(GameSurfaceView())
         binding.informationGameSurfaceview.holder.addCallback(InformationSurfaceView())
 
@@ -54,39 +62,39 @@ class GameActivity : AppCompatActivity() {
         binding.exitGameButton.setOnClickListener {
             finish()
         }
+    }
 
-        var prevTime = System.currentTimeMillis()
+    private fun collectFlows() {
+        var lastTime = System.currentTimeMillis()
+        var fps = 60
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                launch {
-                    viewModel.viewState.collectLatest { gameState ->
+                withContext(Dispatchers.Main) {
+                    viewModel.viewState.collectLatest { viewState ->
 
                         val now = System.currentTimeMillis()
-                        val fps = (1000 / (now - prevTime)).toInt()
+                        val deltaTime = now - lastTime
+                        fps = ((fps + (1000 / deltaTime)) / 2).toInt()
 
                         binding.gameGameSurfaceview.holder.lockCanvas()?.let {
                             display.render(
-                                gameState,
-                                it,
-                                gameState.controllers[0]
+                                viewState,
+                                it
                             )
                             binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
 
                         binding.informationGameSurfaceview.holder.lockCanvas()?.let {
-                            display.renderInfo(gameState, it, fps)
+                            display.renderInfo(viewState, it, fps)
                             binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
 
                         binding.pauseGameButton.text =
-                            if (gameState.status == ViewState.Companion.StatusCurrentGame.Pause)
-                                resources.getString(R.string.resume_game_button)
-                            else
-                                resources.getString(R.string.pause_game_button)
+                            getString(viewState.getResourceTextForPauseResumeButton())
 
-                        prevTime = now
+                        lastTime = now
 
                     }
                 }
@@ -97,50 +105,83 @@ class GameActivity : AppCompatActivity() {
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) return false
-        viewModel.onTouch(
-            event,
-            binding.gameGameSurfaceview.left,
-            binding.gameGameSurfaceview.top,
-            binding.gameGameSurfaceview.width,
-            binding.gameGameSurfaceview.height
-        )
-        return super.onTouchEvent(event)
-    }
 
-    override fun onStop() {
-        super.onStop()
-        isGameSurfaceViewReady = false
-        isInformationSurfaceViewReady = false
-        viewModel.gameStop()
+        val pointerIndex = event.actionIndex
+        val pointerId = event.getPointerId(pointerIndex)
+
+        val point =
+            Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
+
+        val pointIndex = (event.findPointerIndex(pointerId))
+
+        val pointUp = Vec(
+            event.getX(event.findPointerIndex(pointerId)).toDouble(),
+            event.getY(event.findPointerIndex(pointerId)).toDouble()
+        )
+
+        when (event.actionMasked) {
+            // первое касание
+            MotionEvent.ACTION_DOWN -> viewModel.firstTouchDown(
+                pointerId,
+                point,
+                binding.gameGameSurfaceview.left,
+                binding.gameGameSurfaceview.top,
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height
+            )
+            // последующие касания
+            MotionEvent.ACTION_POINTER_DOWN -> viewModel.nextTouchDown(
+                pointerId,
+                point,
+                binding.gameGameSurfaceview.left,
+                binding.gameGameSurfaceview.top,
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height
+            )
+            // прерывание последнего касания
+            MotionEvent.ACTION_UP -> viewModel.lastTouchUp()
+            // прерывания касаний
+            MotionEvent.ACTION_POINTER_UP -> viewModel.beforeTouchUp(pointIndex)
+            // движение
+            MotionEvent.ACTION_MOVE -> viewModel.moveTouch(pointUp)
+        }
+
+        return super.onTouchEvent(event)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putSerializable(
-            ViewState::class.java.simpleName,
-            viewModel.viewState.value
+            Game::class.java.simpleName,
+            viewModel.game
+        )
+        outState.putSerializable(
+            ViewState.Companion.StatusCurrentGame::class.java.simpleName,
+            viewModel.viewState.value.status
         )
         super.onSaveInstanceState(outState)
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.gameStop()
+    }
+
     inner class GameSurfaceView : SurfaceHolder.Callback {
         override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-            isGameSurfaceViewReady = true
-
-
             val a = IntArray(2)
             binding.gameGameSurfaceview.getLocationOnScreen(a)
-            val left = a[0]
-            val top = a[1]
+            val leftLocationOnScreen = a[0]
+            val topLocationOnScreen = a[1]
 
-            display = Display(
+            val widthJoystick = WIDTH_JOYSTICK_DEFAULT * resources.displayMetrics.scaledDensity
+
+            viewModel.gameSurfaceChanged(
                 binding.gameGameSurfaceview.width,
                 binding.gameGameSurfaceview.height,
-                viewModel.viewState.value,
-                bitmapRepository,
-                left,
-                top
+                leftLocationOnScreen,
+                topLocationOnScreen,
+                widthJoystick
             )
-            startGame()
         }
 
         override fun surfaceCreated(p0: SurfaceHolder) {}
@@ -149,18 +190,14 @@ class GameActivity : AppCompatActivity() {
 
     inner class InformationSurfaceView : SurfaceHolder.Callback {
         override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-            isInformationSurfaceViewReady = true
-            startGame()
+            viewModel.informationSurfaceChanged(
+                binding.informationGameSurfaceview.width,
+                binding.informationGameSurfaceview.height
+            )
         }
 
         override fun surfaceCreated(p0: SurfaceHolder) {}
         override fun surfaceDestroyed(p0: SurfaceHolder) {}
-    }
-
-    fun startGame() {
-        if (isGameSurfaceViewReady && isInformationSurfaceViewReady)
-            viewModel.startGame()
-
     }
 }
 

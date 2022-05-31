@@ -24,7 +24,7 @@ class TwoBullet(
     player: Int
 ) : Weapon(
     center, speed, angle, size, inGame, roadLength, player, SPEED_MAX
-) {
+), java.io.Serializable {
 
     override var roadLengthMax = 6.0
 
@@ -54,5 +54,9 @@ class TwoBullet(
 
     override fun getBitmap(display: Display): Bitmap {
         return display.bitmapRepository.bmpWeapon[1]
+    }
+
+    override fun getType(): Int {
+        return 1
     }
 }

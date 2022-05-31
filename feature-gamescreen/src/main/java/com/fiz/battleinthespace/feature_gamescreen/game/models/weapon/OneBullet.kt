@@ -24,7 +24,7 @@ class OneBullet(
     player: Int
 ) : Weapon(
     center, speed, angle, size, inGame, roadLength, player, SPEED_MAX
-) {
+), java.io.Serializable {
 
     override var roadLengthMax = 6.0
 
@@ -53,5 +53,9 @@ class OneBullet(
 
     override fun getBitmap(display: Display): Bitmap {
         return display.bitmapRepository.bmpWeapon[0]
+    }
+
+    override fun getType(): Int {
+        return 0
     }
 }

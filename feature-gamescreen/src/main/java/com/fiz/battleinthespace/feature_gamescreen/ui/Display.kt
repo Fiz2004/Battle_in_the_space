@@ -2,326 +2,280 @@ package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import android.graphics.*
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
-import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.game.models.Actor
-import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShip
-import kotlin.math.*
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-const val NUMBER_BITMAP_METEORITE_OPTION = 4
+@Singleton
+class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
 
-private const val NUMBER_BITMAP_BULLET_DESTROY = 3
+    private val paintBitmap: Paint = Paint()
 
-private const val DIVISION_BY_SCREEN = 11
+    private val paintOutsideCircleJoystick = Paint().apply {
+        color = Color.RED
+        style = Paint.Style.STROKE
+        alpha = 80
+        strokeWidth = 6F
+    }
 
-class Display(
-    surfaceWidth: Int, surfaceHeight: Int,
-    stateGame: ViewState,
-    val bitmapRepository: BitmapRepository,
-    private val leftLocationOnScreen: Int,
-    private val topLocationOnScreen: Int
-) {
+    private val paintInnerCircleJoystick = Paint().apply {
+        color = Color.GREEN
+        style = Paint.Style.FILL
+        alpha = 40
+        strokeWidth = 30F
+    }
 
-    private val paint: Paint = Paint()
+    private val paintHelperPlayer = Paint().apply {
+        style = Paint.Style.FILL
+        alpha = 80
+        strokeWidth = 30F
+    }
 
-    private var sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
+    private val paintHelperMeteorites = Paint().apply {
+        color = Color.RED
+        style = Paint.Style.FILL
+        alpha = 160
+        strokeWidth = 20F
+    }
 
-    private var viewport = Viewport(
-        surfaceWidth,
-        surfaceHeight,
-        stateGame.gameState.width,
-        stateGame.gameState.height,
-        sizeUnit
-    )
+    private val paintRound = Paint().apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.CENTER
+    }
+
+    private val paintPlayer = Paint().apply {
+        textAlign = Paint.Align.LEFT
+    }
 
     fun render(
         stateGame: ViewState,
-        canvas: Canvas,
-        controller: Controller
+        canvas: Canvas
     ) {
-        viewport.update(stateGame)
-        drawBackground(stateGame, canvas)
-        drawActors(stateGame, canvas)
-        drawAnimationDestroys(stateGame, canvas)
-        drawJoystick(controller, leftLocationOnScreen, topLocationOnScreen, canvas)
-        drawHelper(stateGame, canvas)
+        drawBackground(stateGame.gameState.backgroundsUi, canvas)
+        drawActors(
+            stateGame.gameState.spaceshipsUi,
+            stateGame.gameState.spaceshipsFlyUi,
+            stateGame.gameState.bulletsUi,
+            stateGame.gameState.meteoritesUi, canvas
+        )
+        drawAnimationDestroys(
+            stateGame.gameState.bulletsAnimationsDestroyUi,
+            stateGame.gameState.spaceShipsAnimationsDestroyUi,
+            canvas
+        )
+        drawJoystick(stateGame.controllerState, canvas)
+        drawHelper(
+            stateGame.gameState.helpersPlayerUi,
+            stateGame.gameState.helpersMeteoriteUi,
+            canvas
+        )
     }
 
-    private fun drawBackground(stateGame: ViewState, canvas: Canvas) {
+    private fun drawBackground(backgroundsUi: List<BackgroundUi>, canvas: Canvas) {
         canvas.drawColor(Color.BLACK)
 
-        val xStart = floor(viewport.left).toInt()
-        val xEnd = ceil(viewport.left + viewport.width).toInt()
-        val yStart = floor(viewport.top).toInt()
-        val yEnd = ceil(viewport.top + viewport.height).toInt()
-
-        val rectSrc = Rect(
-            0, 0,
-            bitmapRepository.bmpBackground[0].width, bitmapRepository.bmpBackground[0].height
-        )
-        for (n in xStart until xEnd)
-            for (k in yStart until yEnd) {
-                val x = Physics.changeCoordinateIfBorderTop(n.toDouble(), Physics.width)
-                val y = Physics.changeCoordinateIfBorderTop(k.toDouble(), Physics.height)
-                val background = stateGame.gameState.backgrounds[x.toInt()][y.toInt()]
-
-                val xStartDst = (n - viewport.left).toFloat() * sizeUnit
-                val yStartDst = (k - viewport.top).toFloat() * sizeUnit
-                val rectDst = RectF(
-                    xStartDst,
-                    yStartDst,
-                    xStartDst + sizeUnit,
-                    yStartDst + sizeUnit
-                )
-
-                canvas.drawBitmap(
-                    bitmapRepository.bmpBackground[background],
-                    rectSrc,
-                    rectDst,
-                    paint
-                )
-            }
-    }
-
-    private fun drawActors(stateGame: ViewState, canvas: Canvas) {
-        for (actor in stateGame.gameState.actors) {
-            if (actor is SpaceShip)
-                if (!actor.inGame)
-                    continue
-            drawActor(actor, actor.getBitmap(this), canvas)
+        backgroundsUi.forEach {
+            canvas.drawBitmap(
+                bitmapRepository.bmpBackground[it.value],
+                it.src,
+                it.dst,
+                paintBitmap
+            )
         }
     }
 
-    private fun drawActor(actor: Actor, bmp: Bitmap, canvas: Canvas) {
-        for (point in viewport.getAllPoints(actor))
-            drawFrame(bmp, point.x, point.y, actor.size, actor.angle, canvas)
+    private fun drawActors(
+        spaceshipsUi: List<SpriteUi>,
+        spaceshipsFlyUi: List<SpriteUi>,
+        bulletsUi: List<SpriteUi>,
+        meteoritesUi: List<MeteoriteSpriteUi>,
+        canvas: Canvas
+    ) {
+
+        spaceshipsUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpSpaceship[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        spaceshipsFlyUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpSpaceshipFly[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        bulletsUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpWeapon[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        meteoritesUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpMeteorites[it.view][it.viewSize],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
     }
 
     private fun drawFrame(
         bmp: Bitmap,
-        x: Double,
-        y: Double,
-        size: Double,
-        angle: Double = 0.0,
+        x: Float,
+        y: Float,
+        src: Rect,
+        dst: RectF,
+        angle: Float,
         canvas: Canvas
     ) {
         canvas.save()
-        canvas.translate(x.toFloat() * sizeUnit, y.toFloat() * sizeUnit)
-        canvas.rotate(angle.toFloat())
-
-        val rectSrc = Rect(
-            0, 0,
-            bmp.width, bmp.height
-        )
-        val halfSize = (size * sizeUnit / 2).toFloat()
-        val rectDst = RectF(
-            -halfSize, -halfSize,
-            halfSize, halfSize
-        )
-
-        canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
-
+        canvas.translate(x, y)
+        canvas.rotate(angle)
+        canvas.drawBitmap(bmp, src, dst, paintBitmap)
         canvas.restore()
     }
 
-    private fun drawAnimationDestroys(stateGame: ViewState, canvas: Canvas) {
-        for (animationDestroy in stateGame.gameState.listAnimationDestroy) {
-            val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
-            animationDestroy.frame =
-                NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            if (animationDestroy.frame == 3) {
-                var a = 1
-                a += 1
-                println(a)
-            }
-            drawActor(animationDestroy as Actor, animationDestroy.getBitmap(this), canvas)
+    private fun drawAnimationDestroys(
+        bulletsSpriteUi: List<SpriteUi>,
+        spaceShipsSpriteUi: List<SpriteUi>, canvas: Canvas
+    ) {
+        bulletsSpriteUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpBulletDestroy[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        spaceShipsSpriteUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpSpaceshipDestroy[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
         }
     }
 
     private fun drawJoystick(
-        controller: Controller,
-        leftLocationOnScreen: Int,
-        topLocationOnScreen: Int,
+        controllerState: ControllerState?,
         canvas: Canvas
     ) {
-        val paintFont = Paint()
-        paintFont.color = Color.RED
-        paintFont.style = Paint.Style.STROKE
-        paintFont.alpha = 80
-        paintFont.strokeWidth = 6F
+        controllerState ?: return
 
-        var cx = controller.leftSide.point.x.toFloat() - leftLocationOnScreen
-        var cy = controller.leftSide.point.y.toFloat() - topLocationOnScreen
-        if (controller.leftSide.touch) {
+        canvas.drawCircle(
+            controllerState.centerXOutsideCircle,
+            controllerState.centerYOutsideCircle,
+            controllerState.widthJoystick,
+            paintOutsideCircleJoystick
+        )
+
+        canvas.drawCircle(
+            controllerState.centerXInnerCircle,
+            controllerState.centerYInnerCircle,
+            30F,
+            paintInnerCircleJoystick
+        )
+    }
+
+    private fun drawHelper(
+        helpersPlayerUi: List<HelperPlayerUi>,
+        helpersMeteoriteUi: List<HelperMeteoritesUi>,
+        canvas: Canvas
+    ) {
+        helpersPlayerUi.forEach {
+            paintHelperPlayer.color = it.value
+
             canvas.drawCircle(
-                cx,
-                cy,
-                controller.widthJoystick,
-                paintFont
+                it.centerX,
+                it.centerY,
+                it.radius,
+                paintHelperPlayer
             )
         }
 
-        paintFont.color = Color.GREEN
-        paintFont.style = Paint.Style.FILL
-        paintFont.alpha = 40
-        paintFont.strokeWidth = 30F
-        cx += controller.widthJoystick * controller.power * cos(controller.angle / 180.0 * Math.PI).toFloat()
-        cy += controller.widthJoystick * controller.power * sin(controller.angle / 180.0 * Math.PI).toFloat()
-        if (controller.leftSide.touch)
+        helpersMeteoriteUi.forEach {
             canvas.drawCircle(
-                cx,
-                cy,
-                30F,
-                paintFont
+                it.centerX,
+                it.centerY,
+                it.radius,
+                paintHelperMeteorites
             )
-    }
-
-    //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
-    private fun drawHelper(stateGame: ViewState, canvas: Canvas) {
-        val mainSpaceship = stateGame.gameState.spaceShips.filter { it.player.main }
-        if (mainSpaceship.isNotEmpty()) {
-            stateGame.gameState.spaceShips.filter { it.inGame && !it.player.main }
-                .forEach {
-                    if (viewport.getAllPoints(it).size == 0) {
-                        val paintFont = Paint()
-                        paintFont.color = getColor(it.player.number)
-                        paintFont.style = Paint.Style.FILL
-                        paintFont.alpha = 80
-                        paintFont.strokeWidth = 30F
-
-                        val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
-                        val angleToRadians = angle / 180.0 * Math.PI
-                        val vec = Vec(cos(angleToRadians), sin(angleToRadians))
-                        val cx =
-                            (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
-                        val cy =
-                            (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
-                        canvas.drawCircle(
-                            cx,
-                            cy,
-                            30F,
-                            paintFont
-                        )
-                    }
-                }
-
-            if (stateGame.gameState.meteorites.all { (viewport.getAllPoints(it).size == 0) })
-                stateGame.gameState.meteorites.forEach {
-                    val paintFont = Paint()
-                    paintFont.color = Color.RED
-                    paintFont.style = Paint.Style.FILL
-                    paintFont.alpha = 160
-                    paintFont.strokeWidth = 20F
-
-                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
-                    val angleToRadians = angle / 180.0 * Math.PI
-                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
-                    val cx =
-                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 40F
-                    val cy =
-                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 40F
-                    canvas.drawCircle(
-                        cx,
-                        cy,
-                        30F,
-                        paintFont
-                    )
-                }
         }
     }
 
     fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
         drawInfo(stateGame, canvasInfo, FPS)
-
     }
 
     private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
-        val width = canvasInfo.width
-        val height = canvasInfo.height
-        val minCharacteristic = min(width, height)
-        val bmplife = minCharacteristic / 3 / 3
-
         canvasInfo.drawColor(Color.BLACK)
-        val paintFont = Paint()
-        val rectSrc = Rect(
-            0, 0,
-            bitmapRepository.bmpSpaceshipLife[0].width, bitmapRepository.bmpSpaceshipLife[0].height
-        )
 
-        val baseTextSize = minCharacteristic / 6F
-        val textSize = baseTextSize * 0.75F
-        paintFont.textSize = baseTextSize
-        paintFont.color = Color.WHITE
-        paintFont.textAlign = Paint.Align.CENTER
-        canvasInfo.drawText(
-            "Round ${stateGame.gameState.round}",
-            canvasInfo.width / 2F,
-            baseTextSize,
-            paintFont
-        )
-
-        val maxTextWidth = getMaxTextWidth(stateGame, paintFont)
-
-        for (n in 0 until stateGame.gameState.players.size) {
-            paintFont.textSize = textSize
-            paintFont.textAlign = Paint.Align.LEFT
-            paintFont.color = getColor(n)
+        stateGame.gameState.textRoundInfoUi.also {
+            paintRound.textSize = it.textSize
+            paintRound.color = it.color
             canvasInfo.drawText(
-                stateGame.gameState.players[n].name,
-                0F,
-                baseTextSize + (textSize * (n + 1)),
-                paintFont
+                it.value,
+                it.x,
+                it.y,
+                paintRound
             )
+        }
 
-            for (k in 0 until stateGame.gameState.players[n].life)
-                canvasInfo.drawBitmap(
-                    bitmapRepository.bmpSpaceshipLife[n], rectSrc,
-                    RectF(
-                        maxTextWidth + bmplife * (k - 1).toFloat(),
-                        baseTextSize + textSize * n,
-                        (maxTextWidth + bmplife * (k - 1) + bmplife).toFloat(),
-                        baseTextSize + textSize * n + textSize
-                    ),
-                    paint
-                )
-
+        stateGame.gameState.textsInfoUi.forEach {
+            paintPlayer.textSize = it.textSize
+            paintPlayer.color = it.color
             canvasInfo.drawText(
-                stateGame.gameState.players[n].score.toString(),
-                (maxTextWidth + bmplife * 2).toFloat(),
-                baseTextSize + textSize * (n + 1),
-                paintFont
+                it.value,
+                it.x,
+                it.y,
+                paintPlayer
+            )
+        }
+
+        stateGame.gameState.infoUi.forEach {
+            canvasInfo.drawBitmap(
+                bitmapRepository.bmpSpaceshipLife[it.value], it.src,
+                it.dst,
+                paintBitmap
             )
         }
 
         canvasInfo.drawText(
             FPS.toString(),
             0F,
-            baseTextSize,
-            paintFont
+            66F,
+            paintPlayer
         )
-
     }
-
-    private fun getColor(n: Int) = when (n) {
-        0 -> Color.GREEN
-        1 -> Color.CYAN
-        // Color = pink
-        2 -> Color.rgb(255, 192, 203)
-        3 -> Color.YELLOW
-        else -> Color.WHITE
-    }
-
-    private fun getMaxTextWidth(stateGame: ViewState, paintFont: Paint): Int {
-        var result = 0
-        for (namePlayer in stateGame.gameState.players) {
-            val mTextBoundRect = Rect(0, 0, 0, 0)
-            paintFont.getTextBounds(namePlayer.name, 0, namePlayer.name.length, mTextBoundRect)
-            val textWidth = mTextBoundRect.width()
-            result = max(textWidth, result)
-        }
-        return result
-    }
-
 }
 

@@ -21,13 +21,17 @@ abstract class Weapon(
     speedMax: Double
 ) : MoveableActor(
     center, speed, angle, size, inGame, speedMax
-) {
+), java.io.Serializable {
 
     open var roadLengthMax: Double = 6.0
 
     override fun update(deltaTime: Double, width: Int, height: Int) {
         super.update(deltaTime, width, height)
         roadLength += sqrt(speed.sumPow2()) * deltaTime
+    }
+
+    open fun getType(): Int {
+        return 0
     }
 
     companion object {

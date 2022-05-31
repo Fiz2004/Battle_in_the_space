@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.Display
 
-interface Drawable {
+interface Drawable : java.io.Serializable {
     var center: Vec
     var angle: Double
     var size: Double
@@ -15,7 +15,8 @@ interface Drawable {
 abstract class Actor(
     center: Vec,
     angle: Double,
-    var size: Double) {
+    var size: Double
+) : java.io.Serializable {
 
     val halfSize
         get() = size / 2

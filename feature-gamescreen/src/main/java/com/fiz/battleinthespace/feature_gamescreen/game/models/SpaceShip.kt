@@ -29,7 +29,7 @@ class SpaceShip(
     val player: Player
 ) : MoveableActor(
     center, speed, angle, size, inGame, SPEED_MAX
-) {
+), java.io.Serializable {
     constructor (respawn: Respawn, playerGame: Player) : this(
         center = Vec(respawn.center),
         player = playerGame,

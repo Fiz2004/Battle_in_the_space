@@ -11,7 +11,7 @@ data class Player(
     var number: Int = 0,
     var main: Boolean = false,
     var life: Int = 3
-) {
+) : java.io.Serializable {
 
     fun newGame() {
         score = 0

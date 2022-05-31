@@ -6,7 +6,7 @@ import kotlin.math.sqrt
 
 const val EPSILON: Double = 0.0001
 
-class Vec(var x: Double, var y: Double) {
+class Vec(var x: Double, var y: Double) : java.io.Serializable {
     constructor (vec: Vec) : this(vec.x, vec.y)
 
     operator fun plus(vec: Vec): Vec {

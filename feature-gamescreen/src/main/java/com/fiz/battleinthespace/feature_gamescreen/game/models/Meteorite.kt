@@ -1,9 +1,9 @@
 package com.fiz.battleinthespace.feature_gamescreen.game.models
 
 import android.graphics.Bitmap
+import com.fiz.battleinthespace.feature_gamescreen.data.repositories.NUMBER_BITMAP_METEORITE_OPTION
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.Display
-import com.fiz.battleinthespace.feature_gamescreen.ui.NUMBER_BITMAP_METEORITE_OPTION
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -24,7 +24,7 @@ class Meteorite(
     var view: Int
 ) : MoveableActor(
     center, speed, angle, size, inGame, SPEED_MAX
-) {
+), java.io.Serializable {
 
     fun createMeteorite(angleDestroy: Double, angleCreate: Double): Meteorite {
         val currentSpeed = speed.length()

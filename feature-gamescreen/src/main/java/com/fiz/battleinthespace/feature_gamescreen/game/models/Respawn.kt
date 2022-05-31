@@ -7,4 +7,4 @@ class Respawn(
     center: Vec,
     angle: Double,
     size: Double = 4.0
-) : Actor(center, angle, size)
+) : Actor(center, angle, size), java.io.Serializable
