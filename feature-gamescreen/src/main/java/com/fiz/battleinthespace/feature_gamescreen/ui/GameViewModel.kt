@@ -1,6 +1,5 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.content.Context
 import android.view.MotionEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,6 @@ import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
 import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -21,8 +19,8 @@ import kotlin.math.min
 
 private const val mSecFromFPS60 = ((1.0 / 60.0) * 1000.0).toLong()
 
-val widthWorld=20
-val heightWorld=20
+val widthWorld = 20
+val heightWorld = 20
 
 private const val DIVISION_BY_SCREEN = 11
 
@@ -31,11 +29,14 @@ private const val DIVISION_BY_SCREEN = 11
 class GameViewModel @Inject constructor(
     private val playerRepository: PlayerRepository,
     private val bitmapRepository: BitmapRepository,
-    private val soundUseCase: SoundUseCase,
-    @ApplicationContext context: Context
+    private val soundUseCase: SoundUseCase
 ) : ViewModel() {
 
-    var getGameStateFromGame:GetGameStateFromGame=GetGameStateFromGame(0,0,0,0,0f ,bitmapRepository)
+    var getGameStateFromGame: GetGameStateFromGame =
+        GetGameStateFromGame(0, 0, 0, 0, 0f, bitmapRepository)
+
+    var getControllerState: GetControllerState =
+        GetControllerState(0, 0, 0f)
 
     private var isGameSurfaceViewReady = false
     private var isInformationSurfaceViewReady = false
@@ -53,7 +54,7 @@ class GameViewModel @Inject constructor(
     }
 
     private val controllers: List<Controller> =
-        List(players.size) { Controller(scaledDensity = context.resources.displayMetrics.scaledDensity) }
+        List(players.size) { Controller() }
 
 
     private val game: Game = run {
@@ -71,6 +72,7 @@ class GameViewModel @Inject constructor(
     var viewState = MutableStateFlow(
         ViewState(
             controllers = controllers,
+            controllerState = getControllerState(controllers[0]),
             gameState = getGameStateFromGame(game),
             status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
@@ -87,6 +89,7 @@ class GameViewModel @Inject constructor(
     fun startGame() {
         viewModelScope.launch(Dispatchers.Default) {
             job?.cancelAndJoin()
+            job = null
             job = viewModelScope.launch(Dispatchers.Default, block = gameLoop())
         }
     }
@@ -140,6 +143,7 @@ class GameViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.Default) {
                 job?.cancelAndJoin()
+                job = null
             }
         }
     }
@@ -185,6 +189,7 @@ class GameViewModel @Inject constructor(
         }
         viewState.value = viewState.value
             .copy(
+                controllerState = getControllerState(controllers[0]),
                 changed = !viewState.value.changed
             )
     }
@@ -193,11 +198,29 @@ class GameViewModel @Inject constructor(
         soundUseCase.play(numberSound)
     }
 
-    fun gameSurfaceChanged(surfaceWidth:Int,surfaceHeight:Int) {
+    fun gameSurfaceChanged(
+        surfaceWidth: Int,
+        surfaceHeight: Int,
+        leftLocationOnScreen: Int,
+        topLocationOnScreen: Int,
+        widthJoystick: Float
+    ) {
 
         val sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
 
-        getGameStateFromGame.setViewport(surfaceWidth,surfaceHeight,widthWorld,heightWorld,sizeUnit)
+        getGameStateFromGame.setViewport(
+            surfaceWidth,
+            surfaceHeight,
+            widthWorld,
+            heightWorld,
+            sizeUnit
+        )
+
+        getControllerState = GetControllerState(
+            leftLocationOnScreen,
+            topLocationOnScreen,
+            widthJoystick
+        )
 
         isGameSurfaceViewReady = true
         ifCanStartGameWhenStartGame()

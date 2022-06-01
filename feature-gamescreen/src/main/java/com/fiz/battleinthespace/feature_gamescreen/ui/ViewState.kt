@@ -9,6 +9,7 @@ private const val SecTimeForRestartForEndGame = 1.0
 
 data class ViewState(
     val controllers: List<Controller>,
+    val controllerState: ControllerState?,
     val gameState: GameState,
     val status: StatusCurrentGame = StatusCurrentGame.Playing,
     val playSound: (Int) -> Unit,

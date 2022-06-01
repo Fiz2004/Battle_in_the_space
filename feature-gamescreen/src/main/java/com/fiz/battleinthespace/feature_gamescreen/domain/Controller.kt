@@ -6,10 +6,11 @@ import java.io.Serializable
 import kotlin.math.abs
 import kotlin.math.atan2
 
+const val WIDTH_JOYSTICK_DEFAULT = 50F
+
 class Controller(
     var fire: Boolean = false,
     var power: Float = 0F,
-    scaledDensity: Float,
     _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F
 ) : Serializable {
@@ -19,10 +20,8 @@ class Controller(
         var ID: Int = 0
     }
 
-    val leftSide = Side()
-    val rightSide = Side()
-
-    val widthJoystick = 50F * scaledDensity
+    val moveSide = Side()
+    val fireSide = Side()
 
     var angle: Float = _angle
         set(value) {
@@ -43,7 +42,7 @@ class Controller(
 
         if (timeLastFire == 0.0) {
             timeLastFire = timeBetweenFireMin
-            if (!rightSide.touch)
+            if (!fireSide.touch)
                 fire = false
             return true
         }
@@ -55,60 +54,60 @@ class Controller(
 
     fun down(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
         if (touchLeftSide) {
-            leftSide.point = point.copy()
-            leftSide.touch = true
-            leftSide.ID = pointerId
+            moveSide.point = point.copy()
+            moveSide.touch = true
+            moveSide.ID = pointerId
         } else {
             fire = true
-            rightSide.touch = true
+            fireSide.touch = true
         }
     }
 
     fun pointerDown(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
-        if (!leftSide.touch && touchLeftSide) {
-            leftSide.point = point.copy()
-            leftSide.touch = true
-            leftSide.ID = pointerId
+        if (!moveSide.touch && touchLeftSide) {
+            moveSide.point = point.copy()
+            moveSide.touch = true
+            moveSide.ID = pointerId
         }
-        if (!rightSide.touch && !touchLeftSide) {
+        if (!fireSide.touch && !touchLeftSide) {
             fire = true
-            rightSide.touch = true
-            rightSide.ID = pointerId
+            fireSide.touch = true
+            fireSide.ID = pointerId
         }
     }
 
     fun up() {
-        leftSide.touch = false
+        moveSide.touch = false
         power = 0F
 
-        rightSide.touch = false
+        fireSide.touch = false
     }
 
     fun powerUp(event: MotionEvent) {
         val pointerIndex = event.actionIndex
-        val isLeftSide = event.findPointerIndex(pointerIndex) == leftSide.ID
-        val isRightSide = event.findPointerIndex(pointerIndex) == rightSide.ID
+        val isLeftSide = event.findPointerIndex(pointerIndex) == moveSide.ID
+        val isRightSide = event.findPointerIndex(pointerIndex) == fireSide.ID
         if (isLeftSide) {
-            leftSide.touch = false
+            moveSide.touch = false
             power = 0F
         }
         if (isRightSide)
-            rightSide.touch = false
+            fireSide.touch = false
     }
 
     fun move(event: MotionEvent) {
-        if (leftSide.touch) {
+        if (moveSide.touch) {
             val point = Vec(
-                event.getX(event.findPointerIndex(leftSide.ID)).toDouble(),
-                event.getY(event.findPointerIndex(leftSide.ID)).toDouble()
+                event.getX(event.findPointerIndex(moveSide.ID)).toDouble(),
+                event.getY(event.findPointerIndex(moveSide.ID)).toDouble()
             )
 
             val delta = Vec(
-                if (abs(point.x - leftSide.point.x) > sensivity.x) point.x - leftSide.point.x else 0.0,
-                if (abs(point.y - leftSide.point.y) > sensivity.y) point.y - leftSide.point.y else 0.0
+                if (abs(point.x - moveSide.point.x) > sensivity.x) point.x - moveSide.point.x else 0.0,
+                if (abs(point.y - moveSide.point.y) > sensivity.y) point.y - moveSide.point.y else 0.0
             )
 
-            val tempPower = delta.length() / (widthJoystick * 3)
+            val tempPower = delta.length() / (WIDTH_JOYSTICK_DEFAULT * 3)
             power = (if (tempPower > 1) 1.0 else tempPower).toFloat()
 
             angle = (atan2(delta.y, delta.x) * 180 / Math.PI).toFloat()

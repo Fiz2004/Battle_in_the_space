@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
+import com.fiz.battleinthespace.feature_gamescreen.domain.WIDTH_JOYSTICK_DEFAULT
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -69,8 +70,7 @@ class GameActivity : AppCompatActivity() {
                         binding.gameGameSurfaceview.holder.lockCanvas()?.let {
                             display.render(
                                     viewState,
-                                    it,
-                                    viewState.controllers[0]
+                                it
                             )
                             binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
@@ -120,20 +120,25 @@ class GameActivity : AppCompatActivity() {
         override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
             val a = IntArray(2)
             binding.gameGameSurfaceview.getLocationOnScreen(a)
-            val left = a[0]
-            val top = a[1]
+            val leftLocationOnScreen = a[0]
+            val topLocationOnScreen = a[1]
 
             display = Display(
-                    binding.gameGameSurfaceview.width,
-                    binding.gameGameSurfaceview.height,
-                    viewModel.viewState.value,
-                    bitmapRepository,
-                    left,
-                    top
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height,
+                viewModel.viewState.value,
+                bitmapRepository
             )
 
-            viewModel.gameSurfaceChanged(binding.gameGameSurfaceview.width,
-                    binding.gameGameSurfaceview.height)
+            val widthJoystick = WIDTH_JOYSTICK_DEFAULT * resources.displayMetrics.scaledDensity
+
+            viewModel.gameSurfaceChanged(
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height,
+                leftLocationOnScreen,
+                topLocationOnScreen,
+                widthJoystick
+            )
         }
 
         override fun surfaceCreated(p0: SurfaceHolder) {}
