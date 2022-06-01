@@ -26,6 +26,10 @@ class GameViewModel @Inject constructor(
     private val soundUseCase: SoundUseCase,
     @ApplicationContext context: Context
 ) : ViewModel() {
+
+    private var isGameSurfaceViewReady = false
+    private var isInformationSurfaceViewReady = false
+
     private val countPlayers = playerRepository.getCountPlayers()
 
     private val players = run {
@@ -98,6 +102,8 @@ class GameViewModel @Inject constructor(
     }
 
     fun gameStop() {
+        isGameSurfaceViewReady = false
+        isInformationSurfaceViewReady = false
 
         val countPlayers = playerRepository.getCountPlayers()
 
@@ -181,5 +187,19 @@ class GameViewModel @Inject constructor(
         GameState.setDisplay(display)
     }
 
+    fun gameSurfaceChanged() {
+        isGameSurfaceViewReady = true
+        ifCanStartGameWhenStartGame()
+    }
+
+    fun informationSurfaceChanged() {
+        isInformationSurfaceViewReady = true
+        ifCanStartGameWhenStartGame()
+    }
+
+    private fun ifCanStartGameWhenStartGame() {
+        if (isGameSurfaceViewReady && isInformationSurfaceViewReady)
+            startGame()
+    }
 
 }

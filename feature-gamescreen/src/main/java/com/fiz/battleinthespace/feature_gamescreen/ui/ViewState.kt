@@ -1,5 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
+import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
 import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import java.io.Serializable
@@ -14,6 +15,13 @@ data class ViewState(
     val changed: Boolean = false,
     private var timeToRestart: Double = SecTimeForRestartForEndGame
 ) : Serializable {
+
+    fun getResourceTextForPauseResumeButton(): Int {
+        return if (status == StatusCurrentGame.Pause)
+            R.string.resume_game_button
+        else
+            R.string.pause_game_button
+    }
 
     fun update(deltaTime: Double, game: Game): ViewState {
 

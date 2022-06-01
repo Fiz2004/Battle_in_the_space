@@ -59,38 +59,6 @@ class Display(
                 paint
             )
         }
-//
-//        val xStart = floor(viewport.left).toInt()
-//        val xEnd = ceil(viewport.left + viewport.width).toInt()
-//        val yStart = floor(viewport.top).toInt()
-//        val yEnd = ceil(viewport.top + viewport.height).toInt()
-//
-//        val rectSrc = Rect(
-//            0, 0,
-//            bitmapRepository.bmpBackground[0].width, bitmapRepository.bmpBackground[0].height
-//        )
-//        for (n in xStart until xEnd)
-//            for (k in yStart until yEnd) {
-//                val x = Physics.changeCoordinateIfBorderTop(n.toDouble(), Physics.width)
-//                val y = Physics.changeCoordinateIfBorderTop(k.toDouble(), Physics.height)
-//                val background = stateGame.gameState.backgrounds[x.toInt()][y.toInt()]
-//
-//                val xStartDst = (n - viewport.left).toFloat() * sizeUnit
-//                val yStartDst = (k - viewport.top).toFloat() * sizeUnit
-//                val rectDst = RectF(
-//                    xStartDst,
-//                    yStartDst,
-//                    xStartDst + sizeUnit,
-//                    yStartDst + sizeUnit
-//                )
-//
-//                canvas.drawBitmap(
-//                    bitmapRepository.bmpBackground[background],
-//                    rectSrc,
-//                    rectDst,
-//                    paint
-//                )
-//            }
     }
 
     private fun drawActors(stateGame: ViewState, canvas: Canvas) {
