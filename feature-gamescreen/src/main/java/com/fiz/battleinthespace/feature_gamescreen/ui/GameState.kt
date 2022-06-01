@@ -5,33 +5,33 @@ import android.graphics.RectF
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.game.models.DrawableAnimationDestroy
+import com.fiz.battleinthespace.feature_gamescreen.game.models.BulletAnimationDestroy
 import com.fiz.battleinthespace.feature_gamescreen.game.models.Meteorite
-import com.fiz.battleinthespace.feature_gamescreen.game.models.MoveableActor
 import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShip
+import com.fiz.battleinthespace.feature_gamescreen.game.models.SpaceShipAnimationDestroy
 import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
 import kotlin.math.ceil
 import kotlin.math.floor
 
 data class BackgroundUi(
-    val value: Int,
-    val src: Rect,
-    val dst: RectF
+        val value: Int,
+        val src: Rect,
+        val dst: RectF
 )
 
 data class GameState(
-    val width: Int,
-    val height: Int,
-    val round: Int,
-    val backgroundsUi: List<BackgroundUi>,
-    val players: MutableList<Player>,
-    val countPlayers: Int = players.size,
-    val backgrounds: List<List<Int>>,
-    val actors: MutableList<MoveableActor>,
-    val listAnimationDestroy: MutableList<DrawableAnimationDestroy>,
-    var spaceShips: MutableList<SpaceShip>,
-    var bullets: MutableList<Weapon>,
-    var meteorites: MutableList<Meteorite>
+        val width: Int,
+        val height: Int,
+        val round: Int,
+        val backgroundsUi: List<BackgroundUi>,
+        val players: MutableList<Player>,
+        val countPlayers: Int = players.size,
+        val backgrounds: List<List<Int>>,
+        val bulletsAnimationDestroy: List<BulletAnimationDestroy>,
+        val spaceshipsAnimationDestroy: List<SpaceShipAnimationDestroy>,
+        var spaceShips: List<SpaceShip>,
+        var bullets: List<Weapon>,
+        var meteorites: List<Meteorite>
 ) {
     companion object {
 
@@ -42,29 +42,19 @@ data class GameState(
         }
 
         fun getStateFromGame(game: Game): GameState {
-            if (game.listActors.listAnimationDestroy.any { it.timeShow <= 0 }) {
-                var a = 1
-                a += 1
-                println(a)
-            }
-            if (game.listActors.listAnimationDestroy.toMutableList().any { it.timeShow <= 0 }) {
-                var a = 1
-                a += 1
-                println(a)
-            }
             return GameState(
-                game.width,
-                game.height,
-                game.round,
-                backgroundsUi = getBackgroundsUI(game),
-                game.players,
-                game.countPlayers,
-                game.backgrounds.toList(),
-                game.listActors.actors.toMutableList(),
-                game.listActors.listAnimationDestroy.toMutableList(),
-                game.listActors.spaceShips.toMutableList(),
-                game.listActors.bullets.toMutableList(),
-                game.listActors.meteorites.toMutableList(),
+                    game.width,
+                    game.height,
+                    game.round,
+                    backgroundsUi = getBackgroundsUI(game),
+                    game.players,
+                    game.countPlayers,
+                    game.backgrounds.toList(),
+                    game.listActors.bulletsAnimationDestroy.toList(),
+                    game.listActors.spaceShipsAnimationDestroy.toList(),
+                    game.listActors.spaceShips.toList(),
+                    game.listActors.bullets.toList(),
+                    game.listActors.meteorites.toList(),
             )
         }
 
@@ -79,10 +69,10 @@ data class GameState(
             val yEnd = ceil(display.viewport.top + display.viewport.height).toInt()
 
             val rectSrc = Rect(
-                0,
-                0,
-                display.bitmapRepository.bmpBackground[0].width,
-                display.bitmapRepository.bmpBackground[0].height
+                    0,
+                    0,
+                    display.bitmapRepository.bmpBackground[0].width,
+                    display.bitmapRepository.bmpBackground[0].height
             )
             for (n in xStart until xEnd)
                 for (k in yStart until yEnd) {
@@ -93,17 +83,17 @@ data class GameState(
                     val xStartDst = (n - display.viewport.left).toFloat() * display.sizeUnit
                     val yStartDst = (k - display.viewport.top).toFloat() * display.sizeUnit
                     val rectDst = RectF(
-                        xStartDst,
-                        yStartDst,
-                        xStartDst + display.sizeUnit,
-                        yStartDst + display.sizeUnit
+                            xStartDst,
+                            yStartDst,
+                            xStartDst + display.sizeUnit,
+                            yStartDst + display.sizeUnit
                     )
                     result.add(
-                        BackgroundUi(
-                            value = background,
-                            src = rectSrc,
-                            dst = rectDst
-                        )
+                            BackgroundUi(
+                                    value = background,
+                                    src = rectSrc,
+                                    dst = rectDst
+                            )
                     )
                 }
             return result

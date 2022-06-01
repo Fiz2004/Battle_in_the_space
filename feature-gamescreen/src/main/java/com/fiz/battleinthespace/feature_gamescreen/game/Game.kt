@@ -62,10 +62,17 @@ class Game(
 
         listActors.update(deltaTime, playSound)
 
-        listActors.listAnimationDestroy.forEach {
+        listActors.bulletsAnimationDestroy.forEach {
             it.timeShow -= deltaTime
         }
-        listActors.listAnimationDestroy = listActors.listAnimationDestroy.filter {
+        listActors.bulletsAnimationDestroy = listActors.bulletsAnimationDestroy.filter {
+            it.timeShow > 0
+        }.toMutableList()
+
+        listActors.spaceShipsAnimationDestroy.forEach {
+            it.timeShow -= deltaTime
+        }
+        listActors.spaceShipsAnimationDestroy = listActors.spaceShipsAnimationDestroy.filter {
             it.timeShow > 0
         }.toMutableList()
 

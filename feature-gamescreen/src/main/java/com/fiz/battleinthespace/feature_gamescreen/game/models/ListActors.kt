@@ -14,19 +14,11 @@ class ListActors(
     private var players: MutableList<Player>
 ) : Serializable {
 
-    var actors: MutableList<MoveableActor> = mutableListOf()
-        get() {
-            field.clear()
-            field.addAll(spaceShips)
-            field.addAll(bullets)
-            field.addAll(meteorites)
-            return field
-        }
-
     var spaceShips: MutableList<SpaceShip> = mutableListOf()
     var bullets: MutableList<Weapon> = mutableListOf()
     var meteorites: MutableList<Meteorite> = mutableListOf()
-    var listAnimationDestroy: MutableList<DrawableAnimationDestroy> = mutableListOf()
+    var bulletsAnimationDestroy: MutableList<BulletAnimationDestroy> = mutableListOf()
+    var spaceShipsAnimationDestroy: MutableList<SpaceShipAnimationDestroy> = mutableListOf()
 
     private var lineSpaceShipsOnRespawn: MutableList<SpaceShip> = mutableListOf()
 
@@ -215,7 +207,7 @@ class ListActors(
 
     private fun destroyBullets() {
         bullets.filter { !it.inGame }.forEach { bullet ->
-            listAnimationDestroy.add(BulletAnimationDestroy(bullet))
+            bulletsAnimationDestroy.add(BulletAnimationDestroy(bullet))
         }
         bullets = bullets.filter { it.inGame }.toMutableList()
         bullets = bullets.filter {
@@ -238,7 +230,7 @@ class ListActors(
             spaceShip.inGame = false
             if (players[spaceShips.indexOf(spaceShip)].life > 0)
                 lineSpaceShipsOnRespawn.add(spaceShip)
-            listAnimationDestroy.add(SpaceShipAnimationDestroy(spaceShip))
+            spaceShipsAnimationDestroy.add(SpaceShipAnimationDestroy(spaceShip))
         }
     }
 
