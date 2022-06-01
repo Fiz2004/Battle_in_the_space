@@ -132,9 +132,8 @@ class GameActivity : AppCompatActivity() {
                     top
             )
 
-            viewModel.setDisplay(display)
-
-            viewModel.gameSurfaceChanged()
+            viewModel.gameSurfaceChanged(binding.gameGameSurfaceview.width,
+                    binding.gameGameSurfaceview.height)
         }
 
         override fun surfaceCreated(p0: SurfaceHolder) {}

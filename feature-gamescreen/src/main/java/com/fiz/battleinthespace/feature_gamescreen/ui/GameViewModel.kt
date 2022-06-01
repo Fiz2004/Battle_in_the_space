@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
+import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.domain.AI
 import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
 import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
@@ -20,12 +21,21 @@ import kotlin.math.min
 
 private const val mSecFromFPS60 = ((1.0 / 60.0) * 1000.0).toLong()
 
+val widthWorld=20
+val heightWorld=20
+
+private const val DIVISION_BY_SCREEN = 11
+
+
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val playerRepository: PlayerRepository,
+    private val bitmapRepository: BitmapRepository,
     private val soundUseCase: SoundUseCase,
     @ApplicationContext context: Context
 ) : ViewModel() {
+
+    var getGameStateFromGame:GetGameStateFromGame=GetGameStateFromGame(0,0,0,0,0f ,bitmapRepository)
 
     private var isGameSurfaceViewReady = false
     private var isInformationSurfaceViewReady = false
@@ -55,13 +65,13 @@ class GameViewModel @Inject constructor(
             else
                 ai.add(null)
 
-        Game(20, 20, 0, players, ai = ai, playSound = ::playSound)
+        Game(widthWorld, heightWorld, 0, players, ai = ai, playSound = ::playSound)
     }
 
     var viewState = MutableStateFlow(
         ViewState(
             controllers = controllers,
-            gameState = GameState.getStateFromGame(game),
+            gameState = getGameStateFromGame(game),
             status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
         )
@@ -93,7 +103,7 @@ class GameViewModel @Inject constructor(
 
             viewState.value = viewState.value.update(deltaTime, game)
                 .copy(
-                    gameState = GameState.getStateFromGame(game),
+                    gameState = getGameStateFromGame(game),
                     changed = !viewState.value.changed
                 )
 
@@ -183,11 +193,12 @@ class GameViewModel @Inject constructor(
         soundUseCase.play(numberSound)
     }
 
-    fun setDisplay(display: Display) {
-        GameState.setDisplay(display)
-    }
+    fun gameSurfaceChanged(surfaceWidth:Int,surfaceHeight:Int) {
 
-    fun gameSurfaceChanged() {
+        val sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
+
+        getGameStateFromGame.setViewport(surfaceWidth,surfaceHeight,widthWorld,heightWorld,sizeUnit)
+
         isGameSurfaceViewReady = true
         ifCanStartGameWhenStartGame()
     }
