@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.WIDTH_JOYSTICK_DEFAULT
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,17 +25,15 @@ class GameActivity : AppCompatActivity() {
         ActivityGameBinding.inflate(layoutInflater)
     }
 
-    lateinit var display: Display
-
     @Inject
-    lateinit var bitmapRepository: BitmapRepository
+    lateinit var display: Display
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         val loadStateGame =
-                savedInstanceState?.getSerializable(ViewState::class.java.simpleName) as? ViewState
+            savedInstanceState?.getSerializable(ViewState::class.java.simpleName) as? ViewState
         viewModel.loadState(loadStateGame)
 
         binding.gameGameSurfaceview.holder.addCallback(GameSurfaceView())
@@ -69,7 +66,7 @@ class GameActivity : AppCompatActivity() {
 
                         binding.gameGameSurfaceview.holder.lockCanvas()?.let {
                             display.render(
-                                    viewState,
+                                viewState,
                                 it
                             )
                             binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
@@ -80,7 +77,8 @@ class GameActivity : AppCompatActivity() {
                             binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
                         }
 
-                        binding.pauseGameButton.text = getString(viewState.getResourceTextForPauseResumeButton())
+                        binding.pauseGameButton.text =
+                            getString(viewState.getResourceTextForPauseResumeButton())
 
                         lastTime = now
 
@@ -94,11 +92,11 @@ class GameActivity : AppCompatActivity() {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) return false
         viewModel.onTouch(
-                event,
-                binding.gameGameSurfaceview.left,
-                binding.gameGameSurfaceview.top,
-                binding.gameGameSurfaceview.width,
-                binding.gameGameSurfaceview.height
+            event,
+            binding.gameGameSurfaceview.left,
+            binding.gameGameSurfaceview.top,
+            binding.gameGameSurfaceview.width,
+            binding.gameGameSurfaceview.height
         )
         return super.onTouchEvent(event)
     }
@@ -110,8 +108,8 @@ class GameActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putSerializable(
-                ViewState::class.java.simpleName,
-                viewModel.viewState.value
+            ViewState::class.java.simpleName,
+            viewModel.viewState.value
         )
         super.onSaveInstanceState(outState)
     }
@@ -122,13 +120,6 @@ class GameActivity : AppCompatActivity() {
             binding.gameGameSurfaceview.getLocationOnScreen(a)
             val leftLocationOnScreen = a[0]
             val topLocationOnScreen = a[1]
-
-            display = Display(
-                binding.gameGameSurfaceview.width,
-                binding.gameGameSurfaceview.height,
-                viewModel.viewState.value,
-                bitmapRepository
-            )
 
             val widthJoystick = WIDTH_JOYSTICK_DEFAULT * resources.displayMetrics.scaledDensity
 
@@ -147,7 +138,10 @@ class GameActivity : AppCompatActivity() {
 
     inner class InformationSurfaceView : SurfaceHolder.Callback {
         override fun surfaceChanged(p0: SurfaceHolder, p1: Int, p2: Int, p3: Int) {
-            viewModel.informationSurfaceChanged()
+            viewModel.informationSurfaceChanged(
+                binding.informationGameSurfaceview.width,
+                binding.informationGameSurfaceview.height
+            )
         }
 
         override fun surfaceCreated(p0: SurfaceHolder) {}

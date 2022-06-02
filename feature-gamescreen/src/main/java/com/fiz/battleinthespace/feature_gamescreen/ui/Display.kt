@@ -2,21 +2,11 @@ package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import android.graphics.*
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
+import javax.inject.Inject
+import javax.inject.Singleton
 
-const val NUMBER_BITMAP_METEORITE_OPTION = 4
-private const val DIVISION_BY_SCREEN = 11
-
-class Display(
-    surfaceWidth: Int, surfaceHeight: Int,
-    stateGame: ViewState,
-    val bitmapRepository: BitmapRepository
-) {
+@Singleton
+class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
 
     private val paint: Paint = Paint()
 
@@ -34,24 +24,40 @@ class Display(
         strokeWidth = 30F
     }
 
-    private var sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
+    private val paintHelperPlayer = Paint().apply {
+        style = Paint.Style.FILL
+        alpha = 80
+        strokeWidth = 30F
+    }
 
-    private var viewport = Viewport(
-        surfaceWidth,
-        surfaceHeight,
-        stateGame.gameState.width,
-        stateGame.gameState.height,
-        sizeUnit
-    )
+    private val paintHelperMeteorites = Paint().apply {
+        color = Color.RED
+        style = Paint.Style.FILL
+        alpha = 160
+        strokeWidth = 20F
+    }
+
+    private val paintRound = Paint().apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.CENTER
+    }
+
+    private val paintPlayer = Paint().apply {
+        textAlign = Paint.Align.LEFT
+    }
 
     fun render(
         stateGame: ViewState,
         canvas: Canvas
     ) {
-        viewport.update(stateGame)
 
         drawBackground(stateGame.gameState.backgroundsUi, canvas)
-        drawActors(stateGame, canvas)
+        drawActors(
+            stateGame.gameState.spaceshipsUi,
+            stateGame.gameState.spaceshipsFlyUi,
+            stateGame.gameState.bulletsUi,
+            stateGame.gameState.meteoritesUi, canvas
+        )
         drawAnimationDestroys(
             stateGame.gameState.bulletsAnimationsDestroyUi,
             stateGame.gameState.spaceShipsAnimationsDestroyUi,
@@ -74,9 +80,15 @@ class Display(
         }
     }
 
-    private fun drawActors(stateGame: ViewState, canvas: Canvas) {
+    private fun drawActors(
+        spaceshipsUi: List<SpriteUi>,
+        spaceshipsFlyUi: List<SpriteUi>,
+        bulletsUi: List<SpriteUi>,
+        meteoritesUi: List<MeteoriteSpriteUi>,
+        canvas: Canvas
+    ) {
 
-        stateGame.gameState.spaceshipsUi.forEach {
+        spaceshipsUi.forEach {
             drawFrame(
                 bitmapRepository.bmpSpaceship[it.value],
                 it.centerX,
@@ -88,7 +100,7 @@ class Display(
             )
         }
 
-        stateGame.gameState.spaceshipsFlyUi.forEach {
+        spaceshipsFlyUi.forEach {
             drawFrame(
                 bitmapRepository.bmpSpaceshipFly[it.value],
                 it.centerX,
@@ -100,7 +112,7 @@ class Display(
             )
         }
 
-        stateGame.gameState.bulletsUi.forEach {
+        bulletsUi.forEach {
             drawFrame(
                 bitmapRepository.bmpWeapon[it.value],
                 it.centerX,
@@ -112,7 +124,7 @@ class Display(
             )
         }
 
-        stateGame.gameState.meteoritesUi.forEach {
+        meteoritesUi.forEach {
             drawFrame(
                 bitmapRepository.bmpMeteorites[it.view][it.viewSize],
                 it.centerX,
@@ -192,151 +204,62 @@ class Display(
         )
     }
 
-    //TODO сделать указатели на соседние корабли и метеориты, если они не в зоне видимости экрана
     private fun drawHelper(stateGame: ViewState, canvas: Canvas) {
-        val mainSpaceship = stateGame.gameState.spaceShips.filter { it.player.main }
-        if (mainSpaceship.isNotEmpty()) {
-            stateGame.gameState.spaceShips.filter { it.inGame && !it.player.main }
-                .forEach {
-                    if (viewport.getAllPoints(it).size == 0) {
-                        val paintFont = Paint()
-                        paintFont.color = getColor(it.player.number)
-                        paintFont.style = Paint.Style.FILL
-                        paintFont.alpha = 80
-                        paintFont.strokeWidth = 30F
+        stateGame.gameState.helpersPlayerUi.forEach {
+            paintHelperPlayer.color = it.value
 
-                        val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
-                        val angleToRadians = angle / 180.0 * Math.PI
-                        val vec = Vec(cos(angleToRadians), sin(angleToRadians))
-                        val cx =
-                            (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
-                        val cy =
-                            (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
-                        canvas.drawCircle(
-                            cx,
-                            cy,
-                            30F,
-                            paintFont
-                        )
-                    }
-                }
+            canvas.drawCircle(
+                it.centerX,
+                it.centerY,
+                it.radius,
+                paintHelperPlayer
+            )
+        }
 
-            if (stateGame.gameState.meteorites.all { (viewport.getAllPoints(it).size == 0) })
-                stateGame.gameState.meteorites.forEach {
-                    val paintFont = Paint()
-                    paintFont.color = Color.RED
-                    paintFont.style = Paint.Style.FILL
-                    paintFont.alpha = 160
-                    paintFont.strokeWidth = 20F
-
-                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
-                    val angleToRadians = angle / 180.0 * Math.PI
-                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
-                    val cx =
-                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 40F
-                    val cy =
-                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 40F
-                    canvas.drawCircle(
-                        cx,
-                        cy,
-                        30F,
-                        paintFont
-                    )
-                }
+        stateGame.gameState.helpersMeteoriteUi.forEach {
+            canvas.drawCircle(
+                it.centerX,
+                it.centerY,
+                it.radius,
+                paintHelperMeteorites
+            )
         }
     }
 
     fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
         drawInfo(stateGame, canvasInfo, FPS)
-
     }
 
     private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
-        val width = canvasInfo.width
-        val height = canvasInfo.height
-        val minCharacteristic = min(width, height)
-        val bmplife = minCharacteristic / 3 / 3
-
         canvasInfo.drawColor(Color.BLACK)
-        val paintFont = Paint()
-        val rectSrc = Rect(
-            0, 0,
-            bitmapRepository.bmpSpaceshipLife[0].width, bitmapRepository.bmpSpaceshipLife[0].height
-        )
 
-        val baseTextSize = minCharacteristic / 6F
-        val textSize = baseTextSize * 0.75F
-        paintFont.textSize = baseTextSize
-        paintFont.color = Color.WHITE
-        paintFont.textAlign = Paint.Align.CENTER
-        canvasInfo.drawText(
-            "Round ${stateGame.gameState.round}",
-            canvasInfo.width / 2F,
-            baseTextSize,
-            paintFont
-        )
-
-        val maxTextWidth = getMaxTextWidth(stateGame, paintFont)
-
-        for (n in 0 until stateGame.gameState.players.size) {
-            paintFont.textSize = textSize
-            paintFont.textAlign = Paint.Align.LEFT
-            paintFont.color = getColor(n)
+        stateGame.gameState.textsInfoUi.forEachIndexed { index, it ->
+            paintRound.textSize = it.textSize
+            paintRound.color = it.color
+            paintPlayer.textSize = it.textSize
+            paintPlayer.color = it.color
             canvasInfo.drawText(
-                stateGame.gameState.players[n].name,
-                0F,
-                baseTextSize + (textSize * (n + 1)),
-                paintFont
+                it.value,
+                it.x,
+                it.y,
+                if (index == 0) paintRound else paintPlayer
             )
+        }
 
-            for (k in 0 until stateGame.gameState.players[n].life)
-                canvasInfo.drawBitmap(
-                    bitmapRepository.bmpSpaceshipLife[n], rectSrc,
-                    RectF(
-                        maxTextWidth + bmplife * (k - 1).toFloat(),
-                        baseTextSize + textSize * n,
-                        (maxTextWidth + bmplife * (k - 1) + bmplife).toFloat(),
-                        baseTextSize + textSize * n + textSize
-                    ),
-                    paint
-                )
-
-            canvasInfo.drawText(
-                stateGame.gameState.players[n].score.toString(),
-                (maxTextWidth + bmplife * 2).toFloat(),
-                baseTextSize + textSize * (n + 1),
-                paintFont
+        stateGame.gameState.infoUi.forEach {
+            canvasInfo.drawBitmap(
+                bitmapRepository.bmpSpaceshipLife[it.value], it.src,
+                it.dst,
+                paint
             )
         }
 
         canvasInfo.drawText(
             FPS.toString(),
             0F,
-            baseTextSize,
-            paintFont
+            66F,
+            paintPlayer
         )
-
     }
-
-    private fun getColor(n: Int) = when (n) {
-        0 -> Color.GREEN
-        1 -> Color.CYAN
-        // Color = pink
-        2 -> Color.rgb(255, 192, 203)
-        3 -> Color.YELLOW
-        else -> Color.WHITE
-    }
-
-    private fun getMaxTextWidth(stateGame: ViewState, paintFont: Paint): Int {
-        var result = 0
-        for (namePlayer in stateGame.gameState.players) {
-            val mTextBoundRect = Rect(0, 0, 0, 0)
-            paintFont.getTextBounds(namePlayer.name, 0, namePlayer.name.length, mTextBoundRect)
-            val textWidth = mTextBoundRect.width()
-            result = max(textWidth, result)
-        }
-        return result
-    }
-
 }
 

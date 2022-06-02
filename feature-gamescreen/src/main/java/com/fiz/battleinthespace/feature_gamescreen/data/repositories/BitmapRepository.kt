@@ -4,12 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.fiz.battleinthespace.feature_gamescreen.R
-import com.fiz.battleinthespace.feature_gamescreen.ui.NUMBER_BITMAP_METEORITE_OPTION
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val NUMBER_IMAGES_FIGURE = 5
+
+const val NUMBER_BITMAP_METEORITE_OPTION = 4
 
 const val NUMBER_BITMAP_BACKGROUND = 8
 private const val NUMBER_BITMAP_BULLET_DESTROY = 3

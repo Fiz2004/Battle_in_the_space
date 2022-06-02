@@ -33,7 +33,7 @@ class GameViewModel @Inject constructor(
 ) : ViewModel() {
 
     var getGameStateFromGame: GetGameStateFromGame =
-        GetGameStateFromGame(0, 0, 0, 0, 0f, bitmapRepository)
+        GetGameStateFromGame(0, 0, 0, 0, 0, 0, 0f, bitmapRepository)
 
     var getControllerState: GetControllerState =
         GetControllerState(0, 0, 0f)
@@ -226,7 +226,14 @@ class GameViewModel @Inject constructor(
         ifCanStartGameWhenStartGame()
     }
 
-    fun informationSurfaceChanged() {
+    fun informationSurfaceChanged(
+        infoWidth: Int,
+        infoHeight: Int,
+    ) {
+        getGameStateFromGame.setInfo(
+            infoWidth, infoHeight
+        )
+
         isInformationSurfaceViewReady = true
         ifCanStartGameWhenStartGame()
     }
