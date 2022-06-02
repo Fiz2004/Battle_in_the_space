@@ -10,6 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.battleinthespace.feature_gamescreen.domain.WIDTH_JOYSTICK_DEFAULT
+import com.fiz.battleinthespace.feature_gamescreen.game.Game
+import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -32,10 +34,20 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        init(savedInstanceState)
+        bindListeners()
+        collectFlows()
+    }
+
+    private fun init(savedInstanceState: Bundle?) {
+        val loadGame =
+            savedInstanceState?.getSerializable(Game::class.java.simpleName) as? Game
         val loadStateGame =
             savedInstanceState?.getSerializable(ViewState::class.java.simpleName) as? ViewState
-        viewModel.loadState(loadStateGame)
+        viewModel.loadState(loadGame, loadStateGame)
+    }
 
+    private fun bindListeners() {
         binding.gameGameSurfaceview.holder.addCallback(GameSurfaceView())
         binding.informationGameSurfaceview.holder.addCallback(InformationSurfaceView())
 
@@ -50,7 +62,9 @@ class GameActivity : AppCompatActivity() {
         binding.exitGameButton.setOnClickListener {
             finish()
         }
+    }
 
+    private fun collectFlows() {
         var lastTime = System.currentTimeMillis()
         var fps = 60
 
@@ -91,27 +105,65 @@ class GameActivity : AppCompatActivity() {
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event == null) return false
-        viewModel.onTouch(
-            event,
-            binding.gameGameSurfaceview.left,
-            binding.gameGameSurfaceview.top,
-            binding.gameGameSurfaceview.width,
-            binding.gameGameSurfaceview.height
+
+        val pointerIndex = event.actionIndex
+        val pointerId = event.getPointerId(pointerIndex)
+
+        val point =
+            Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
+
+        val pointIndex = (event.findPointerIndex(pointerId))
+
+        val pointUp = Vec(
+            event.getX(event.findPointerIndex(pointerId)).toDouble(),
+            event.getY(event.findPointerIndex(pointerId)).toDouble()
         )
+
+        when (event.actionMasked) {
+            // первое касание
+            MotionEvent.ACTION_DOWN -> viewModel.firstTouchDown(
+                pointerId,
+                point,
+                binding.gameGameSurfaceview.left,
+                binding.gameGameSurfaceview.top,
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height
+            )
+            // последующие касания
+            MotionEvent.ACTION_POINTER_DOWN -> viewModel.nextTouchDown(
+                pointerId,
+                point,
+                binding.gameGameSurfaceview.left,
+                binding.gameGameSurfaceview.top,
+                binding.gameGameSurfaceview.width,
+                binding.gameGameSurfaceview.height
+            )
+            // прерывание последнего касания
+            MotionEvent.ACTION_UP -> viewModel.lastTouchUp()
+            // прерывания касаний
+            MotionEvent.ACTION_POINTER_UP -> viewModel.beforeTouchUp(pointIndex)
+            // движение
+            MotionEvent.ACTION_MOVE -> viewModel.moveTouch(pointUp)
+        }
+
         return super.onTouchEvent(event)
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewModel.gameStop()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putSerializable(
+            Game::class.java.simpleName,
+            viewModel.game
+        )
         outState.putSerializable(
             ViewState::class.java.simpleName,
             viewModel.viewState.value
         )
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.gameStop()
     }
 
     inner class GameSurfaceView : SurfaceHolder.Callback {

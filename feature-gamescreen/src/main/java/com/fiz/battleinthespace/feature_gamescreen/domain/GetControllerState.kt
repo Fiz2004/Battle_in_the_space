@@ -1,6 +1,6 @@
-package com.fiz.battleinthespace.feature_gamescreen.ui
+package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
+import com.fiz.battleinthespace.feature_gamescreen.ui.ControllerState
 
 class GetControllerState(
     private val leftLocationOnScreen: Int,
@@ -10,8 +10,8 @@ class GetControllerState(
 
     operator fun invoke(controller: Controller): ControllerState? {
 
-        val centerXOutsideCircle = controller.moveSide.point.x.toFloat() - leftLocationOnScreen
-        val centerYOutsideCircle = controller.moveSide.point.y.toFloat() - topLocationOnScreen
+        val centerXOutsideCircle = controller.movePart.point.x.toFloat() - leftLocationOnScreen
+        val centerYOutsideCircle = controller.movePart.point.y.toFloat() - topLocationOnScreen
 
         val centerXInnerCircle =
             centerXOutsideCircle + widthJoystick * controller.power * kotlin.math.cos(controller.angle / 180.0 * java.lang.Math.PI)
@@ -20,7 +20,7 @@ class GetControllerState(
             centerYOutsideCircle + widthJoystick * controller.power * kotlin.math.sin(controller.angle / 180.0 * java.lang.Math.PI)
                 .toFloat()
 
-        return if (controller.moveSide.touch)
+        return if (controller.movePart.touch)
             ControllerState(
                 centerXOutsideCircle = centerXOutsideCircle,
                 centerYOutsideCircle = centerYOutsideCircle,

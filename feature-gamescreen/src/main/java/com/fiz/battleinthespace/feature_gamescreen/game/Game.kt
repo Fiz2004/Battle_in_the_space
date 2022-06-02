@@ -21,18 +21,15 @@ class Game(
     var listActors: ListActors = ListActors(width, height, players)
 ) : Serializable {
 
-    var currentStatus: Boolean = true
-
     init {
         Physics.createWorld(width, height)
         newGame()
-        newRound()
     }
 
     fun update(
         controllers: List<Controller>,
         deltaTime: Double,
-    ) {
+    ): Boolean {
 
         for ((index, player) in players.withIndex()) {
             if (ai[index] != null && !player.main) {
@@ -78,15 +75,15 @@ class Game(
 
         if (players.none { it.life > 0 } || listActors.meteorites.isEmpty()) {
             if (round + 1 == 11)
-                currentStatus = false
+                return false
 
             newRound()
         }
 
-        currentStatus = true
+        return true
     }
 
-    fun newRound() {
+    private fun newRound() {
         round += 1
         val countMeteorites = round
 
@@ -119,10 +116,6 @@ class Game(
         for (player in players)
             player.newGame()
         players[0].main = true
+        newRound()
     }
-
-    fun getStatus(): Boolean {
-        return currentStatus
-    }
-
 }

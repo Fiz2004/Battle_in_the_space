@@ -1,4 +1,4 @@
-package com.fiz.battleinthespace.feature_gamescreen.ui
+package com.fiz.battleinthespace.feature_gamescreen.domain
 
 import com.fiz.battleinthespace.feature_gamescreen.game.Game
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
@@ -31,21 +31,10 @@ class Viewport(
         levelHeight * countViewportYOnScreen
     }
 
-    fun update(stateGame: ViewState) {
-        val spaceship =
-            stateGame.gameState.spaceShips[stateGame.gameState.players.indexOf(stateGame.gameState.players.find { it.main })]
-        val center = spaceship.center
-
-        left = center.x - marginX
-
-        top = center.y - marginY
-    }
-
     fun update(game: Game) {
         val spaceship =
-                game.listActors.spaceShips[game.players.indexOf(game.players.find { it.main })]
+            game.listActors.spaceShips[game.players.indexOf(game.players.find { it.main })]
         val center = spaceship.center
-
         left = center.x - marginX
 
         top = center.y - marginY

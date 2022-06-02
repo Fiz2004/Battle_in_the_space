@@ -2,13 +2,14 @@ package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import android.graphics.*
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
 
-    private val paint: Paint = Paint()
+    private val paintBitmap: Paint = Paint()
 
     private val paintOutsideCircleJoystick = Paint().apply {
         color = Color.RED
@@ -50,7 +51,6 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
         stateGame: ViewState,
         canvas: Canvas
     ) {
-
         drawBackground(stateGame.gameState.backgroundsUi, canvas)
         drawActors(
             stateGame.gameState.spaceshipsUi,
@@ -64,7 +64,11 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
             canvas
         )
         drawJoystick(stateGame.controllerState, canvas)
-        drawHelper(stateGame, canvas)
+        drawHelper(
+            stateGame.gameState.helpersPlayerUi,
+            stateGame.gameState.helpersMeteoriteUi,
+            canvas
+        )
     }
 
     private fun drawBackground(backgroundsUi: List<BackgroundUi>, canvas: Canvas) {
@@ -75,7 +79,7 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
                 bitmapRepository.bmpBackground[it.value],
                 it.src,
                 it.dst,
-                paint
+                paintBitmap
             )
         }
     }
@@ -149,8 +153,7 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
         canvas.save()
         canvas.translate(x, y)
         canvas.rotate(angle)
-        canvas.drawBitmap(bmp, src, dst, paint)
-
+        canvas.drawBitmap(bmp, src, dst, paintBitmap)
         canvas.restore()
     }
 
@@ -204,8 +207,12 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
         )
     }
 
-    private fun drawHelper(stateGame: ViewState, canvas: Canvas) {
-        stateGame.gameState.helpersPlayerUi.forEach {
+    private fun drawHelper(
+        helpersPlayerUi: List<HelperPlayerUi>,
+        helpersMeteoriteUi: List<HelperMeteoritesUi>,
+        canvas: Canvas
+    ) {
+        helpersPlayerUi.forEach {
             paintHelperPlayer.color = it.value
 
             canvas.drawCircle(
@@ -216,7 +223,7 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
             )
         }
 
-        stateGame.gameState.helpersMeteoriteUi.forEach {
+        helpersMeteoriteUi.forEach {
             canvas.drawCircle(
                 it.centerX,
                 it.centerY,
@@ -233,16 +240,25 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
     private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
         canvasInfo.drawColor(Color.BLACK)
 
-        stateGame.gameState.textsInfoUi.forEachIndexed { index, it ->
+        stateGame.gameState.textRoundInfoUi.also {
             paintRound.textSize = it.textSize
             paintRound.color = it.color
+            canvasInfo.drawText(
+                it.value,
+                it.x,
+                it.y,
+                paintRound
+            )
+        }
+
+        stateGame.gameState.textsInfoUi.forEach {
             paintPlayer.textSize = it.textSize
             paintPlayer.color = it.color
             canvasInfo.drawText(
                 it.value,
                 it.x,
                 it.y,
-                if (index == 0) paintRound else paintPlayer
+                paintPlayer
             )
         }
 
@@ -250,7 +266,7 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
             canvasInfo.drawBitmap(
                 bitmapRepository.bmpSpaceshipLife[it.value], it.src,
                 it.dst,
-                paint
+                paintBitmap
             )
         }
 

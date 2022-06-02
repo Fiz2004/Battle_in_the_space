@@ -1,6 +1,5 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import android.view.MotionEvent
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
 import java.io.Serializable
 import kotlin.math.abs
@@ -14,14 +13,14 @@ class Controller(
     _timeBetweenFireMin: Double = 0.250,
     _angle: Float = 0F
 ) : Serializable {
-    class Side : Serializable {
+    class Part : Serializable {
         var point: Vec = Vec(0.0, 0.0)
         var touch: Boolean = false
         var ID: Int = 0
     }
 
-    val moveSide = Side()
-    val fireSide = Side()
+    val movePart = Part()
+    val firePart = Part()
 
     var angle: Float = _angle
         set(value) {
@@ -42,7 +41,7 @@ class Controller(
 
         if (timeLastFire == 0.0) {
             timeLastFire = timeBetweenFireMin
-            if (!fireSide.touch)
+            if (!firePart.touch)
                 fire = false
             return true
         }
@@ -52,59 +51,54 @@ class Controller(
         return false
     }
 
-    fun down(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
-        if (touchLeftSide) {
-            moveSide.point = point.copy()
-            moveSide.touch = true
-            moveSide.ID = pointerId
+    fun down(touchMoveSide: Boolean, point: Vec, pointerId: Int) {
+        if (touchMoveSide) {
+            movePart.point = point.copy()
+            movePart.touch = true
+            movePart.ID = pointerId
         } else {
             fire = true
-            fireSide.touch = true
+            firePart.touch = true
         }
     }
 
     fun pointerDown(touchLeftSide: Boolean, point: Vec, pointerId: Int) {
-        if (!moveSide.touch && touchLeftSide) {
-            moveSide.point = point.copy()
-            moveSide.touch = true
-            moveSide.ID = pointerId
+        if (!movePart.touch && touchLeftSide) {
+            movePart.point = point.copy()
+            movePart.touch = true
+            movePart.ID = pointerId
         }
-        if (!fireSide.touch && !touchLeftSide) {
+        if (!firePart.touch && !touchLeftSide) {
             fire = true
-            fireSide.touch = true
-            fireSide.ID = pointerId
+            firePart.touch = true
+            firePart.ID = pointerId
         }
     }
 
     fun up() {
-        moveSide.touch = false
+        movePart.touch = false
         power = 0F
 
-        fireSide.touch = false
+        firePart.touch = false
     }
 
-    fun powerUp(event: MotionEvent) {
-        val pointerIndex = event.actionIndex
-        val isLeftSide = event.findPointerIndex(pointerIndex) == moveSide.ID
-        val isRightSide = event.findPointerIndex(pointerIndex) == fireSide.ID
-        if (isLeftSide) {
-            moveSide.touch = false
+    fun powerUp(pointIndex: Int) {
+        val isMoveSide = pointIndex == movePart.ID
+        val isFireSide = pointIndex == firePart.ID
+        if (isMoveSide) {
+            movePart.touch = false
             power = 0F
         }
-        if (isRightSide)
-            fireSide.touch = false
+        if (isFireSide)
+            firePart.touch = false
     }
 
-    fun move(event: MotionEvent) {
-        if (moveSide.touch) {
-            val point = Vec(
-                event.getX(event.findPointerIndex(moveSide.ID)).toDouble(),
-                event.getY(event.findPointerIndex(moveSide.ID)).toDouble()
-            )
+    fun move(point: Vec) {
+        if (movePart.touch) {
 
             val delta = Vec(
-                if (abs(point.x - moveSide.point.x) > sensivity.x) point.x - moveSide.point.x else 0.0,
-                if (abs(point.y - moveSide.point.y) > sensivity.y) point.y - moveSide.point.y else 0.0
+                if (abs(point.x - movePart.point.x) > sensivity.x) point.x - movePart.point.x else 0.0,
+                if (abs(point.y - movePart.point.y) > sensivity.y) point.y - movePart.point.y else 0.0
             )
 
             val tempPower = delta.length() / (WIDTH_JOYSTICK_DEFAULT * 3)
