@@ -53,8 +53,8 @@ class Display(
         drawBackground(stateGame.gameState.backgroundsUi, canvas)
         drawActors(stateGame, canvas)
         drawAnimationDestroys(
-            stateGame.gameState.bulletsAnimationDestroyUi,
-            stateGame.gameState.spaceShipsAnimationDestroyUi,
+            stateGame.gameState.bulletsAnimationsDestroyUi,
+            stateGame.gameState.spaceShipsAnimationsDestroyUi,
             canvas
         )
         drawJoystick(stateGame.controllerState, canvas)
@@ -75,72 +75,96 @@ class Display(
     }
 
     private fun drawActors(stateGame: ViewState, canvas: Canvas) {
-        for (actor in stateGame.gameState.spaceShips) {
-            if (!actor.inGame)
-                continue
-            for (point in viewport.getAllPoints(actor))
-                drawFrame(actor.getBitmap(this), point.x, point.y, actor.size, actor.angle, canvas)
-        }
 
-        for (actor in stateGame.gameState.bullets) {
-            for (point in viewport.getAllPoints(actor))
-                drawFrame(actor.getBitmap(this), point.x, point.y, actor.size, actor.angle, canvas)
-        }
-
-        for (actor in stateGame.gameState.meteorites) {
-            for (point in viewport.getAllPoints(actor))
-                drawFrame(actor.getBitmap(this), point.x, point.y, actor.size, actor.angle, canvas)
-        }
-    }
-
-    private fun drawFrame(
-        bmp: Bitmap,
-        x: Double,
-        y: Double,
-        size: Double,
-        angle: Double = 0.0,
-        canvas: Canvas
-    ) {
-        canvas.save()
-        canvas.translate(x.toFloat() * sizeUnit, y.toFloat() * sizeUnit)
-        canvas.rotate(angle.toFloat())
-
-        val rectSrc = Rect(
-            0, 0,
-            bmp.width, bmp.height
-        )
-        val halfSize = (size * sizeUnit / 2).toFloat()
-        val rectDst = RectF(
-            -halfSize, -halfSize,
-            halfSize, halfSize
-        )
-
-        canvas.drawBitmap(bmp, rectSrc, rectDst, paint)
-
-        canvas.restore()
-    }
-
-    private fun drawAnimationDestroys(
-        bulletsAnimationDestroyUi: List<AnimationDestroyUi>,
-        spaceShipsAnimationDestroyUi: List<AnimationDestroyUi>, canvas: Canvas
-    ) {
-        bulletsAnimationDestroyUi.forEach {
+        stateGame.gameState.spaceshipsUi.forEach {
             drawFrame(
-                bitmapRepository.bmpBulletDestroy[it.value],
+                bitmapRepository.bmpSpaceship[it.value],
                 it.centerX,
                 it.centerY,
-                it.size,
+                it.src,
+                it.dst,
                 it.angle,
                 canvas
             )
         }
 
-        spaceShipsAnimationDestroyUi.forEach {
+        stateGame.gameState.spaceshipsFlyUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpSpaceshipFly[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        stateGame.gameState.bulletsUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpWeapon[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        stateGame.gameState.meteoritesUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpMeteorites[it.view][it.viewSize],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+    }
+
+    private fun drawFrame(
+        bmp: Bitmap,
+        x: Float,
+        y: Float,
+        src: Rect,
+        dst: RectF,
+        angle: Float,
+        canvas: Canvas
+    ) {
+        canvas.save()
+        canvas.translate(x, y)
+        canvas.rotate(angle)
+        canvas.drawBitmap(bmp, src, dst, paint)
+
+        canvas.restore()
+    }
+
+    private fun drawAnimationDestroys(
+        bulletsSpriteUi: List<SpriteUi>,
+        spaceShipsSpriteUi: List<SpriteUi>, canvas: Canvas
+    ) {
+        bulletsSpriteUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpBulletDestroy[it.value],
+                it.centerX,
+                it.centerY,
+                it.src,
+                it.dst,
+                it.angle,
+                canvas
+            )
+        }
+
+        spaceShipsSpriteUi.forEach {
             drawFrame(
                 bitmapRepository.bmpSpaceshipDestroy[it.value],
                 it.centerX,
                 it.centerY,
-                it.size,
+                it.src,
+                it.dst,
                 it.angle,
                 canvas
             )

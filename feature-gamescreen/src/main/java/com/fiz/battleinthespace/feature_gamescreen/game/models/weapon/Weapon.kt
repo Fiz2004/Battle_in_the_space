@@ -30,6 +30,10 @@ abstract class Weapon(
         roadLength += sqrt(speed.sumPow2()) * deltaTime
     }
 
+    open fun getType(): Int {
+        return 0
+    }
+
     companion object {
         fun create(spaceShips: MutableList<SpaceShip>, player: Int, type: Int): Weapon {
             return when (type) {

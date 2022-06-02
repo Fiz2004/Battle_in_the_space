@@ -55,4 +55,8 @@ class TwoBullet(
     override fun getBitmap(display: Display): Bitmap {
         return display.bitmapRepository.bmpWeapon[1]
     }
+
+    override fun getType(): Int {
+        return 1
+    }
 }

@@ -54,4 +54,8 @@ class OneBullet(
     override fun getBitmap(display: Display): Bitmap {
         return display.bitmapRepository.bmpWeapon[0]
     }
+
+    override fun getType(): Int {
+        return 0
+    }
 }

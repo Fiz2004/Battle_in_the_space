@@ -20,12 +20,23 @@ data class BackgroundUi(
     val dst: RectF
 )
 
-data class AnimationDestroyUi(
+data class SpriteUi(
     val value: Int,
-    val centerX: Double,
-    val centerY: Double,
-    val size: Double,
-    val angle: Double
+    val centerX: Float,
+    val centerY: Float,
+    val src: Rect,
+    val dst: RectF,
+    val angle: Float
+)
+
+data class MeteoriteSpriteUi(
+    val view: Int,
+    val viewSize: Int,
+    val centerX: Float,
+    val centerY: Float,
+    val src: Rect,
+    val dst: RectF,
+    val angle: Float
 )
 
 data class GameState(
@@ -33,8 +44,12 @@ data class GameState(
     val height: Int,
     val round: Int,
     val backgroundsUi: List<BackgroundUi>,
-    val bulletsAnimationDestroyUi: List<AnimationDestroyUi>,
-    val spaceShipsAnimationDestroyUi: List<AnimationDestroyUi>,
+    val spaceshipsUi: List<SpriteUi>,
+    val spaceshipsFlyUi: List<SpriteUi>,
+    val bulletsUi: List<SpriteUi>,
+    val meteoritesUi: List<MeteoriteSpriteUi>,
+    val bulletsAnimationsDestroyUi: List<SpriteUi>,
+    val spaceShipsAnimationsDestroyUi: List<SpriteUi>,
     val players: MutableList<Player>,
     val countPlayers: Int = players.size,
     val backgrounds: List<List<Int>>,
@@ -88,8 +103,12 @@ class GetGameStateFromGame(
             game.height,
             game.round,
             backgroundsUi = getBackgroundsUI(game),
-            bulletsAnimationDestroyUi = getBulletsAnimationDestroyUi(game),
-            spaceShipsAnimationDestroyUi = getSpaceshipsAnimationDestroyUi(game),
+            spaceshipsUi = getSpaceshipsUi(game),
+            spaceshipsFlyUi = getSpaceshipsFlyUi(game),
+            bulletsUi = getBulletsUi(game),
+            meteoritesUi = getMeteoritesUi(game),
+            bulletsAnimationsDestroyUi = getBulletsAnimationDestroyUi(game),
+            spaceShipsAnimationsDestroyUi = getSpaceshipsAnimationDestroyUi(game),
             game.players,
             game.countPlayers,
             game.backgrounds.toList(),
@@ -140,45 +159,212 @@ class GetGameStateFromGame(
         return result
     }
 
-    private fun getBulletsAnimationDestroyUi(game: Game): List<AnimationDestroyUi> {
-        val result = mutableListOf<AnimationDestroyUi>()
+    private fun getBulletsAnimationDestroyUi(game: Game): List<SpriteUi> {
+        val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.bulletsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
             val actor = animationDestroy as Actor
-            for (point in viewport.getAllPoints(actor))
+            for (point in viewport.getAllPoints(actor)) {
+
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpBulletDestroy.first().width,
+                    bitmapRepository.bmpBulletDestroy.first().height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
                 result.add(
-                    AnimationDestroyUi(
+                    SpriteUi(
                         value = animationDestroy.frame,
-                        centerX = point.x,
-                        centerY = point.y,
-                        size = actor.size,
-                        angle = actor.angle,
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
                     )
                 )
+            }
         }
         return result
     }
 
-    private fun getSpaceshipsAnimationDestroyUi(game: Game): List<AnimationDestroyUi> {
-        val result = mutableListOf<AnimationDestroyUi>()
+    private fun getSpaceshipsAnimationDestroyUi(game: Game): List<SpriteUi> {
+        val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.bulletsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
             val actor = animationDestroy as Actor
-            for (point in viewport.getAllPoints(actor))
+            for (point in viewport.getAllPoints(actor)) {
+
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpSpaceshipDestroy.first().width,
+                    bitmapRepository.bmpSpaceshipDestroy.first().height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
                 result.add(
-                    AnimationDestroyUi(
+                    SpriteUi(
                         value = animationDestroy.frame,
-                        centerX = point.x,
-                        centerY = point.y,
-                        size = actor.size,
-                        angle = actor.angle,
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
                     )
                 )
+            }
         }
+        return result
+    }
+
+    private fun getSpaceshipsUi(game: Game): List<SpriteUi> {
+        val result = mutableListOf<SpriteUi>()
+
+        for (actor in game.listActors.spaceShips) {
+            if (!actor.inGame || actor.isFly)
+                continue
+            for (point in viewport.getAllPoints(actor)) {
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpSpaceship.first().width,
+                    bitmapRepository.bmpSpaceship.first().height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
+                result.add(
+                    SpriteUi(
+                        value = actor.player.number,
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun getSpaceshipsFlyUi(game: Game): List<SpriteUi> {
+        val result = mutableListOf<SpriteUi>()
+
+        for (actor in game.listActors.spaceShips) {
+            if (!actor.inGame || !actor.isFly)
+                continue
+            for (point in viewport.getAllPoints(actor)) {
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpSpaceshipFly.first().width,
+                    bitmapRepository.bmpSpaceshipFly.first().height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
+                result.add(
+                    SpriteUi(
+                        value = actor.player.number,
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun getBulletsUi(game: Game): List<SpriteUi> {
+        val result = mutableListOf<SpriteUi>()
+
+        for (actor in game.listActors.bullets) {
+            for (point in viewport.getAllPoints(actor)) {
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpWeapon[actor.getType()].width,
+                    bitmapRepository.bmpWeapon[actor.getType()].height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
+                result.add(
+                    SpriteUi(
+                        value = actor.getType(),
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    private fun getMeteoritesUi(game: Game): List<MeteoriteSpriteUi> {
+        val result = mutableListOf<MeteoriteSpriteUi>()
+
+        for (actor in game.listActors.meteorites) {
+            for (point in viewport.getAllPoints(actor)) {
+                val rectSrc = Rect(
+                    0,
+                    0,
+                    bitmapRepository.bmpMeteorites[actor.view][actor.viewSize].width,
+                    bitmapRepository.bmpMeteorites[actor.view][actor.viewSize].height
+                )
+                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val rectDst = RectF(
+                    -halfSize, -halfSize,
+                    halfSize, halfSize
+                )
+
+                result.add(
+                    MeteoriteSpriteUi(
+                        view = actor.view,
+                        viewSize = actor.viewSize,
+                        centerX = (point.x * sizeUnit).toFloat(),
+                        centerY = (point.y * sizeUnit).toFloat(),
+                        src = rectSrc,
+                        dst = rectDst,
+                        angle = actor.angle.toFloat(),
+                    )
+                )
+            }
+        }
+
         return result
     }
 }
