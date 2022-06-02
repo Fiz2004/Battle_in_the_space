@@ -4,14 +4,12 @@ import android.graphics.*
 import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.game.models.Actor
-import kotlin.math.*
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sin
 
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
-
-private const val NUMBER_BITMAP_BULLET_DESTROY = 3
-private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
-
 private const val DIVISION_BY_SCREEN = 11
 
 class Display(
@@ -54,7 +52,11 @@ class Display(
 
         drawBackground(stateGame.gameState.backgroundsUi, canvas)
         drawActors(stateGame, canvas)
-        drawAnimationDestroys(stateGame, canvas)
+        drawAnimationDestroys(
+            stateGame.gameState.bulletsAnimationDestroyUi,
+            stateGame.gameState.spaceShipsAnimationDestroyUi,
+            canvas
+        )
         drawJoystick(stateGame.controllerState, canvas)
         drawHelper(stateGame, canvas)
     }
@@ -118,37 +120,30 @@ class Display(
         canvas.restore()
     }
 
-    private fun drawAnimationDestroys(stateGame: ViewState, canvas: Canvas) {
-        for (animationDestroy in stateGame.gameState.bulletsAnimationDestroy) {
-            val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
-            animationDestroy.frame =
-                NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as Actor
-            for (point in viewport.getAllPoints(actor))
-                drawFrame(
-                    animationDestroy.getBitmap(this),
-                    point.x,
-                    point.y,
-                    actor.size,
-                    actor.angle,
-                    canvas
-                )
+    private fun drawAnimationDestroys(
+        bulletsAnimationDestroyUi: List<AnimationDestroyUi>,
+        spaceShipsAnimationDestroyUi: List<AnimationDestroyUi>, canvas: Canvas
+    ) {
+        bulletsAnimationDestroyUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpBulletDestroy[it.value],
+                it.centerX,
+                it.centerY,
+                it.size,
+                it.angle,
+                canvas
+            )
         }
 
-        for (animationDestroy in stateGame.gameState.spaceshipsAnimationDestroy) {
-            val step = animationDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY
-            animationDestroy.frame =
-                NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as Actor
-            for (point in viewport.getAllPoints(actor))
-                drawFrame(
-                    animationDestroy.getBitmap(this),
-                    point.x,
-                    point.y,
-                    actor.size,
-                    actor.angle,
-                    canvas
-                )
+        spaceShipsAnimationDestroyUi.forEach {
+            drawFrame(
+                bitmapRepository.bmpSpaceshipDestroy[it.value],
+                it.centerX,
+                it.centerY,
+                it.size,
+                it.angle,
+                canvas
+            )
         }
     }
 
