@@ -59,4 +59,8 @@ class TwoBullet(
     override fun getType(): Int {
         return 1
     }
+
+    override fun getType(): Int {
+        return 1
+    }
 }

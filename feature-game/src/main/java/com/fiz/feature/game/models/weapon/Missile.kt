@@ -58,4 +58,8 @@ class Missile(
     override fun getType(): Int {
         return 2
     }
+
+    override fun getType(): Int {
+        return 2
+    }
 }
