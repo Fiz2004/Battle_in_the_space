@@ -21,6 +21,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class GameActivity : AppCompatActivity() {
+
     private val viewModel: GameViewModel by viewModels()
 
     private val binding: ActivityGameBinding by lazy {
@@ -42,9 +43,7 @@ class GameActivity : AppCompatActivity() {
     private fun init(savedInstanceState: Bundle?) {
         val loadGame =
             savedInstanceState?.getSerializable(Game::class.java.simpleName) as? Game
-        val viewStatus =
-            savedInstanceState?.getSerializable(ViewState.Companion.StatusCurrentGame::class.java.simpleName) as? ViewState.Companion.StatusCurrentGame
-        viewModel.loadState(loadGame, viewStatus)
+        viewModel.loadState(loadGame)
     }
 
     private fun bindListeners() {
@@ -150,14 +149,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putSerializable(
-            Game::class.java.simpleName,
-            viewModel.game
-        )
-        outState.putSerializable(
-            ViewState.Companion.StatusCurrentGame::class.java.simpleName,
-            viewModel.viewState.value.status
-        )
+        outState.putSerializable(Game::class.java.simpleName, viewModel.game)
         super.onSaveInstanceState(outState)
     }
 

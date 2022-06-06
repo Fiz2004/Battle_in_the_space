@@ -7,7 +7,13 @@ import com.fiz.battleinthespace.feature_gamescreen.domain.Controller
 import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
 import com.fiz.battleinthespace.feature_gamescreen.game.models.ListActors
 import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
+import com.fiz.battleinthespace.feature_gamescreen.ui.SecTimeForRestartForEndGame
 import java.io.Serializable
+import kotlin.math.min
+
+private const val mSEC_FOR_FPS_60 = ((1.0 / 60.0) * 1000.0).toLong()
+
+const val SecTimeForRestartForEndGame = 1.0
 
 class Game(
     val width: Int,
@@ -17,8 +23,12 @@ class Game(
     var countPlayers: Int = players.size,
     var ai: MutableList<AI?>,
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
-    var listActors: ListActors = ListActors(width, height, players)
+    var listActors: ListActors = ListActors(width, height, players),
+    var status: StatusCurrentGame = StatusCurrentGame.Playing,
 ) : Serializable {
+
+    private var lastTime = System.currentTimeMillis()
+    private var timeToRestart: Double = SecTimeForRestartForEndGame
 
     init {
         Physics.createWorld(width, height)
@@ -26,9 +36,47 @@ class Game(
 
     fun update(
         controllers: List<Controller>,
+        playSound: (Int) -> Unit,
+    ) {
+        val now = System.currentTimeMillis()
+        val deltaTime = min(now - lastTime, mSEC_FOR_FPS_60).toInt() / 1000.0
+        if (deltaTime == 0.0) return
+
+        gameLoop(deltaTime, controllers, playSound)
+
+        lastTime = now
+    }
+
+
+    private fun gameLoop(
+        deltaTime: Double,
+        controllers: List<Controller>,
+        playSound: (Int) -> Unit,
+    ) {
+
+        if (timeToRestart < 0)
+            newGame(playSound)
+
+        val status = if (timeToRestart == SecTimeForRestartForEndGame)
+            getStatusGame(controllers, deltaTime, playSound)
+        else
+            false
+
+        if (!status) {
+            val newTimeToRestart = timeToRestart - deltaTime
+            timeToRestart = newTimeToRestart
+            return
+        }
+    }
+
+    private fun getStatusGame(
+        controllers: List<Controller>,
         deltaTime: Double,
         playSound: (Int) -> Unit,
     ): Boolean {
+
+        if (status == StatusCurrentGame.Pause)
+            return true
 
         for ((index, player) in players.withIndex()) {
             if (ai[index] != null && !player.main) {
@@ -111,10 +159,25 @@ class Game(
     }
 
     fun newGame(playSound: (Int) -> Unit) {
+        timeToRestart = SecTimeForRestartForEndGame
         round = 0
         for (player in players)
             player.newGame()
         players[0].main = true
+        status = StatusCurrentGame.Playing
         newRound(playSound)
+    }
+
+    fun changeStatusPauseOrPlaying() {
+        status = if (status == StatusCurrentGame.Playing)
+            StatusCurrentGame.Pause
+        else
+            StatusCurrentGame.Playing
+    }
+
+    companion object {
+        enum class StatusCurrentGame : Serializable {
+            Playing, Pause, NewGame
+        }
     }
 }

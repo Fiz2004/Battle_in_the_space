@@ -84,6 +84,7 @@ class GetGameStateFromGame @Inject constructor(
 
         return GameState(
             round = game.round,
+            status = game.status,
             backgroundsUi = getBackgroundsUI(game),
             spaceshipsUi = getSpaceshipsUi(game),
             spaceshipsFlyUi = getSpaceshipsFlyUi(game),

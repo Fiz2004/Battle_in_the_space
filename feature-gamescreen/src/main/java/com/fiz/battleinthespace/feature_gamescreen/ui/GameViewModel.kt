@@ -15,8 +15,6 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
-private const val mSEC_FOR_FPS_60 = ((1.0 / 60.0) * 1000.0).toLong()
-
 const val WIDTH_WORLD = 20
 const val HEIGHT_WORLD = 20
 
@@ -77,16 +75,15 @@ class GameViewModel @Inject constructor(
             controllers = controllers,
             controllerState = getControllerState(controllers[0]),
             gameState = getGameStateFromGame(game),
-            status = ViewState.Companion.StatusCurrentGame.Playing,
             playSound = ::playSound,
         )
     )
         private set
 
-    fun loadState(game: Game?, viewStatus: ViewState.Companion.StatusCurrentGame?) {
+    fun loadState(game: Game?) {
         this.game = game ?: return
-        this.viewState.value = this.viewState.value.copy(
-            status = viewStatus ?: return
+        viewState.value = viewState.value.copy(
+            gameState = getGameStateFromGame(game)
         )
     }
 
@@ -156,59 +153,16 @@ class GameViewModel @Inject constructor(
     private fun startGame() {
         viewModelScope.launch(Dispatchers.Default) {
             job?.cancelAndJoin()
-            job = viewModelScope.launch(Dispatchers.Default, block = gameLoop())
+            job = viewModelScope.launch(Dispatchers.Default) {
+                while (isActive) {
+                    game.update(controllers, ::playSound)
+                    viewState.value = viewState.value
+                        .copy(
+                            gameState = getGameStateFromGame(game),
+                        )
+                }
+            }
         }
-    }
-
-    private fun gameLoop(): suspend CoroutineScope.() -> Unit = {
-        var lastTime = System.currentTimeMillis()
-
-        while (isActive) {
-            val now = System.currentTimeMillis()
-            val deltaTime = min(now - lastTime, mSEC_FOR_FPS_60).toInt() / 1000.0
-            if (deltaTime == 0.0) continue
-
-            update(deltaTime)
-
-            lastTime = now
-        }
-    }
-
-    private fun update(deltaTime: Double) {
-
-        if (viewState.value.status == ViewState.Companion.StatusCurrentGame.Pause)
-            return
-
-        if (viewState.value.timeToRestart < 0 || viewState.value.status == ViewState.Companion.StatusCurrentGame.NewGame) {
-            game.newGame(::playSound)
-            viewState.value = viewState.value
-                .copy(
-                    gameState = getGameStateFromGame(game),
-                    status = ViewState.Companion.StatusCurrentGame.Playing,
-                    timeToRestart = SecTimeForRestartForEndGame,
-                )
-        }
-
-
-        val status = if (viewState.value.timeToRestart == SecTimeForRestartForEndGame)
-            game.update(viewState.value.controllers, deltaTime, ::playSound)
-        else
-            false
-
-        if (!status) {
-            val newTimeToRestart = viewState.value.timeToRestart - deltaTime
-            viewState.value = viewState.value
-                .copy(
-                    timeToRestart = newTimeToRestart,
-                )
-            return
-        }
-
-        viewState.value = viewState.value
-            .copy(
-                gameState = getGameStateFromGame(game),
-            )
-
     }
 
     fun gameStop() {
@@ -246,13 +200,17 @@ class GameViewModel @Inject constructor(
     }
 
     fun clickNewGameButton() {
+        game.newGame(::playSound)
         viewState.value = viewState.value
-            .copy(status = ViewState.Companion.StatusCurrentGame.NewGame)
+            .copy(
+                gameState = getGameStateFromGame(game)
+            )
     }
 
     fun clickPauseGameButton() {
+        game.changeStatusPauseOrPlaying()
         viewState.value = viewState.value
-            .copy(status = viewState.value.getStatusPauseOrPlaying())
+            .copy(gameState = getGameStateFromGame(game))
 
     }
 
