@@ -5,7 +5,7 @@ import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
 
 data class GameState(
     val round: Int,
-    val status: Game.Companion.StatusCurrentGame,
+    val status: Game.Companion.GlobalStatusGame,
     val backgroundsUi: List<BackgroundUi>,
     val spaceshipsUi: List<SpriteUi>,
     val spaceshipsFlyUi: List<SpriteUi>,

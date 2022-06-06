@@ -84,7 +84,7 @@ class SpaceShip(
 
     fun moveForward(deltaTime: Double, controller: Controller) {
         val step = INCREASE_SPEED_PER_SECOND * deltaTime * controller.power
-        isFly = controller.power != 0F
+        isFly = controller.power != 0.0
 
         speed += Vec(step * cos(angleToRadians), step * sin(angleToRadians))
     }

@@ -1,9 +1,9 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
 data class ControllerState(
-    val centerXOutsideCircle: Float,
-    val centerYOutsideCircle: Float,
-    val centerXInnerCircle: Float,
-    val centerYInnerCircle: Float,
-    val widthJoystick: Float
+    val centerXOutsideCircle: Double,
+    val centerYOutsideCircle: Double,
+    val centerXInnerCircle: Double,
+    val centerYInnerCircle: Double,
+    val widthJoystick: Double
 ) : java.io.Serializable

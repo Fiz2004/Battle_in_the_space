@@ -5,7 +5,7 @@ import java.io.Serializable
 import kotlin.math.abs
 import kotlin.math.atan2
 
-const val WIDTH_JOYSTICK_DEFAULT = 50F
+const val WIDTH_JOYSTICK_DEFAULT = 50.0
 
 data class InfoTouch(
     val point: Vec = Vec(0.0, 0.0),
@@ -13,43 +13,23 @@ data class InfoTouch(
     val ID: Int = 0
 ) : Serializable
 
-private const val SEC_MIN_TIME_BETWEEN_FIRE = 0.250
-
 class Controller(
     var fire: Boolean = false,
-    var power: Float = 0F
+    var power: Double = 0.0
 ) : Serializable {
 
     var moveInfoTouch = InfoTouch()
 
-    var angle: Float = 0F
+    var angle: Double = 0.0
         set(value) {
             field = value
-            if (value >= 360)
-                field = value - 360
-            if (value < 0)
-                field = value + 360
+            if (value >= 360.0)
+                field = value - 360.0
+            if (value < 0.0)
+                field = value + 360.0
         }
 
     private val sensitivity: Vec = Vec(0.0, 0.0)
-
-    private var timeLastFire: Double = 0.0
-
-    fun isCanFire(deltaTime: Double): Boolean {
-        if (!fire) return false
-
-        if (timeLastFire == 0.0) {
-            timeLastFire = SEC_MIN_TIME_BETWEEN_FIRE
-            return true
-        }
-
-        timeLastFire -= deltaTime
-
-        if (timeLastFire < 0)
-            timeLastFire = 0.0
-
-        return false
-    }
 
     fun down(touchMoveSide: Boolean, point: Vec, pointerId: Int) {
         if (touchMoveSide) {
@@ -80,7 +60,7 @@ class Controller(
         moveInfoTouch = moveInfoTouch.copy(
             touch = false
         )
-        power = 0F
+        power = 0.0
 
         fire = false
     }
@@ -91,7 +71,7 @@ class Controller(
             moveInfoTouch = moveInfoTouch.copy(
                 touch = false
             )
-            power = 0F
+            power = 0.0
         }
         if (!isMoveSide) {
             fire = false
@@ -112,9 +92,9 @@ class Controller(
             val delta = Vec(deltaX, deltaY)
 
             val tempPower = (1.0 / 3.0) * (delta.length() / WIDTH_JOYSTICK_DEFAULT)
-            power = (if (tempPower > 1) 1.0 else tempPower).toFloat()
+            power = if (tempPower > 1) 1.0 else tempPower
 
-            angle = (atan2(delta.y, delta.x).convertRadToDeg()).toFloat()
+            angle = atan2(delta.y, delta.x).convertRadToDeg()
         }
     }
 }

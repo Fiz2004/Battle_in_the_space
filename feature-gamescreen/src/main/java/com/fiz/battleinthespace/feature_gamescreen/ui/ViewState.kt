@@ -15,7 +15,7 @@ data class ViewState(
 ) : Serializable {
 
     fun getResourceTextForPauseResumeButton(): Int {
-        return if (gameState.status == Game.Companion.StatusCurrentGame.Pause)
+        return if (gameState.status == Game.Companion.GlobalStatusGame.Pause)
             R.string.resume_game_button
         else
             R.string.pause_game_button

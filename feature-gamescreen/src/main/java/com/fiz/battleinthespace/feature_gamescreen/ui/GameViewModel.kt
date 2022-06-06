@@ -41,19 +41,16 @@ class GameViewModel @Inject constructor(
         for ((index, player) in playerRepository.getPlayers().withIndex())
             if (index < countPlayers)
                 result.add(player.copy(number = index))
+
         result
     }
 
-    private val controllers: List<Controller> =
-        List(players.size) { Controller() }
+    private val controllers: MutableList<Controller> =
+        MutableList(players.size) { Controller() }
 
     private var job: Job? = null
 
-    var getControllerState: GetControllerState =
-        GetControllerState(0, 0, 0f)
-        private set
-
-    var game: Game = run {
+    private var ai: MutableList<AI?> = run {
         val ai = mutableListOf<AI?>()
 
         for (n in 0 until players.size)
@@ -62,13 +59,19 @@ class GameViewModel @Inject constructor(
             else
                 ai.add(null)
 
-        Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players, ai = ai)
+        ai
     }
+
+    var getControllerState: GetControllerState =
+        GetControllerState(0, 0, 0.0)
         private set
 
-    init {
-        game.newGame(::playSound)
+    var game: Game = run {
+        Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players)
+    }.apply {
+        newGame(::playSound)
     }
+        private set
 
     var viewState = MutableStateFlow(
         ViewState(
@@ -93,7 +96,7 @@ class GameViewModel @Inject constructor(
         surfaceHeight: Int,
         leftLocationOnScreen: Int,
         topLocationOnScreen: Int,
-        widthJoystick: Float
+        widthJoystick: Double
     ) {
 
         val sizeUnit: Float = min(surfaceWidth, surfaceHeight).toFloat() / DIVISION_BY_SCREEN
@@ -155,6 +158,16 @@ class GameViewModel @Inject constructor(
             job?.cancelAndJoin()
             job = viewModelScope.launch(Dispatchers.Default) {
                 while (isActive) {
+
+                    for ((index, player) in players.withIndex()) {
+                        if (ai[index] != null && !player.main) {
+                            controllers[index] = ai[index]?.getNewController(
+                                index,
+                                game
+                            ) ?: controllers[index]
+                        }
+                    }
+
                     game.update(controllers, ::playSound)
                     viewState.value = viewState.value
                         .copy(
@@ -200,7 +213,7 @@ class GameViewModel @Inject constructor(
     }
 
     fun clickNewGameButton() {
-        game.newGame(::playSound)
+        game.clickNewGame()
         viewState.value = viewState.value
             .copy(
                 gameState = getGameStateFromGame(game)

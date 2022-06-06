@@ -183,7 +183,7 @@ class ListActors(
     private fun updateMeteorites(deltaTime: Double, playSound: (Int) -> Unit) {
         meteorites.forEach { meteorite -> meteorite.update(deltaTime, width, height) }
 
-        findCombinationsMeteoritesMetioritesOverlapAndKickback(playSound)
+        findCombinationsMeteoritesMeteoritesOverlapAndKickback(playSound)
 
         val spaceShipsIsCollisionMeteorite = getSpaceShipsIsCollisionMeteorite(playSound)
         addAnimationsDestroySpaceShipFor(spaceShipsIsCollisionMeteorite)
@@ -199,7 +199,7 @@ class ListActors(
         destroyBullets()
     }
 
-    private fun findCombinationsMeteoritesMetioritesOverlapAndKickback(playSound: (Int) -> Unit) {
+    private fun findCombinationsMeteoritesMeteoritesOverlapAndKickback(playSound: (Int) -> Unit) {
         createCombinations(meteorites)
             .filter { overlap(it.first, it.second, playSound) }
             .forEach { kickback(it.first, it.second) }

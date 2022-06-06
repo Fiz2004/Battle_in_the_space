@@ -193,15 +193,15 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
         controllerState ?: return
 
         canvas.drawCircle(
-            controllerState.centerXOutsideCircle,
-            controllerState.centerYOutsideCircle,
-            controllerState.widthJoystick,
+            controllerState.centerXOutsideCircle.toFloat(),
+            controllerState.centerYOutsideCircle.toFloat(),
+            controllerState.widthJoystick.toFloat(),
             paintOutsideCircleJoystick
         )
 
         canvas.drawCircle(
-            controllerState.centerXInnerCircle,
-            controllerState.centerYInnerCircle,
+            controllerState.centerXInnerCircle.toFloat(),
+            controllerState.centerYInnerCircle.toFloat(),
             30F,
             paintInnerCircleJoystick
         )
