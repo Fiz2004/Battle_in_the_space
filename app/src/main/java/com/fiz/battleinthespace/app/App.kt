@@ -6,6 +6,7 @@ import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSourc
 import com.fiz.battleinthespace.feature_gamescreen.ui.GameActivity
 import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.google.android.material.color.DynamicColors
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class App : Application(), ApplicationFeatureMainScreen {
 
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(applicationContext)
         DynamicColors.applyToActivitiesIfAvailable(this)
     }
 

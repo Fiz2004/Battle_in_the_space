@@ -38,30 +38,29 @@ dependencies {
     implementation project(path: ":common")
     implementation project(path: ":domain")
 
-    implementation("androidx.core:core-ktx:1.7.0")
+    implementation('androidx.core:core-ktx:1.8.0')
 
-    implementation platform('com.google.firebase:firebase-bom:30.0.2')
-    implementation("com.google.firebase:firebase-auth:21.0.4")
-    implementation("com.google.firebase:firebase-database-ktx:20.0.5")
-    implementation("com.google.firebase:firebase-storage:20.0.1")
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.4")
+    implementation platform('com.google.firebase:firebase-bom:30.3.0')
+    implementation('com.google.firebase:firebase-auth:21.0.6')
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation('com.google.firebase:firebase-auth-ktx:21.0.6')
     implementation("com.firebaseui:firebase-ui-auth:8.0.1")
     implementation("com.google.android.gms:play-services-auth:20.2.0")
 
     //    Realm
-    implementation('io.realm:realm-annotations:10.11.0')
-    implementation('io.realm:realm-android-library:10.11.0')
-    implementation('io.realm:realm-android-kotlin-extensions:10.11.0')
-    kapt('io.realm:realm-annotations-processor:10.11.0')
+    implementation('io.realm:realm-annotations:10.11.1')
+    implementation('io.realm:realm-android-library:10.11.1')
+    implementation('io.realm:realm-android-kotlin-extensions:10.11.1')
+    kapt('io.realm:realm-annotations-processor:10.11.1')
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.42")
     kapt("com.google.dagger:hilt-android-compiler:2.42")
 
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2')
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4')
 
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.1")
-    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:2.4.1")
+    implementation('androidx.lifecycle:lifecycle-livedata-ktx:2.5.0')
+    implementation('androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.0')
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

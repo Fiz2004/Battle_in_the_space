@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.fiz.battleinthespace.database.ItemsDatabase
 import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
 import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
+import com.fiz.battleinthespace.database.data_source.network.PlayersRemoteDataSource
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
 import javax.inject.Inject
@@ -16,6 +17,7 @@ class PlayerRepositoryImpl @Inject constructor(
     override suspend fun save(player: Player?) {
         if (player == null) return
         playersLocalDataSource.save(player)
+        PlayersRemoteDataSource().addPlayer(player)
     }
 
     override fun saveCountPlayers(count: Int): Boolean {

@@ -1,7 +1,6 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
@@ -13,14 +12,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.*
 
 
 class AccountViewModel : ViewModel() {
 
     val user = MutableLiveData<FirebaseUser?>(null)
-    lateinit var mAuth: FirebaseAuth
+    val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    lateinit var googleSignInActivityLauncher: ActivityResultLauncher<Intent>
 
     var errorTextToToast = MutableLiveData<String?>(null); private set
 
@@ -167,11 +166,7 @@ class AccountViewModel : ViewModel() {
         errorTextToToast.value = value
     }
 
-    lateinit var googleSignInActivityLauncher: ActivityResultLauncher<Intent>
-
-    fun set(context: Context, googleSignInActivityLauncher: ActivityResultLauncher<Intent>) {
-        FirebaseApp.initializeApp(context)
-        mAuth = FirebaseAuth.getInstance()
+    fun set(googleSignInActivityLauncher: ActivityResultLauncher<Intent>) {
         this.googleSignInActivityLauncher = googleSignInActivityLauncher
     }
 

@@ -18,7 +18,6 @@ interface ApplicationFeatureMainScreen {
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val viewModel: MainViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
 
     private val binding: ActivityMainBinding by lazy {
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        accountViewModel.set(this, googleSignInActivityLauncher)
+        accountViewModel.set(googleSignInActivityLauncher)
 
         init()
         setupListener()

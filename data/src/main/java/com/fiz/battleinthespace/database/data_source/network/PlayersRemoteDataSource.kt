@@ -6,8 +6,7 @@ import com.fiz.battleinthespace.domain.models.Player
 class PlayersRemoteDataSource {
     private val db = DBManager()
 
-    private suspend fun addPlayer(player: Player) {
-        val key = db.db.push().key
+    suspend fun addPlayer(player: Player) {
         db.add(player)
     }
 }
