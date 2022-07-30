@@ -3,14 +3,11 @@ package com.fiz.battleinthespace.feature_gamescreen.domain
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
-import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
-import com.fiz.battleinthespace.feature_gamescreen.game.Game
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
-import com.fiz.battleinthespace.feature_gamescreen.game.models.Actor
+import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.GameState
 import com.fiz.battleinthespace.feature_gamescreen.ui.WIDTH_WORLD
 import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
+import com.fiz.battleinthespace.repositories.BitmapRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.ceil
@@ -27,8 +24,8 @@ class GetGameStateFromGame @Inject constructor(
 ) {
     private var surfaceWidth: Int = 0
     private var surfaceHeight: Int = 0
-    private var infoWidth: Int = 0
-    private var infoHeight: Int = 0
+    var infoWidth: Int = 0
+    var infoHeight: Int = 0
     private var gameWidth: Int = 0
     private var gameHeight: Int = 0
     private var sizeUnit: Float = 0f
@@ -44,15 +41,19 @@ class GetGameStateFromGame @Inject constructor(
         0f
     )
 
-    fun setInfo(
+    fun setInfoScreen(
         infoWidth: Int,
         infoHeight: Int,
+    ) {
+        this.infoWidth = infoWidth
+        this.infoHeight = infoHeight
+    }
+
+    fun setInfo(
         bmpLife: Int,
         baseTextSize: Float,
         maxTextNameWidth: Int
     ) {
-        this.infoWidth = infoWidth
-        this.infoHeight = infoHeight
         this.bmplife = bmpLife
         this.baseTextSize = baseTextSize
         this.maxTextNameWidth = maxTextNameWidth
@@ -79,7 +80,7 @@ class GetGameStateFromGame @Inject constructor(
         )
     }
 
-    operator fun invoke(game: Game): GameState {
+    operator fun invoke(game: com.fiz.feature.game.Game): GameState {
         viewport.update(game)
 
         return GameState(
@@ -100,7 +101,7 @@ class GetGameStateFromGame @Inject constructor(
         )
     }
 
-    private fun getBackgroundsUI(game: Game): List<BackgroundUi> {
+    private fun getBackgroundsUI(game: com.fiz.feature.game.Game): List<BackgroundUi> {
         val result = mutableListOf<BackgroundUi>()
 
         val xStart = floor(viewport.left).toInt()
@@ -116,8 +117,14 @@ class GetGameStateFromGame @Inject constructor(
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
-                val x = Physics.changeCoordinateIfBorderTop(n.toDouble(), Physics.width)
-                val y = Physics.changeCoordinateIfBorderTop(k.toDouble(), Physics.height)
+                val x = com.fiz.feature.game.engine.Physics.changeCoordinateIfBorderTop(
+                    n.toDouble(),
+                    com.fiz.feature.game.engine.Physics.width
+                )
+                val y = com.fiz.feature.game.engine.Physics.changeCoordinateIfBorderTop(
+                    k.toDouble(),
+                    com.fiz.feature.game.engine.Physics.height
+                )
                 val background = game.backgrounds[x.toInt()][y.toInt()]
 
                 val xStartDst = (n - viewport.left).toFloat() * sizeUnit
@@ -139,13 +146,13 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getBulletsAnimationDestroyUi(game: Game): List<SpriteUi> {
+    private fun getBulletsAnimationDestroyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.bulletsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as Actor
+            val actor = animationDestroy as com.fiz.feature.game.models.Actor
             for (point in viewport.getAllPoints(actor)) {
 
                 val rectSrc = Rect(
@@ -175,13 +182,13 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsAnimationDestroyUi(game: Game): List<SpriteUi> {
+    private fun getSpaceshipsAnimationDestroyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.spaceShipsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as Actor
+            val actor = animationDestroy as com.fiz.feature.game.models.Actor
             for (point in viewport.getAllPoints(actor)) {
 
                 val rectSrc = Rect(
@@ -211,7 +218,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsUi(game: Game): List<SpriteUi> {
+    private fun getSpaceshipsUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
 
         for (actor in game.listActors.spaceShips) {
@@ -246,7 +253,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsFlyUi(game: Game): List<SpriteUi> {
+    private fun getSpaceshipsFlyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
 
         for (actor in game.listActors.spaceShips) {
@@ -281,7 +288,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getBulletsUi(game: Game): List<SpriteUi> {
+    private fun getBulletsUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
 
         for (actor in game.listActors.bullets) {
@@ -314,7 +321,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getMeteoritesUi(game: Game): List<MeteoriteSpriteUi> {
+    private fun getMeteoritesUi(game: com.fiz.feature.game.Game): List<MeteoriteSpriteUi> {
         val result = mutableListOf<MeteoriteSpriteUi>()
 
         for (actor in game.listActors.meteorites) {
@@ -348,7 +355,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getHelperPlayerUi(game: Game): List<HelperPlayerUi> {
+    private fun getHelperPlayerUi(game: com.fiz.feature.game.Game): List<HelperPlayerUi> {
 
         val result = mutableListOf<HelperPlayerUi>()
 
@@ -358,9 +365,15 @@ class GetGameStateFromGame @Inject constructor(
                 .forEach {
                     if (viewport.getAllPoints(it).size == 0) {
 
-                        val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
+                        val angle = com.fiz.feature.game.engine.Physics.findAngle(
+                            mainSpaceship[0].center,
+                            it.center
+                        )
                         val angleToRadians = angle / 180.0 * Math.PI
-                        val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+                        val vec = Vec(
+                            cos(angleToRadians),
+                            sin(angleToRadians)
+                        )
                         val cx =
                             (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
                         val cy =
@@ -383,7 +396,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getHelperMeteoritesUi(game: Game): List<HelperMeteoritesUi> {
+    private fun getHelperMeteoritesUi(game: com.fiz.feature.game.Game): List<HelperMeteoritesUi> {
 
         val result = mutableListOf<HelperMeteoritesUi>()
 
@@ -393,9 +406,13 @@ class GetGameStateFromGame @Inject constructor(
             if (game.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
                 game.listActors.meteorites.forEach {
 
-                    val angle = Physics.findAngle(mainSpaceship[0].center, it.center)
+                    val angle = com.fiz.feature.game.engine.Physics.findAngle(
+                        mainSpaceship[0].center,
+                        it.center
+                    )
                     val angleToRadians = angle / 180.0 * Math.PI
-                    val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+                    val vec =
+                        Vec(cos(angleToRadians), sin(angleToRadians))
                     val cx =
                         (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 40F
                     val cy =
@@ -414,7 +431,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getTextRoundInfoUi(game: Game): TextInfoUi {
+    private fun getTextRoundInfoUi(game: com.fiz.feature.game.Game): TextInfoUi {
 
         val paintRoundTextSize = baseTextSize
 
@@ -428,7 +445,7 @@ class GetGameStateFromGame @Inject constructor(
 
     }
 
-    private fun getInfoTextUi(game: Game): List<TextInfoUi> {
+    private fun getInfoTextUi(game: com.fiz.feature.game.Game): List<TextInfoUi> {
         val result = mutableListOf<TextInfoUi>()
 
         val textSize = baseTextSize * 0.75F
@@ -460,7 +477,7 @@ class GetGameStateFromGame @Inject constructor(
     }
 
 
-    private fun getInfoUi(game: Game): List<InfoUi> {
+    private fun getInfoUi(game: com.fiz.feature.game.Game): List<InfoUi> {
         val result = mutableListOf<InfoUi>()
 
         val textSize = baseTextSize * 0.75F

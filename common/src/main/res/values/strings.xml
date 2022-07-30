@@ -6,20 +6,22 @@
 
     <plurals name="count_players">
         <item quantity="one">%1$d Игрок </item>
+        <item quantity="two">%1$d Игрока </item>
         <item quantity="few">%1$d Игрока </item>
         <item quantity="many">%1$d Игроков </item>
         <item quantity="other">%1$d Игроков </item>
     </plurals>
 
     <plurals name="players_count">
-        <item quantity="one">Игрок %1$d</item>
-        <item quantity="few">Игрок %1$d</item>
-        <item quantity="many">Игрок %1$d</item>
-        <item quantity="other">Игрок %1$d</item>
+        <item quantity="one">Игрока %1$d</item>
+        <item quantity="two">Игрока %1$d</item>
+        <item quantity="few">Игрока %1$d</item>
+        <item quantity="many">Игрока %1$d</item>
+        <item quantity="other">Игрока %1$d</item>
     </plurals>
 
     <string name="name_options_textview">Имя:</string>
-    <string name="name_options_edittext">Введите имя</string>
+    <string name="name_options_edittext">Введите имя %1$s</string>
     <string name="controller_options_togglebutton_off">Компьютер</string>
     <string name="controller_options_togglebutton_on">Игрок</string>
 

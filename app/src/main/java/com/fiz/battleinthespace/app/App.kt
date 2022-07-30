@@ -1,33 +1,16 @@
 package com.fiz.battleinthespace.app
 
 import android.app.Application
-import android.content.Intent
-import com.fiz.battleinthespace.database.data_source.local.PlayersLocalDataSource
-import com.fiz.battleinthespace.feature_gamescreen.ui.GameActivity
-import com.fiz.battleinthespace.feature_mainscreen.ui.ApplicationFeatureMainScreen
 import com.google.android.material.color.DynamicColors
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 
 @HiltAndroidApp
-class App : Application(), ApplicationFeatureMainScreen {
-
-    @Inject
-    lateinit var playersLocalDataSource: PlayersLocalDataSource
-
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        FirebaseApp.initializeApp(applicationContext)
         DynamicColors.applyToActivitiesIfAvailable(this)
-    }
 
-    override fun onTerminate() {
-        super.onTerminate()
-        playersLocalDataSource.close()
-    }
-
-    override fun getIntentForNextScreen(): Intent {
-        return Intent(this, GameActivity::class.java)
+        FirebaseApp.initializeApp(this)
     }
 }

@@ -1,5 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
+import com.fiz.battleinthespace.domain.models.Controller
 import com.fiz.battleinthespace.feature_gamescreen.ui.ControllerState
 
 class GetControllerState(

@@ -3,18 +3,16 @@ package com.fiz.battleinthespace.feature_mainscreen.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
-import com.fiz.battleinthespace.feature_mainscreen.ui.utils.ActivityContract
 import dagger.hilt.android.AndroidEntryPoint
-
-interface ApplicationFeatureMainScreen {
-    fun getIntentForNextScreen(): Intent
-}
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -24,18 +22,25 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val googleSignInActivityLauncher =
-        registerForActivityResult(ActivityContract()) { result ->
-            result?.let { accountViewModel.signInFirebaseWithGoogle(result) }
+    val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(), ::activityCallback,
+    )
+
+    private fun activityCallback(result: ActivityResult) {
+        if (result.resultCode == RESULT_OK || result.data == null) {
+            result.data?.let { data ->
+                accountViewModel.signInFirebaseWithGoogle(data)
+            }
+        } else {
+            Toast.makeText(this@MainActivity, "Отмена входа", Toast.LENGTH_LONG).show()
         }
+    }
 
     private val itemMenu = listOf(R.id.page_1, R.id.page_2, R.id.page_3, R.id.page_4)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        accountViewModel.set(googleSignInActivityLauncher)
 
         init()
         setupListener()
@@ -62,15 +67,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.flyFab.setOnClickListener {
-            val intent = (application as ApplicationFeatureMainScreen).getIntentForNextScreen()
+            val intent = Intent("com.fiz.battleinthespace.GameActivity")
             startActivity(intent)
         }
     }
 
     private fun setupObserve() {
-        accountViewModel.errorTextToToast.observe(this) {
-            it?.let {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+        launchAndRepeatWithViewLifecycle {
+            accountViewModel.textToToast.collect {
+                it?.let {
+                    Toast.makeText(this@MainActivity, it, Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

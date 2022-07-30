@@ -16,8 +16,7 @@ import com.google.android.material.color.MaterialColors
 class ItemsAdapter(
     private val Items: List<Item>,
     val callback: (Int) -> Unit
-) :
-    RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -37,7 +36,8 @@ class ItemsAdapter(
         return Items.size
     }
 
-    inner class ViewHolder(val binding: ListItemItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(val binding: ListItemItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         private val colorDefault = binding.cardView.cardBackgroundColor.defaultColor
         private val colorFontDefault = binding.costText.textColors.defaultColor
         var item: Item? = null
@@ -84,12 +84,14 @@ class ItemsAdapter(
                 else -> names
             }
             binding.infoText.text = info
-            binding.costText.text = binding.root.context.resources.getString(R.string.cost, item.cost)
+            binding.costText.text =
+                binding.root.context.resources.getString(R.string.cost, item.cost)
 
             binding.cardView.setOnClickListener {
                 if (item.cost != 0 && item.state == StateProduct.NONE) {
                     binding.cardView.setCardBackgroundColor(Color.YELLOW)
-                    binding.infoText.text = binding.root.context.resources.getString(R.string.buying_question)
+                    binding.infoText.text =
+                        binding.root.context.resources.getString(R.string.buying_question)
                     binding.costText.visibility = View.GONE
                     binding.buttonsLayout.visibility = View.VISIBLE
                     binding.okButton.setOnClickListener {

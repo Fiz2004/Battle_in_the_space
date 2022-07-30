@@ -1,12 +1,12 @@
 package com.fiz.battleinthespace.domain.models
 
 data class Player(
-    val id: Int = 0,
+    val id: String = "",
     var name: String = "Player",
     var controllerPlayer: Boolean = true,
     var mission: Int = 0,
     var money: Int = 1000,
-    var items: List<TypeItems>,
+    var items: List<TypeItems> = emptyList(),
     var score: Int = 0,
     var number: Int = 0,
     var main: Boolean = false,

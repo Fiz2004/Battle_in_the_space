@@ -1,5 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -8,16 +9,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.fiz.battleinthespace.common.Vec
+import com.fiz.battleinthespace.domain.models.WIDTH_JOYSTICK_DEFAULT
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
-import com.fiz.battleinthespace.feature_gamescreen.domain.WIDTH_JOYSTICK_DEFAULT
-import com.fiz.battleinthespace.feature_gamescreen.game.Game
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.feature.game.Game
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.Serializable
 import javax.inject.Inject
+
+@Suppress("DEPRECATION")
+fun <T : Serializable?> getSerializable(
+    savedInstanceState: Bundle?,
+    name: String,
+    clazz: Class<T>
+): T {
+    @Suppress("UNCHECKED_CAST")
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        savedInstanceState?.getSerializable(name, clazz)!!
+    else
+        savedInstanceState?.getSerializable(name) as T
+}
 
 @AndroidEntryPoint
 class GameActivity : AppCompatActivity() {
@@ -42,7 +57,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun init(savedInstanceState: Bundle?) {
         val loadGame =
-            savedInstanceState?.getSerializable(Game::class.java.simpleName) as? Game
+            getSerializable(savedInstanceState, Game::class.java.simpleName, Game::class.java)
         viewModel.loadState(loadGame)
     }
 
@@ -109,7 +124,10 @@ class GameActivity : AppCompatActivity() {
         val pointerId = event.getPointerId(pointerIndex)
 
         val point =
-            Vec(event.getX(pointerIndex).toDouble(), event.getY(pointerIndex).toDouble())
+            Vec(
+                event.getX(pointerIndex).toDouble(),
+                event.getY(pointerIndex).toDouble()
+            )
 
         val pointIndex = (event.findPointerIndex(pointerId))
 

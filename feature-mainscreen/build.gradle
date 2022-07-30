@@ -1,38 +1,14 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
     id("dagger.hilt.android.plugin")
 }
 
+apply from: "$rootProject.projectDir/android.gradle"
+
 android {
-    compileSdk 32
-
-    defaultConfig {
-        minSdk 21
-        targetSdk 32
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-    buildFeatures {
-        viewBinding true
-    }
     namespace "com.fiz.battleinthespace.feature_mainscreen"
 }
 
@@ -45,25 +21,19 @@ dependencies {
     implementation("androidx.core:core-ktx:1.8.0")
     implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.activity:activity-ktx:1.5.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.0")
+    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("androidx.activity:activity-ktx:1.5.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.1")
+
+    implementation platform("com.google.firebase:firebase-bom:30.3.1")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:20.2.0")
+    implementation("com.firebaseui:firebase-ui-auth:8.0.1")
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.42")
-    kapt("com.google.dagger:hilt-android-compiler:2.42")
-
-    implementation platform("com.google.firebase:firebase-bom:30.3.0")
-    implementation("com.google.firebase:firebase-auth:21.0.6")
-    implementation("com.google.firebase:firebase-database-ktx:20.0.5")
-    implementation("com.google.firebase:firebase-storage:20.0.1")
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.6")
-    implementation("com.google.firebase:firebase-core:21.1.0")
-    implementation("com.firebaseui:firebase-ui-auth:8.0.1")
-    implementation("com.google.android.gms:play-services-auth:20.2.0")
-
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.0")
-
-    implementation("androidx.appcompat:appcompat:1.4.2")
+    implementation("com.google.dagger:hilt-android:2.43.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.43.1")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

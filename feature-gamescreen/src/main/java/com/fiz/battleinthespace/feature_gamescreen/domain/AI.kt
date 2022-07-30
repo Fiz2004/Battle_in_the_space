@@ -1,8 +1,7 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import com.fiz.battleinthespace.feature_gamescreen.game.Game
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Physics
-import com.fiz.battleinthespace.feature_gamescreen.game.models.weapon.Weapon
+import com.fiz.battleinthespace.domain.models.Controller
+import com.fiz.feature.game.Game
 import kotlin.math.min
 
 class AI {
@@ -15,19 +14,20 @@ class AI {
 
         val (minDistanceMeteorite, minDistance) = game.listActors.meteorites.toMutableList()
             .map {
-                Pair(it, Physics.findDistance(center, it.center))
+                Pair(it, com.fiz.feature.game.engine.Physics.findDistance(center, it.center))
             }
             .minByOrNull {
                 it.second
             }
             ?: return newController
 
-        val angle = Physics.findAngle(center, minDistanceMeteorite.center)
+        val angle =
+            com.fiz.feature.game.engine.Physics.findAngle(center, minDistanceMeteorite.center)
         newController.angle = angle
 
         val indexWeapon = spaceship.player.weapon
 
-        if (minDistance > Weapon.create(
+        if (minDistance > com.fiz.feature.game.models.weapon.Weapon.create(
                 game.listActors.spaceShips,
                 index,
                 indexWeapon

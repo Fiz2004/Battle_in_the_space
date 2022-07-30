@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentStatisticsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 
@@ -28,15 +29,20 @@ class StatisticsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        launchAndRepeatWithViewLifecycle {
+            viewModel.viewState.collect { viewState ->
+                if (viewState.players.isEmpty()) return@collect
+
+                adapter.setData(viewState.players)
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.players.observe(viewLifecycleOwner) {
-            adapter.setData(it)
-        }
     }
 }

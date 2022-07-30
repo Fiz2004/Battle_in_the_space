@@ -34,11 +34,6 @@ class MissionSelectedFragment : Fragment() {
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewpagerMission.registerOnPageChangeCallback(object :
@@ -50,6 +45,11 @@ class MissionSelectedFragment : Fragment() {
                 binding.viewpagerMission.currentItem = position
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

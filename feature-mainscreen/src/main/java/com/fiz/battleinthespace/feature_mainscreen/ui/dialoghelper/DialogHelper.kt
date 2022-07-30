@@ -9,13 +9,16 @@ import androidx.fragment.app.activityViewModels
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.SignDialogBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.MainActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 class DialogHelper : DialogFragment() {
     private val accountViewModel: AccountViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val index = requireArguments().getInt("index")
+        val index = requireArguments().getInt(KEY)
 
         val builder = AlertDialog.Builder(requireActivity())
         val binding = SignDialogBinding.inflate(requireActivity().layoutInflater)
@@ -75,18 +78,25 @@ class DialogHelper : DialogFragment() {
             dialog?.dismiss()
         } else {
             binding.dialogMessageTextView.visibility = View.VISIBLE
-
         }
     }
 
 
     private fun setOnClickSignInGoogle(dialog: AlertDialog?) {
-        accountViewModel.signInWithGoogle(requireActivity())
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        val signInClient = GoogleSignIn.getClient(requireActivity(), gso)
+        val intent = signInClient.signInIntent
+
+        (requireActivity() as MainActivity).signInLauncher.launch(intent)
         dialog?.dismiss()
     }
 
     companion object {
         const val SIGN_UP_STATE = 0
         const val SIGN_IN_STATE = 1
+        const val KEY = "index"
     }
 }

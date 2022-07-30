@@ -3,14 +3,20 @@ package com.fiz.battleinthespace.feature_gamescreen.ui
 import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fiz.battleinthespace.common.Vec
+import com.fiz.battleinthespace.domain.models.Controller
 import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
-import com.fiz.battleinthespace.feature_gamescreen.domain.*
-import com.fiz.battleinthespace.feature_gamescreen.game.Game
-import com.fiz.battleinthespace.feature_gamescreen.game.engine.Vec
+import com.fiz.battleinthespace.domain.repositories.SettingsRepository
+import com.fiz.battleinthespace.feature_gamescreen.domain.AI
+import com.fiz.battleinthespace.feature_gamescreen.domain.GetControllerState
+import com.fiz.battleinthespace.feature_gamescreen.domain.GetGameStateFromGame
+import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
+import com.fiz.feature.game.Game
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
@@ -24,6 +30,7 @@ private const val DIVISION_BY_SCREEN = 11
 @HiltViewModel
 class GameViewModel @Inject constructor(
     private val playerRepository: PlayerRepository,
+    private val settingsRepository: SettingsRepository,
     private val getGameStateFromGame: GetGameStateFromGame,
     private val soundUseCase: SoundUseCase
 ) : ViewModel() {
@@ -32,56 +39,73 @@ class GameViewModel @Inject constructor(
 
     private var isInformationSurfaceViewReady = false
 
-    private val countPlayers = playerRepository.getCountPlayers()
-
-    private val players = run {
-
-        val result = mutableListOf<Player>()
-
-        for ((index, player) in playerRepository.getPlayers().withIndex())
-            if (index < countPlayers)
-                result.add(player.copy(number = index))
-
-        result
-    }
-
-    private val controllers: MutableList<Controller> =
-        MutableList(players.size) { Controller() }
-
-    private var job: Job? = null
-
-    private var ai: MutableList<AI?> = run {
-        val ai = mutableListOf<AI?>()
-
-        for (n in 0 until players.size)
-            if (!players[n].controllerPlayer)
-                ai.add(AI())
-            else
-                ai.add(null)
-
-        ai
-    }
+    private var countPlayers: Int = 4
 
     var getControllerState: GetControllerState =
         GetControllerState(0, 0, 0.0)
         private set
 
-    var game: Game = run {
-        Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players)
-    }.apply {
-        newGame(::playSound)
-    }
-        private set
-
     var viewState = MutableStateFlow(
         ViewState(
-            controllers = controllers,
-            controllerState = getControllerState(controllers[0]),
-            gameState = getGameStateFromGame(game),
+            isLoading = true,
+            controllers = MutableList(4) { Controller() },
+            controllerState = getControllerState(Controller()),
+            gameState = null,
             playSound = ::playSound,
         )
     )
-        private set
+
+    private lateinit var players: List<Player>
+    private lateinit var controllers: MutableList<Controller>
+    lateinit var game: Game
+    private lateinit var ai: MutableList<AI?>
+
+    init {
+        viewModelScope.launch {
+            countPlayers = settingsRepository.getFlowCountPlayers().first()
+
+            val tempPlayers = mutableListOf<Player>()
+
+            for ((index, player) in playerRepository.getPlayers(
+                settingsRepository.getFlowUuid().first()
+            )
+                .withIndex())
+                if (index < countPlayers)
+                    tempPlayers.add(player.copy(number = index))
+
+            players = tempPlayers
+
+            controllers = MutableList(players.size) { Controller() }
+
+            val tempAi = mutableListOf<AI?>()
+
+            for (element in players)
+                if (!element.controllerPlayer)
+                    tempAi.add(AI())
+                else
+                    tempAi.add(null)
+
+            ai = tempAi
+
+            game = run {
+                Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players)
+            }.apply {
+                newGame(::playSound)
+            }
+
+            viewState.value = viewState.value.copy(
+                isLoading = false,
+                controllers = controllers,
+                controllerState = getControllerState(controllers[0]),
+                gameState = getGameStateFromGame(game),
+                playSound = ::playSound,
+            )
+            ifAllSurfaceReadyWhenStartGame()
+        }
+    }
+
+
+    private var job: Job? = null
 
     fun loadState(game: Game?) {
         this.game = game ?: return
@@ -89,7 +113,6 @@ class GameViewModel @Inject constructor(
             gameState = getGameStateFromGame(game)
         )
     }
-
 
     fun gameSurfaceChanged(
         surfaceWidth: Int,
@@ -123,21 +146,15 @@ class GameViewModel @Inject constructor(
         infoWidth: Int,
         infoHeight: Int,
     ) {
-        val minCharacteristic = min(infoWidth, infoHeight)
-        val bmpLife = minCharacteristic / 3 / 3
-        val baseTextSize = minCharacteristic / 6F
-        val textSize = baseTextSize * 0.75F
-        val maxTextNameWidth = getMaxTextWidth(game.players, textSize)
-
-        getGameStateFromGame.setInfo(
-            infoWidth, infoHeight, bmpLife, baseTextSize, maxTextNameWidth
+        getGameStateFromGame.setInfoScreen(
+            infoWidth, infoHeight
         )
 
         isInformationSurfaceViewReady = true
         ifAllSurfaceReadyWhenStartGame()
     }
 
-    private fun getMaxTextWidth(players: MutableList<Player>, textSize: Float): Int {
+    private fun getMaxTextWidth(players: List<Player>, textSize: Float): Int {
         var result = 0
         val paint = Paint()
         paint.textSize = textSize
@@ -149,8 +166,19 @@ class GameViewModel @Inject constructor(
     }
 
     private fun ifAllSurfaceReadyWhenStartGame() {
-        if (isGameSurfaceViewReady && isInformationSurfaceViewReady)
+        if (isGameSurfaceViewReady && isInformationSurfaceViewReady && !viewState.value.isLoading) {
+            val minCharacteristic =
+                min(getGameStateFromGame.infoWidth, getGameStateFromGame.infoHeight)
+            val bmpLife = minCharacteristic / 3 / 3
+            val baseTextSize = minCharacteristic / 6F
+            val textSize = baseTextSize * 0.75F
+            val maxTextNameWidth = getMaxTextWidth(game.players, textSize)
+
+            getGameStateFromGame.setInfo(
+                bmpLife, baseTextSize, maxTextNameWidth
+            )
             startGame()
+        }
     }
 
     private fun startGame() {
@@ -182,33 +210,36 @@ class GameViewModel @Inject constructor(
         isGameSurfaceViewReady = false
         isInformationSurfaceViewReady = false
 
-        val countPlayers = playerRepository.getCountPlayers()
-
-        val players = mutableListOf<Player>()
-        val score = mutableListOf<Int>()
-
-        val pl = playerRepository.getPlayers()
-
-        for ((index, player) in pl.withIndex())
-            if (index < countPlayers) {
-                players.add(player.copy(number = index))
-                score.add(game.players[index].score)
-            }
-
         viewModelScope.launch {
-            for (index in playerRepository.getPlayers().indices)
+            job?.cancelAndJoin()
+            job = null
+        }
+        viewModelScope.launch {
+            val countPlayers = settingsRepository.getFlowCountPlayers().first()
+
+            val players = mutableListOf<Player>()
+            val score = mutableListOf<Int>()
+
+            val uuid = settingsRepository.getFlowUuid().first()
+
+            val pl = playerRepository.getPlayers(uuid)
+                .toMutableList()
+
+            for ((index, player) in pl.withIndex())
                 if (index < countPlayers) {
-                    pl[index].let {
-                        playerRepository.save(
-                            it.copy(money = it.money + score[index])
-                        )
-                    }
+                    players.add(player.copy(number = index))
+                    score.add(game.players[index].score)
                 }
 
-            viewModelScope.launch(Dispatchers.Default) {
-                job?.cancelAndJoin()
-                job = null
-            }
+
+            for (index in playerRepository.getPlayers(uuid).indices)
+                if (index < countPlayers) {
+                    pl[index] = pl[index].let {
+                        it.copy(money = it.money + score[index])
+                    }
+                }
+            playerRepository.save(uuid, pl)
+
         }
     }
 
@@ -240,7 +271,14 @@ class GameViewModel @Inject constructor(
             )
     }
 
-    fun nextTouchDown(pointerId: Int, point: Vec, left: Int, top: Int, width: Int, height: Int) {
+    fun nextTouchDown(
+        pointerId: Int,
+        point: Vec,
+        left: Int,
+        top: Int,
+        width: Int,
+        height: Int
+    ) {
 
         val touchMoveSide = point.x > left && point.x < left + width
                 && point.y > top && point.y < top + height

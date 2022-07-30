@@ -1,22 +1,18 @@
 package com.fiz.battleinthespace.domain.repositories
 
-import androidx.lifecycle.LiveData
+import com.fiz.battleinthespace.common.Resource
 import com.fiz.battleinthespace.domain.models.Player
+import kotlinx.coroutines.flow.Flow
 
 interface PlayerRepository {
-    fun saveCountPlayers(count: Int): Boolean
 
-    fun getCountPlayers(): Int
+    fun getFlowPlayers(uuid: String): Flow<Resource<List<Player>>>
 
-    fun getObservePlayers(): LiveData<List<Player>>
+    suspend fun getPlayers(uuid: String): List<Player>
 
-    fun getPlayers(): List<Player>
+    fun save(uuid: String, players: List<Player>)
 
-    suspend fun savePlayer(player: Player?)
-
-    fun isFirstLaunch(): Boolean
-
-    suspend fun initFirstLaunchPlayers()
-
-    suspend fun save(player: Player?)
+    fun initFirstLaunchPlayers(): String
+    fun initFirstLaunchGooglePlayers(uuid: String, players: List<Player>)
 }
+

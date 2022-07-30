@@ -1,13 +1,13 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
 import android.graphics.*
-import com.fiz.battleinthespace.feature_gamescreen.data.repositories.BitmapRepository
 import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
+import com.fiz.battleinthespace.repositories.BitmapRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
+class Display @Inject constructor(private val bitmapRepository: BitmapRepository) {
 
     private val paintBitmap: Paint = Paint()
 
@@ -51,6 +51,7 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
         stateGame: ViewState,
         canvas: Canvas
     ) {
+        if (stateGame.gameState == null) return
         drawBackground(stateGame.gameState.backgroundsUi, canvas)
         drawActors(
             stateGame.gameState.spaceshipsUi,
@@ -238,6 +239,8 @@ class Display @Inject constructor(val bitmapRepository: BitmapRepository) {
     }
 
     private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
+        if (stateGame.gameState == null) return
+
         canvasInfo.drawColor(Color.BLACK)
 
         stateGame.gameState.textRoundInfoUi.also {

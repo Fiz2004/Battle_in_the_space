@@ -1,11 +1,9 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionSelectedFragment
 import com.fiz.battleinthespace.feature_mainscreen.ui.options.OptionsFragment
 import com.fiz.battleinthespace.feature_mainscreen.ui.space_station.SpaceStationFragment
@@ -32,14 +30,4 @@ class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
         return tabFragmentsCreators[position]?.invoke() ?: throw IndexOutOfBoundsException()
     }
 
-    companion object {
-        fun getTitle(context: Context, position: Int): CharSequence {
-            return when (position) {
-                0 -> context.resources.getText(R.string.title_mission_selection)
-                1 -> context.resources.getText(R.string.title_space_station)
-                2 -> context.resources.getText(R.string.title_statistics)
-                else -> context.resources.getText(R.string.title_options)
-            }
-        }
-    }
 }

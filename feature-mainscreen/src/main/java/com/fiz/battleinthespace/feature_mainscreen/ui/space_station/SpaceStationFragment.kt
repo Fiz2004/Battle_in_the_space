@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentSpaceStationBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
@@ -29,11 +30,6 @@ class SpaceStationFragment : Fragment() {
         return binding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -41,20 +37,21 @@ class SpaceStationFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.apply {
-            money.observe(viewLifecycleOwner) {
-                binding.money.text = getString(R.string.balance, it)
-            }
-            type.observe(viewLifecycleOwner) {
+
+        launchAndRepeatWithViewLifecycle {
+            viewModel.viewState.collect { viewState ->
+                if (viewState.players.isEmpty()) return@collect
+
+                binding.money.text = getString(R.string.balance, viewState.players[0].money)
+
                 binding.stationRecycler.adapter =
-                    if (it == 0)
+                    if (viewState.type == 0)
                         getTypeItemsAdapter()
                     else
                         getItemsAdapter()
-            }
-            player.observe(viewLifecycleOwner) {
+
                 binding.stationRecycler.adapter =
-                    if (viewModel.type.value == 0)
+                    if (viewState.type == 0)
                         getTypeItemsAdapter()
                     else
                         getItemsAdapter()
@@ -64,17 +61,18 @@ class SpaceStationFragment : Fragment() {
 
     private fun getItemsAdapter(): ItemsAdapter {
         val items = viewModel.getItemsWithZero()
-        itemsAdapter = ItemsAdapter(items) { position: Int ->
-            viewModel.clickItems(position)
-        }
+        itemsAdapter = ItemsAdapter(items, viewModel::clickItems)
         return itemsAdapter
     }
 
     private fun getTypeItemsAdapter(): TypeItemsAdapter {
         val items = viewModel.getItems()
-        typeItemsAdapter = TypeItemsAdapter(items) { position: Int ->
-            viewModel.clickTypeItem(position + 1)
-        }
+        typeItemsAdapter = TypeItemsAdapter(items, viewModel::clickTypeItem)
         return typeItemsAdapter
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
