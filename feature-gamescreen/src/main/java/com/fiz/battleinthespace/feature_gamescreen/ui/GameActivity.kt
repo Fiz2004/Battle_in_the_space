@@ -5,20 +5,12 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.fiz.battleinthespace.common.MeasureFPS
-import com.fiz.battleinthespace.common.Vec
-import com.fiz.battleinthespace.common.getSerializable
+import com.fiz.battleinthespace.common.*
 import com.fiz.battleinthespace.domain.models.WIDTH_JOYSTICK_DEFAULT
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.feature.game.Game
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -67,38 +59,30 @@ class GameActivity : AppCompatActivity() {
 
     private fun collectFlows() {
         val measureFPS = MeasureFPS()
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                withContext(Dispatchers.Main) {
-                    viewModel.viewState.collectLatest { viewState ->
-
-                        measureFPS {
-
-                            binding.gameGameSurfaceview.holder.lockCanvas()?.let {
-                                display.render(
-                                    viewState,
-                                    it
-                                )
-                                binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
-                            }
-
-                            binding.informationGameSurfaceview.holder.lockCanvas()?.let {
-                                display.renderInfo(viewState, it)
-                                binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
-                            }
-
-                            binding.pauseGameButton.text =
-                                getString(viewState.getResourceTextForPauseResumeButton())
-
-                        }
-
-                    }
+        launchAndRepeatWithViewLifecycle {
+            viewModel.viewState.collectLatest { viewState ->
+                measureFPS {
+                    updateScreenState(viewState)
                 }
-
             }
         }
+    }
+
+    private fun updateScreenState(viewState: ViewState) {
+        binding.progressBar.setVisible(viewState.isLoading)
+
+        binding.gameGameSurfaceview.holder.lockCanvas()?.let {
+            display.render(viewState, it)
+            binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
+        }
+
+        binding.informationGameSurfaceview.holder.lockCanvas()?.let {
+            display.renderInfo(viewState, it)
+            binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
+        }
+
+        binding.pauseGameButton.text =
+            getString(viewState.getResourceTextForPauseResumeButton())
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

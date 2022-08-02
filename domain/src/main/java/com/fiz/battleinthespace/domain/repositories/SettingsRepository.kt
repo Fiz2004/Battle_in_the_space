@@ -5,8 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 interface SettingsRepository {
 
     fun getFlowCountPlayers(): MutableStateFlow<Int>
+    fun getCountPlayers(): Int
 
     fun getFlowUuid(): MutableStateFlow<String>
+    fun getUuid(): String
 
     fun getIsFirstLaunch(): Boolean
 

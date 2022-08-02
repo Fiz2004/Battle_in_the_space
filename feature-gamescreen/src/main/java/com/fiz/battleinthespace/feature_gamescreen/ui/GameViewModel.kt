@@ -39,8 +39,6 @@ class GameViewModel @Inject constructor(
 
     private var isInformationSurfaceViewReady = false
 
-    private var countPlayers: Int = 4
-
     var getControllerState: GetControllerState =
         GetControllerState(0, 0, 0.0)
         private set
@@ -58,34 +56,29 @@ class GameViewModel @Inject constructor(
     private lateinit var players: List<Player>
     private lateinit var controllers: MutableList<Controller>
     lateinit var game: Game
-    private lateinit var ai: MutableList<AI?>
+    private lateinit var ai: List<AI?>
 
     init {
         viewModelScope.launch {
-            countPlayers = settingsRepository.getFlowCountPlayers().first()
+            val countPlayers = settingsRepository.getCountPlayers()
 
-            val tempPlayers = mutableListOf<Player>()
-
-            for ((index, player) in playerRepository.getPlayers(
-                settingsRepository.getFlowUuid().first()
-            )
-                .withIndex())
-                if (index < countPlayers)
-                    tempPlayers.add(player.copy(number = index))
-
-            players = tempPlayers
+            val uuid = settingsRepository.getUuid()
+            players = playerRepository.getPlayers(uuid)
+                .mapIndexedNotNull { index, player ->
+                    if (index < countPlayers)
+                        player.copy(number = index)
+                    else
+                        null
+                }
 
             controllers = MutableList(players.size) { Controller() }
 
-            val tempAi = mutableListOf<AI?>()
-
-            for (element in players)
-                if (!element.controllerPlayer)
-                    tempAi.add(AI())
+            ai = players.map {
+                if (it.controllerPlayer)
+                    null
                 else
-                    tempAi.add(null)
-
-            ai = tempAi
+                    AI()
+            }
 
             game = run {
                 Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players)

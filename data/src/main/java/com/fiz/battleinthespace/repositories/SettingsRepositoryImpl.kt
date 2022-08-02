@@ -20,9 +20,18 @@ class SettingsRepositoryImpl @Inject constructor(
         return uuid
     }
 
+    override fun getUuid(): String {
+        return sharedPrefPlayerStorage.getUuid()
+    }
+
     override fun getFlowCountPlayers(): MutableStateFlow<Int> {
         return countPlayersFlow
     }
+
+    override fun getCountPlayers(): Int {
+        return sharedPrefPlayerStorage.getCountPlayers()
+    }
+
 
     override fun getIsFirstLaunch(): Boolean {
         return sharedPrefPlayerStorage.loadIsFirstLaunch()
