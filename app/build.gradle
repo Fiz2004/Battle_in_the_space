@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk buildConfig.compileSdk
 
     defaultConfig {
         applicationId "com.fiz.battleinthespace"
-        minSdk 21
-        targetSdk 33
+        minSdk buildConfig.minSdk
+        targetSdk buildConfig.targetSdk
         versionCode 1
         versionName "0.0.8"
     }
@@ -21,31 +21,30 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
-    namespace 'com.fiz.battleinthespace'
+    namespace "com.fiz.battleinthespace"
 }
 
 dependencies {
-    implementation project(path: ':data')
+    implementation project(path: ":data")
     implementation project(path: ":domain")
     implementation project(path: ":common")
     implementation project(path: ":feature-game")
     implementation project(path: ":feature-mainscreen")
     implementation project(path: ":feature-gamescreen")
 
-    // Hilt
-    implementation('com.google.dagger:hilt-android:2.43.1')
-    kapt('com.google.dagger:hilt-android-compiler:2.43.1')
+    implementation("com.google.android.material:material:1.6.1")
 
-    implementation platform('com.google.firebase:firebase-bom:30.3.1')
+    // Hilt
+    implementation("com.google.dagger:hilt-android:${versions.hilt}")
+    kapt("com.google.dagger:hilt-android-compiler:${versions.hilt}")
+
+    implementation platform("com.google.firebase:firebase-bom:${versions.firebase_bom}")
 
     implementation("com.google.firebase:firebase-crashlytics-ktx")
     implementation("com.google.firebase:firebase-analytics-ktx")
-
-    implementation("com.google.android.material:material:1.6.1")
-
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

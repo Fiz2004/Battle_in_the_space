@@ -12,34 +12,30 @@ android {
 
 dependencies {
 
-    implementation project(path: ':data')
+    implementation project(path: ":data")
     implementation project(path: ":domain")
     implementation project(path: ":common")
     implementation project(path: ":feature-game")
 
-    implementation ('androidx.core:core-ktx:1.8.0')
-    implementation ('androidx.appcompat:appcompat:1.4.2')
-    implementation ('com.google.android.material:material:1.6.1')
+    implementation ("androidx.core:core-ktx:1.8.0")
+    implementation ("androidx.appcompat:appcompat:1.4.2")
+    implementation ("com.google.android.material:material:1.6.1")
 
-    implementation ('androidx.activity:activity-ktx:1.5.1')
-    implementation ('androidx.fragment:fragment-ktx:1.5.1')
-
-    implementation('androidx.lifecycle:lifecycle-runtime-ktx:2.5.1')
+    implementation ("androidx.activity:activity-ktx:1.5.1")
+    implementation ("androidx.fragment:fragment-ktx:1.5.1")
 
     // Hilt
-    implementation('com.google.dagger:hilt-android:2.43.1')
-    kapt('com.google.dagger:hilt-android-compiler:2.43.1')
+    implementation("com.google.dagger:hilt-android:${versions.hilt}")
+    kapt("com.google.dagger:hilt-android-compiler:${versions.hilt}")
 
-    implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4')
-    implementation ('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4')
-    implementation ('androidx.lifecycle:lifecycle-livedata-ktx:2.5.0')
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
-    implementation platform('com.google.firebase:firebase-bom:30.3.1')
-    implementation ('com.google.firebase:firebase-auth')
+    implementation platform("com.google.firebase:firebase-bom:${versions.firebase_bom}")
+    implementation ("com.google.firebase:firebase-auth")
     implementation ("com.google.firebase:firebase-database-ktx")
     implementation ("com.google.firebase:firebase-storage")
-    implementation ('com.google.firebase:firebase-auth-ktx')
-    implementation ("com.google.android.gms:play-services-auth:20.2.0")
+    implementation ("com.google.firebase:firebase-auth-ktx")
+    implementation ("com.google.android.gms:play-services-auth:${versions.play_services_auth}")
 
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.1.3")

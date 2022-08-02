@@ -234,11 +234,11 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
         }
     }
 
-    fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
-        drawInfo(stateGame, canvasInfo, FPS)
+    fun renderInfo(stateGame: ViewState, canvasInfo: Canvas) {
+        drawInfo(stateGame, canvasInfo)
     }
 
-    private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
+    private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas) {
         if (stateGame.gameState == null) return
 
         canvasInfo.drawColor(Color.BLACK)
@@ -273,12 +273,6 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
             )
         }
 
-        canvasInfo.drawText(
-            FPS.toString(),
-            0F,
-            66F,
-            paintPlayer
-        )
     }
 }
 

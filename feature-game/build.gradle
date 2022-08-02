@@ -7,6 +7,7 @@ apply from:"$rootProject.projectDir/android.gradle"
 android {
     namespace "com.fiz.battleinthespace.feature.game"
 }
+
 dependencies {
     implementation project(path: ":domain")
     implementation project(path: ":data")
