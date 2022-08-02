@@ -6,10 +6,21 @@ import com.fiz.feature.game.engine.Physics
 import com.fiz.feature.game.models.ListActors
 import com.fiz.feature.game.models.weapon.Weapon
 import java.io.Serializable
+import java.util.*
 import kotlin.math.min
 
 private const val mSEC_FOR_FPS_60 = ((1.0 / 60.0) * 1000.0).toLong()
 const val NUMBER_BITMAP_BACKGROUND = 8
+
+data class SoundEvent(
+    val type: SoundType,
+    val x: Double,
+    val y: Double
+)
+
+enum class SoundType {
+    Overlap, Fire
+}
 
 class Game(
     val width: Int,
@@ -18,7 +29,8 @@ class Game(
     var players: List<Player>,
     var countPlayers: Int = players.size,
     var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
-    var listActors: ListActors = ListActors(width, height, players),
+    val queueSound: LinkedList<SoundEvent> = LinkedList<SoundEvent>(),
+    val listActors: ListActors = ListActors(width, height, players, queueSound),
     var status: GlobalStatusGame = GlobalStatusGame.Playing,
 ) : Serializable {
 
@@ -34,16 +46,19 @@ class Game(
 
     fun update(
         controllers: List<Controller>,
-        playSound: (Int) -> Unit,
     ) {
         val deltaTime = getDeltaTime()
         if (deltaTime == 0.0) return
 
         when (status) {
-            GlobalStatusGame.NewGame -> newGame(playSound)
-            GlobalStatusGame.Playing -> gameLoop(deltaTime, controllers, playSound)
+            GlobalStatusGame.NewGame -> newGame()
+            GlobalStatusGame.Playing -> gameLoop(deltaTime, controllers)
             GlobalStatusGame.Pause -> return
         }
+    }
+
+    fun poolQueueSound(): SoundEvent? {
+        return queueSound.poll()
     }
 
     private fun getDeltaTime(): Double {
@@ -55,18 +70,17 @@ class Game(
 
     private fun gameLoop(
         deltaTime: Double,
-        controllers: List<Controller>,
-        playSound: (Int) -> Unit,
+        controllers: List<Controller>
     ) {
         when (loopStatus) {
             LoopStatusGame.Continue -> {
-                actorsUpdate(controllers, deltaTime, playSound)
+                actorsUpdate(controllers, deltaTime)
             }
 
             is LoopStatusGame.End -> {
                 loopStatus.timeToRestart -= deltaTime
                 if (loopStatus.timeToRestart < 0)
-                    newGame(playSound)
+                    newGame()
             }
         }
     }
@@ -74,7 +88,6 @@ class Game(
     private fun actorsUpdate(
         controllers: List<Controller>,
         deltaTime: Double,
-        playSound: (Int) -> Unit,
     ) {
         for ((index, spaceShip) in listActors.spaceShips.withIndex()) {
             spaceShip.moveRotate(deltaTime, controllers[index].angle)
@@ -87,12 +100,18 @@ class Game(
                         spaceShip.player.number,
                         spaceShip.player.weapon
                     )
-                    playSound(1)
+                    queueSound.add(
+                        SoundEvent(
+                            type = SoundType.Fire,
+                            x = spaceShip.center.x,
+                            y = spaceShip.center.y
+                        )
+                    )
                 }
             }
         }
 
-        listActors.update(deltaTime, playSound)
+        listActors.update(deltaTime)
 
         listActors.bulletsAnimationDestroy.forEach {
             it.timeShow -= deltaTime
@@ -112,7 +131,7 @@ class Game(
             if (round + 1 == 11)
                 loopStatus = LoopStatusGame.End()
 
-            newRound(playSound)
+            newRound()
         }
 
         loopStatus = LoopStatusGame.Continue
@@ -135,12 +154,12 @@ class Game(
         return false
     }
 
-    private fun newRound(playSound: (Int) -> Unit) {
+    private fun newRound() {
         round += 1
         val countMeteorites = round
 
         createBackgrounds()
-        createActors(countMeteorites, playSound)
+        createActors(countMeteorites)
         updatePlayers()
     }
 
@@ -153,9 +172,9 @@ class Game(
         }
     }
 
-    private fun createActors(countMeteorites: Int, playSound: (Int) -> Unit) {
+    private fun createActors(countMeteorites: Int) {
         listActors.createSpaceShips(countPlayers)
-        listActors.createMeteorites(countMeteorites, playSound)
+        listActors.createMeteorites(countMeteorites)
     }
 
     private fun updatePlayers() {
@@ -163,14 +182,14 @@ class Game(
             player.newRound()
     }
 
-    fun newGame(playSound: (Int) -> Unit) {
+    fun newGame() {
         round = 0
         for (player in players)
             player.newGame()
         players[0].main = true
         status = GlobalStatusGame.Playing
         loopStatus = LoopStatusGame.Continue
-        newRound(playSound)
+        newRound()
     }
 
     fun changeStatusPauseOrPlaying() {

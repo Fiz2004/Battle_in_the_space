@@ -13,6 +13,8 @@ import com.fiz.battleinthespace.feature_gamescreen.domain.GetControllerState
 import com.fiz.battleinthespace.feature_gamescreen.domain.GetGameStateFromGame
 import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
 import com.fiz.feature.game.Game
+import com.fiz.feature.game.SoundEvent
+import com.fiz.feature.game.engine.Physics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +51,6 @@ class GameViewModel @Inject constructor(
             controllers = MutableList(4) { Controller() },
             controllerState = getControllerState(Controller()),
             gameState = null,
-            playSound = ::playSound,
         )
     )
 
@@ -83,7 +84,7 @@ class GameViewModel @Inject constructor(
             game = run {
                 Game(WIDTH_WORLD, HEIGHT_WORLD, 0, players)
             }.apply {
-                newGame(::playSound)
+                newGame()
             }
 
             viewState.value = viewState.value.copy(
@@ -91,7 +92,6 @@ class GameViewModel @Inject constructor(
                 controllers = controllers,
                 controllerState = getControllerState(controllers[0]),
                 gameState = getGameStateFromGame(game),
-                playSound = ::playSound,
             )
             ifAllSurfaceReadyWhenStartGame()
         }
@@ -189,7 +189,14 @@ class GameViewModel @Inject constructor(
                         }
                     }
 
-                    game.update(controllers, ::playSound)
+                    game.update(controllers)
+
+                    game.poolQueueSound()?.let {
+                        //TODO переделать для озвучки только событий в пределах экрана
+                        if (Physics.overlap(game.listActors.spaceShips[0].center,5.0,Vec(it.x,it.y),5.0))
+                            soundUseCase.play(it)
+                    }
+
                     viewState.value = viewState.value
                         .copy(
                             gameState = getGameStateFromGame(game),
@@ -310,10 +317,6 @@ class GameViewModel @Inject constructor(
             .copy(
                 controllerState = getControllerState(controllers[0])
             )
-    }
-
-    private fun playSound(numberSound: Int) {
-        soundUseCase.play(numberSound)
     }
 
 }
