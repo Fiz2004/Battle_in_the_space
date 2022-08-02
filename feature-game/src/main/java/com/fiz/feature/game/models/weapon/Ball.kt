@@ -57,8 +57,4 @@ class Ball(
     override fun getType(): Int {
         return 3
     }
-
-    override fun getType(): Int {
-        return 3
-    }
 }

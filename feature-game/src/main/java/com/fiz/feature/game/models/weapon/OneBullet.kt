@@ -58,8 +58,4 @@ class OneBullet(
     override fun getType(): Int {
         return 0
     }
-
-    override fun getType(): Int {
-        return 0
-    }
 }
