@@ -1,11 +1,10 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fiz.battleinthespace.common.Vec
+import com.fiz.battleinthespace.common.getMaxTextWidth
 import com.fiz.battleinthespace.domain.models.Controller
-import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
 import com.fiz.battleinthespace.domain.repositories.SettingsRepository
 import com.fiz.battleinthespace.feature_gamescreen.domain.AI
@@ -13,14 +12,11 @@ import com.fiz.battleinthespace.feature_gamescreen.domain.GetControllerState
 import com.fiz.battleinthespace.feature_gamescreen.domain.GetGameStateFromGame
 import com.fiz.battleinthespace.feature_gamescreen.domain.SoundUseCase
 import com.fiz.feature.game.Game
-import com.fiz.feature.game.SoundEvent
 import com.fiz.feature.game.engine.Physics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-import kotlin.math.max
 import kotlin.math.min
 
 const val WIDTH_WORLD = 20
@@ -48,26 +44,24 @@ class GameViewModel @Inject constructor(
     var viewState = MutableStateFlow(
         ViewState(
             isLoading = true,
-            controllers = MutableList(4) { Controller() },
             controllerState = getControllerState(Controller()),
             gameState = null,
         )
     )
 
-    private lateinit var players: List<Player>
-    private lateinit var controllers: MutableList<Controller>
+    private lateinit var controllers: List<Controller>
     lateinit var game: Game
     private lateinit var ai: List<AI?>
 
     init {
         viewModelScope.launch {
             val countPlayers = settingsRepository.getCountPlayers()
-
             val uuid = settingsRepository.getUuid()
-            players = playerRepository.getPlayers(uuid)
+
+            val players = playerRepository.getPlayers(uuid)
                 .mapIndexedNotNull { index, player ->
                     if (index < countPlayers)
-                        player.copy(number = index)
+                        player
                     else
                         null
                 }
@@ -89,7 +83,6 @@ class GameViewModel @Inject constructor(
 
             viewState.value = viewState.value.copy(
                 isLoading = false,
-                controllers = controllers,
                 controllerState = getControllerState(controllers[0]),
                 gameState = getGameStateFromGame(game),
             )
@@ -97,14 +90,12 @@ class GameViewModel @Inject constructor(
         }
     }
 
-
     private var job: Job? = null
 
     fun loadState(game: Game?) {
         this.game = game ?: return
-        viewState.value = viewState.value.copy(
-            gameState = getGameStateFromGame(game)
-        )
+        viewState.value = viewState.value
+            .copy(gameState = getGameStateFromGame(game))
     }
 
     fun gameSurfaceChanged(
@@ -147,31 +138,27 @@ class GameViewModel @Inject constructor(
         ifAllSurfaceReadyWhenStartGame()
     }
 
-    private fun getMaxTextWidth(players: List<Player>, textSize: Float): Int {
-        var result = 0
-        val paint = Paint()
-        paint.textSize = textSize
-        for (namePlayer in players) {
-            val textWidth = paint.measureText(namePlayer.name).toInt()
-            result = max(textWidth, result)
-        }
-        return result
-    }
 
     private fun ifAllSurfaceReadyWhenStartGame() {
-        if (isGameSurfaceViewReady && isInformationSurfaceViewReady && !viewState.value.isLoading) {
-            val minCharacteristic =
-                min(getGameStateFromGame.infoWidth, getGameStateFromGame.infoHeight)
-            val bmpLife = minCharacteristic / 3 / 3
-            val baseTextSize = minCharacteristic / 6F
-            val textSize = baseTextSize * 0.75F
-            val maxTextNameWidth = getMaxTextWidth(game.players, textSize)
 
-            getGameStateFromGame.setInfo(
-                bmpLife, baseTextSize, maxTextNameWidth
-            )
-            startGame()
-        }
+        val isGameReadyStart =
+            isGameSurfaceViewReady && isInformationSurfaceViewReady && !viewState.value.isLoading
+        if (!isGameReadyStart) return
+
+        val isGorisontal = 2 * getGameStateFromGame.infoHeight > getGameStateFromGame.infoWidth
+
+        val minSizeInfoScreen =
+            min(getGameStateFromGame.infoWidth, getGameStateFromGame.infoHeight)
+        val bmpLife = if (isGorisontal) minSizeInfoScreen / 3 / 3 else minSizeInfoScreen / 5
+        val baseTextSize = if (isGorisontal) minSizeInfoScreen / 6F else minSizeInfoScreen / 4F
+        val textSize = baseTextSize * 0.75F
+        val namesPlayers = game.players.map { it.name }
+        val maxTextNameWidth = getMaxTextWidth(namesPlayers, textSize)
+
+        getGameStateFromGame.setInfo(
+            bmpLife, baseTextSize, maxTextNameWidth
+        )
+        startGame()
     }
 
     private fun startGame() {
@@ -180,27 +167,31 @@ class GameViewModel @Inject constructor(
             job = viewModelScope.launch(Dispatchers.Default) {
                 while (isActive) {
 
-                    for ((index, player) in players.withIndex()) {
-                        if (ai[index] != null && !player.main) {
-                            controllers[index] = ai[index]?.getNewController(
-                                index,
-                                game
-                            ) ?: controllers[index]
-                        }
+                    controllers = ai.mapIndexed { index, ai ->
+                        ai?.getNewController(index, game) ?: controllers[index]
                     }
 
                     game.update(controllers)
 
+                    if (game.status==Game.Companion.GlobalStatusGame.Finish){
+                        viewState.value= viewState.value
+                            .copy(isFinish = true)
+                    }
+
                     game.poolQueueSound()?.let {
                         //TODO переделать для озвучки только событий в пределах экрана
-                        if (Physics.overlap(game.listActors.spaceShips[0].center,5.0,Vec(it.x,it.y),5.0))
+                        if (Physics.overlap(
+                                game.listActors.spaceShips.first().center,
+                                5.0,
+                                Vec(it.x, it.y),
+                                5.0
+                            )
+                        )
                             soundUseCase.play(it)
                     }
 
                     viewState.value = viewState.value
-                        .copy(
-                            gameState = getGameStateFromGame(game),
-                        )
+                        .copy(gameState = getGameStateFromGame(game))
                 }
             }
         }
@@ -214,31 +205,22 @@ class GameViewModel @Inject constructor(
             job?.cancelAndJoin()
             job = null
         }
+
         viewModelScope.launch {
-            val countPlayers = settingsRepository.getFlowCountPlayers().first()
+            val countPlayers = settingsRepository.getCountPlayers()
+            val uuid = settingsRepository.getUuid()
 
-            val players = mutableListOf<Player>()
-            val score = mutableListOf<Int>()
-
-            val uuid = settingsRepository.getFlowUuid().first()
-
-            val pl = playerRepository.getPlayers(uuid)
-                .toMutableList()
-
-            for ((index, player) in pl.withIndex())
-                if (index < countPlayers) {
-                    players.add(player.copy(number = index))
-                    score.add(game.players[index].score)
+            val players = playerRepository.getPlayers(uuid)
+                .mapIndexed { index, player ->
+                    if (index < countPlayers)
+                        player.copy(
+                            money = player.money + game.listActors.spaceShips[index].score
+                        )
+                    else
+                        player
                 }
 
-
-            for (index in playerRepository.getPlayers(uuid).indices)
-                if (index < countPlayers) {
-                    pl[index] = pl[index].let {
-                        it.copy(money = it.money + score[index])
-                    }
-                }
-            playerRepository.save(uuid, pl)
+            playerRepository.save(uuid, players)
 
         }
     }
@@ -246,9 +228,7 @@ class GameViewModel @Inject constructor(
     fun clickNewGameButton() {
         game.clickNewGame()
         viewState.value = viewState.value
-            .copy(
-                gameState = getGameStateFromGame(game)
-            )
+            .copy(gameState = getGameStateFromGame(game))
     }
 
     fun clickPauseGameButton() {
@@ -262,13 +242,11 @@ class GameViewModel @Inject constructor(
         val touchMoveSide = point.x > left && point.x < left + width
                 && point.y > top && point.y < top + height
 
-        controllers[0]
+        controllers.first()
             .down(touchMoveSide, point, pointerId)
 
         viewState.value = viewState.value
-            .copy(
-                controllerState = getControllerState(controllers[0])
-            )
+            .copy(controllerState = getControllerState(controllers.first()))
     }
 
     fun nextTouchDown(
@@ -283,40 +261,32 @@ class GameViewModel @Inject constructor(
         val touchMoveSide = point.x > left && point.x < left + width
                 && point.y > top && point.y < top + height
 
-        controllers[0]
+        controllers.first()
             .pointerDown(touchMoveSide, point, pointerId)
 
         viewState.value = viewState.value
-            .copy(
-                controllerState = getControllerState(controllers[0])
-            )
+            .copy(controllerState = getControllerState(controllers.first()))
     }
 
     fun lastTouchUp() {
-        controllers[0].up()
+        controllers.first().up()
 
         viewState.value = viewState.value
-            .copy(
-                controllerState = getControllerState(controllers[0])
-            )
+            .copy(controllerState = getControllerState(controllers.first()))
     }
 
     fun beforeTouchUp(pointIndex: Int) {
-        controllers[0].powerUp(pointIndex)
+        controllers.first().powerUp(pointIndex)
 
         viewState.value = viewState.value
-            .copy(
-                controllerState = getControllerState(controllers[0])
-            )
+            .copy(controllerState = getControllerState(controllers.first()))
     }
 
     fun moveTouch(pointUp: Vec) {
-        controllers[0].move(pointUp)
+        controllers.first().move(pointUp)
 
         viewState.value = viewState.value
-            .copy(
-                controllerState = getControllerState(controllers[0])
-            )
+            .copy(controllerState = getControllerState(controllers.first()))
     }
 
 }

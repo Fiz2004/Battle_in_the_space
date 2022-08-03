@@ -113,13 +113,14 @@ class MainViewModel @Inject constructor(
         players[0] = player.copy(mission = value)
 
         viewModelScope.launch {
-            playerRepository.save(settingsRepository.getFlowUuid().first(), players)
+            playerRepository.save(settingsRepository.getUuid(), players)
         }
     }
 
-    fun onClickReset() {
+    fun onClickReset(number: Int) {
         viewModelScope.launch {
-            playerRepository.initFirstLaunchPlayers()
+            val uuid = settingsRepository.getUuid()
+            playerRepository.resetPlayer(uuid, number)
         }
     }
 
@@ -178,6 +179,8 @@ class MainViewModel @Inject constructor(
 
     fun nameChanged(index: Int, newName: String) {
         val players = viewState.value.players.toMutableList()
+
+        if (players.isEmpty()) return
         if (players[index].name == newName) return
 
         players[index] = players[index].copy(name = newName)

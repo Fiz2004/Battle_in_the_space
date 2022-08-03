@@ -26,16 +26,29 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
     }
 
     private val paintHelperPlayer = Paint().apply {
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
         alpha = 80
-        strokeWidth = 30F
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 10F
+    }
+
+    private val paintTextHelperPlayer = Paint().apply {
+        textAlign = Paint.Align.CENTER
+        textSize = 30F
     }
 
     private val paintHelperMeteorites = Paint().apply {
         color = Color.RED
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
         alpha = 160
-        strokeWidth = 20F
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 10F
+    }
+
+    private val paintTextHelperMeteorites = Paint().apply {
+        color = Color.RED
+        textAlign = Paint.Align.CENTER
+        textSize = 30F
     }
 
     private val paintRound = Paint().apply {
@@ -214,22 +227,44 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
         canvas: Canvas
     ) {
         helpersPlayerUi.forEach {
-            paintHelperPlayer.color = it.value
+            paintHelperPlayer.color = it.color
+            paintTextHelperPlayer.color = it.color
 
-            canvas.drawCircle(
+            canvas.save()
+            canvas.translate(it.centerX, it.centerY)
+            canvas.rotate(it.angle - 90)
+            val path = Path()
+            path.moveTo(-15f, 23f)
+            path.lineTo(0f, 30f)
+            path.lineTo(15f, 23f)
+            canvas.drawPath(path, paintHelperPlayer)
+            canvas.restore()
+
+            canvas.drawText(
+                "S",
                 it.centerX,
                 it.centerY,
-                it.radius,
-                paintHelperPlayer
+                paintTextHelperPlayer
             )
         }
 
         helpersMeteoriteUi.forEach {
-            canvas.drawCircle(
+
+            canvas.save()
+            canvas.translate(it.centerX, it.centerY)
+            canvas.rotate(it.angle - 90)
+            val path = Path()
+            path.moveTo(-15f, 23f)
+            path.lineTo(0f, 30f)
+            path.lineTo(15f, 23f)
+            canvas.drawPath(path, paintHelperMeteorites)
+            canvas.restore()
+
+            canvas.drawText(
+                "M",
                 it.centerX,
                 it.centerY,
-                it.radius,
-                paintHelperMeteorites
+                paintTextHelperMeteorites
             )
         }
     }

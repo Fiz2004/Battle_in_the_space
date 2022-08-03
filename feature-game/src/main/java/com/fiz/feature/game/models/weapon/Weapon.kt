@@ -35,7 +35,7 @@ abstract class Weapon(
     }
 
     companion object {
-        fun create(spaceShips: MutableList<SpaceShip>, player: Int, type: Int): Weapon {
+        fun create(spaceShips: List<SpaceShip>, player: Int, type: Int): Weapon {
             return when (type) {
                 0 -> OneBullet.create(spaceShips, player)
                 1 -> TwoBullet.create(spaceShips, player)

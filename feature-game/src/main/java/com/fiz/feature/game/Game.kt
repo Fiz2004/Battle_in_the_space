@@ -8,9 +8,11 @@ import com.fiz.feature.game.models.weapon.Weapon
 import java.io.Serializable
 import java.util.*
 import kotlin.math.min
+import kotlin.random.Random
 
 private const val mSEC_FOR_FPS_60 = ((1.0 / 60.0) * 1000.0).toLong()
 const val NUMBER_BITMAP_BACKGROUND = 8
+private const val SEC_MIN_TIME_BETWEEN_FIRE = 0.250
 
 data class SoundEvent(
     val type: SoundType,
@@ -27,9 +29,9 @@ class Game(
     val height: Int,
     var round: Int = 0,
     var players: List<Player>,
-    var countPlayers: Int = players.size,
-    var backgrounds: MutableList<MutableList<Int>> = mutableListOf(),
-    val queueSound: LinkedList<SoundEvent> = LinkedList<SoundEvent>(),
+    private var countPlayers: Int = players.size,
+    var backgrounds: List<List<Int>> = mutableListOf(),
+    private val queueSound: LinkedList<SoundEvent> = LinkedList<SoundEvent>(),
     val listActors: ListActors = ListActors(width, height, players, queueSound),
     var status: GlobalStatusGame = GlobalStatusGame.Playing,
 ) : Serializable {
@@ -38,7 +40,6 @@ class Game(
     private var loopStatus: LoopStatusGame = LoopStatusGame.Continue
 
     private var timeLastFire: MutableList<Double> = MutableList(players.size) { 0.0 }
-    private val SEC_MIN_TIME_BETWEEN_FIRE = 0.250
 
     init {
         Physics.createWorld(width, height)
@@ -54,6 +55,7 @@ class Game(
             GlobalStatusGame.NewGame -> newGame()
             GlobalStatusGame.Playing -> gameLoop(deltaTime, controllers)
             GlobalStatusGame.Pause -> return
+            GlobalStatusGame.Finish -> return
         }
     }
 
@@ -82,7 +84,17 @@ class Game(
                 if (loopStatus.timeToRestart < 0)
                     newGame()
             }
+
+            is LoopStatusGame.Finish -> {
+                loopStatus.timeToRestart -= deltaTime
+                if (loopStatus.timeToRestart < 0)
+                    exitGame()
+            }
         }
+    }
+
+    private fun exitGame() {
+        status=GlobalStatusGame.Finish
     }
 
     private fun actorsUpdate(
@@ -95,10 +107,10 @@ class Game(
 
             if (isCanFire(controllers[index], index, deltaTime)) {
                 if (spaceShip.inGame) {
-                    listActors.bullets += Weapon.create(
+                    listActors.weapons += Weapon.create(
                         listActors.spaceShips,
-                        spaceShip.player.number,
-                        spaceShip.player.weapon
+                        spaceShip.number,
+                        spaceShip.weapon
                     )
                     queueSound.add(
                         SoundEvent(
@@ -127,7 +139,7 @@ class Game(
             it.timeShow > 0
         }.toMutableList()
 
-        if (players.none { it.life > 0 } || listActors.meteorites.isEmpty()) {
+        if (listActors.spaceShips.none { it.life > 0 } || listActors.meteorites.isEmpty()) {
             if (round + 1 == 11)
                 loopStatus = LoopStatusGame.End()
 
@@ -164,12 +176,8 @@ class Game(
     }
 
     private fun createBackgrounds() {
-        for (n in 0 until height) {
-            val row: MutableList<Int> = mutableListOf()
-            for (k in 0 until width)
-                row += (0 until NUMBER_BITMAP_BACKGROUND).shuffled().first()
-            backgrounds += row
-        }
+        val getRow = { (0 until width).map { Random.nextInt(NUMBER_BITMAP_BACKGROUND) } }
+        backgrounds = (0 until height).map { getRow() }
     }
 
     private fun createActors(countMeteorites: Int) {
@@ -178,15 +186,12 @@ class Game(
     }
 
     private fun updatePlayers() {
-        for (player in players)
-            player.newRound()
+        listActors.spaceShips.forEach { spaceShip -> spaceShip.life = 3 }
     }
 
     fun newGame() {
         round = 0
-        for (player in players)
-            player.newGame()
-        players[0].main = true
+        listActors.spaceShips.forEach { spaceShip -> spaceShip.score = 0 }
         status = GlobalStatusGame.Playing
         loopStatus = LoopStatusGame.Continue
         newRound()
@@ -209,13 +214,14 @@ class Game(
         private const val SEC_TIME_FOR_RESTART_FOR_END_GAME = 1.0
 
         enum class GlobalStatusGame : Serializable {
-            Playing, Pause, NewGame
+            Playing, Pause, NewGame, Finish
         }
 
         sealed class LoopStatusGame(var timeToRestart: Double = SEC_TIME_FOR_RESTART_FOR_END_GAME) :
             Serializable {
             object Continue : LoopStatusGame()
             class End : LoopStatusGame(timeToRestart = SEC_TIME_FOR_RESTART_FOR_END_GAME)
+            class Finish : LoopStatusGame(timeToRestart = SEC_TIME_FOR_RESTART_FOR_END_GAME)
         }
     }
 }

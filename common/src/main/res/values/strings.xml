@@ -78,7 +78,7 @@
     <string name="back">Назад</string>
     <string name="select_count_players_textview">Выберите количество игроков:</string>
     <string name="controller">Управление:</string>
-    <string name="reset">Сбросить</string>
+    <string name="reset">Сбросить прогресс</string>
     <!-- sign dialog -->
     <string name="no_email">Не зарегестрирован</string>
     <string name="signUp">Зарегистрироваться</string>

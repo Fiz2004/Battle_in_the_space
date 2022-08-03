@@ -32,7 +32,7 @@ class OptionsFragment : Fragment() {
     private lateinit var playersRadioButton: List<RadioButton>
     private lateinit var playersLabelEditText: List<TextInputLayout>
     private lateinit var playersEditText: List<TextInputEditText>
-    private lateinit var playersSwitchCompat: List<SwitchMaterial>
+    private lateinit var playersSwitchOtherCompat: List<SwitchMaterial>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,8 +61,7 @@ class OptionsFragment : Fragment() {
             binding.fourPlayer.PlayersEditText
         )
 
-        playersSwitchCompat = listOf(
-            binding.onePlayer.controllerPlayerSwitchCompat,
+        playersSwitchOtherCompat = listOf(
             binding.twoPlayer.controllerPlayerSwitchCompat,
             binding.threePlayer.controllerPlayerSwitchCompat,
             binding.fourPlayer.controllerPlayerSwitchCompat
@@ -72,6 +71,13 @@ class OptionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init()
+        setupListener()
+        setupObserve()
+    }
+
+    private fun init() {
 
         playersLabelEditText.forEachIndexed { index, textInputLayout ->
             textInputLayout.hint = getString(
@@ -93,9 +99,9 @@ class OptionsFragment : Fragment() {
             }
         }
 
-        playersSwitchCompat.forEachIndexed { index, switchMaterial ->
+        playersSwitchOtherCompat.forEachIndexed { index, switchMaterial ->
             switchMaterial.setOnCheckedChangeListener { compoundButton, isChecked ->
-                viewModel.changeControllerPlayer(index, isChecked)
+                viewModel.changeControllerPlayer(index + 1, isChecked)
             }
         }
 
@@ -103,20 +109,9 @@ class OptionsFragment : Fragment() {
             radioButton.text =
                 resources.getQuantityString(R.plurals.count_players, index + 1, index + 1)
         }
+    }
 
-        binding.twoPlayer.signUp.visibility = View.GONE
-        binding.twoPlayer.signIn.visibility = View.GONE
-        binding.twoPlayer.signOut.visibility = View.GONE
-        binding.twoPlayer.email.visibility = View.GONE
-        binding.threePlayer.signUp.visibility = View.GONE
-        binding.threePlayer.signIn.visibility = View.GONE
-        binding.threePlayer.signOut.visibility = View.GONE
-        binding.threePlayer.email.visibility = View.GONE
-        binding.fourPlayer.signUp.visibility = View.GONE
-        binding.fourPlayer.signIn.visibility = View.GONE
-        binding.fourPlayer.signOut.visibility = View.GONE
-        binding.fourPlayer.email.visibility = View.GONE
-
+    private fun setupListener() {
         binding.onePlayer.signIn.setOnClickListener {
             val args = Bundle()
             args.putInt(DialogHelper.KEY, DialogHelper.SIGN_IN_STATE)
@@ -136,19 +131,21 @@ class OptionsFragment : Fragment() {
         }
 
         binding.onePlayer.reset.setOnClickListener {
-            viewModel.onClickReset()
+            viewModel.onClickReset(0)
         }
 
         binding.twoPlayer.reset.setOnClickListener {
-            viewModel.onClickReset()
+            viewModel.onClickReset(1)
         }
         binding.threePlayer.reset.setOnClickListener {
-            viewModel.onClickReset()
+            viewModel.onClickReset(2)
         }
         binding.fourPlayer.reset.setOnClickListener {
-            viewModel.onClickReset()
+            viewModel.onClickReset(3)
         }
+    }
 
+    private fun setupObserve() {
         launchAndRepeatWithViewLifecycle {
             viewModel.viewState.collect { viewState ->
                 if (viewState.players.isEmpty()) return@collect
@@ -166,12 +163,12 @@ class OptionsFragment : Fragment() {
                         textInputEditText.setText(viewState.players[index].name)
                 }
 
-                playersSwitchCompat.forEachIndexed { index, switchMaterial ->
+                playersSwitchOtherCompat.forEachIndexed { index, switchMaterial ->
                     switchMaterial.isChecked =
-                        viewState.players[index].controllerPlayer == true
+                        viewState.players[index + 1].controllerPlayer == true
 
                     switchMaterial.text = getString(
-                        if (viewState.players[index].controllerPlayer)
+                        if (viewState.players[index + 1].controllerPlayer)
                             R.string.controller_options_togglebutton_on
                         else
                             R.string.controller_options_togglebutton_off
@@ -190,7 +187,6 @@ class OptionsFragment : Fragment() {
                 binding.onePlayer.email.text = email ?: resources.getString(R.string.no_email)
             }
         }
-
     }
 
     override fun onDestroyView() {

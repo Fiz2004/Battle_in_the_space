@@ -57,6 +57,33 @@ class PlayerRepositoryImpl @Inject constructor(
         return uuid
     }
 
+    override suspend fun resetPlayer(uuid: String, number: Int) {
+        val players = getPlayers(uuid).toMutableList()
+        players[number] = when (number) {
+            0 -> Player(id = uuid, name = "Player 1", items = ItemsDatabase.getStartItems())
+            1 -> Player(
+                id = "Player 2",
+                name = "Player 2",
+                controllerPlayer = false,
+                items = ItemsDatabase.getStartItems()
+            )
+            2 -> Player(
+                id = "Player 3",
+                name = "Player 3",
+                controllerPlayer = false,
+                items = ItemsDatabase.getStartItems()
+            )
+            else -> Player(
+                id = "Player 4",
+                name = "Player 4",
+                controllerPlayer = false,
+                items = ItemsDatabase.getStartItems()
+            )
+        }
+
+        save(uuid, players)
+    }
+
     override fun initFirstLaunchGooglePlayers(uuid: String, players: List<Player>) {
         save(uuid, players)
     }

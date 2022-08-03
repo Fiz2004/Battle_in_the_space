@@ -3,7 +3,6 @@ package com.fiz.feature.game.models
 import android.graphics.Bitmap
 import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.domain.models.Controller
-import com.fiz.battleinthespace.domain.models.Player
 import com.fiz.battleinthespace.repositories.BitmapRepository
 import kotlin.math.abs
 import kotlin.math.cos
@@ -26,17 +25,44 @@ class SpaceShip(
 
     inGame: Boolean = true,
     var isFly: Boolean = false,
-    val player: Player
+    var score: Int = 0,
+    var number: Int = 0,
+    var life: Int = 3,
+    val weapon: Int = -1
 ) : MoveableActor(
     center, speed, angle, size, inGame, SPEED_MAX
 ), java.io.Serializable {
-    constructor (respawn: Respawn, playerGame: Player) : this(
+    constructor (respawn: Respawn, score: Int, number: Int, life: Int, weapon: Int) : this(
         center = Vec(respawn.center),
-        player = playerGame,
-        angle = respawn.angle
+        angle = respawn.angle,
+        score = score,
+        number = number,
+        life = life,
+        weapon = weapon
     )
 
     private var timeRespawn: Double = TIME_RESPAWN_MIN
+
+    fun copy(
+        center: Vec? = null,
+        speed: Vec? = null,
+        angle: Double? = null,
+        inGame: Boolean? = null,
+        life: Int? = null
+    ): SpaceShip {
+        return SpaceShip(
+            center = center ?: this.center,
+            speed = speed ?: this.speed,
+            angle = angle ?: this.angle,
+            size = size,
+            inGame = inGame ?: this.inGame,
+            isFly = isFly,
+            score = score,
+            number = number,
+            life = life ?: this.life,
+            weapon = weapon
+        )
+    }
 
     fun respawn(respawn: Respawn) {
         center = respawn.center.copy()
@@ -91,9 +117,9 @@ class SpaceShip(
 
     override fun getBitmap(bitmapRepository: BitmapRepository): Bitmap {
         return if (isFly)
-            bitmapRepository.bmpSpaceshipFly[player.number]
+            bitmapRepository.bmpSpaceshipFly[number]
         else
-            bitmapRepository.bmpSpaceship[player.number]
+            bitmapRepository.bmpSpaceship[number]
 
     }
 

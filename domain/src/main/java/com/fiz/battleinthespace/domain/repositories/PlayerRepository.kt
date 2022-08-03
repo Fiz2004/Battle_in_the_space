@@ -14,5 +14,6 @@ interface PlayerRepository {
 
     fun initFirstLaunchPlayers(): String
     fun initFirstLaunchGooglePlayers(uuid: String, players: List<Player>)
+    suspend fun resetPlayer(uuid: String, number: Int)
 }
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    style="?attr/materialCardViewOutlinedStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/email"
+            style="@style/TextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_email"
+            android:textSize="18sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/label_players_editText"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/name_options_edittext">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/Players_EditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sign_up"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:text="@string/signUp" />
+
+        <Button
+            android:id="@+id/sign_in"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:text="@string/signIn" />
+
+        <Button
+            android:id="@+id/sign_out"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:text="@string/signOut" />
+
+        <Button
+            android:id="@+id/reset"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:text="@string/reset" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

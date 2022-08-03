@@ -56,7 +56,7 @@
 
         <include
             android:id="@+id/onePlayer"
-            layout="@layout/card_options"
+            layout="@layout/card_options_main_players"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
@@ -66,7 +66,7 @@
 
         <include
             android:id="@+id/twoPlayer"
-            layout="@layout/card_options"
+            layout="@layout/card_options_other_players"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
@@ -76,7 +76,7 @@
 
         <include
             android:id="@+id/threePlayer"
-            layout="@layout/card_options"
+            layout="@layout/card_options_other_players"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"
@@ -86,7 +86,7 @@
 
         <include
             android:id="@+id/fourPlayer"
-            layout="@layout/card_options"
+            layout="@layout/card_options_other_players"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="8dp"

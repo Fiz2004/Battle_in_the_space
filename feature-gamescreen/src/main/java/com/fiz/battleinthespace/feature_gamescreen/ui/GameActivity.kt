@@ -69,6 +69,8 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun updateScreenState(viewState: ViewState) {
+        if (viewState.isFinish) finish()
+
         binding.progressBar.setVisible(viewState.isLoading)
 
         binding.gameGameSurfaceview.holder.lockCanvas()?.let {

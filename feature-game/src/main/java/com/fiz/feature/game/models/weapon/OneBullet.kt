@@ -29,7 +29,7 @@ class OneBullet(
     override var roadLengthMax = 6.0
 
     companion object {
-        fun create(spaceShips: MutableList<SpaceShip>, player: Int): Weapon {
+        fun create(spaceShips: List<SpaceShip>, player: Int): Weapon {
             val spaceship = spaceShips[player]
             val center = Vec(
                 spaceship.center.x + (spaceship.halfSize) * cos(spaceship.angleToRadians),

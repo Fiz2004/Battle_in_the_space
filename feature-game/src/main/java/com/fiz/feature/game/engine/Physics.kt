@@ -13,6 +13,8 @@ object Physics {
         Physics.height = height.toDouble()
     }
 
+    fun getAngleToRadians(angle: Double): Double = angle / 180.0 * Math.PI
+
     fun overlap(
         center1: Vec,
         size1: Double,
@@ -60,7 +62,9 @@ object Physics {
             if (center2.x - radius2 < 0) center2.x + width else center2.x,
             if (center2.y - radius2 < 0) center2.y + height else center2.y
         )
-        return radius > (globalCenter1.x - globalCenter2.x).pow(2) + (globalCenter1.y - globalCenter2.y).pow(2)
+        return radius > (globalCenter1.x - globalCenter2.x).pow(2) + (globalCenter1.y - globalCenter2.y).pow(
+            2
+        )
     }
 
     fun overlapRectangle(
@@ -73,8 +77,16 @@ object Physics {
         val halfSize2 = (size2 / 2)
         val (l1, r1) = changeCoorIfDoubleBorder(center1.x - halfSize1, center1.x + halfSize1, width)
         val (l2, r2) = changeCoorIfDoubleBorder(center2.x - halfSize2, center2.x + halfSize2, width)
-        val (u1, d1) = changeCoorIfDoubleBorder(center1.y - halfSize1, center1.y + halfSize1, height)
-        val (u2, d2) = changeCoorIfDoubleBorder(center2.y - halfSize2, center2.y + halfSize2, height)
+        val (u1, d1) = changeCoorIfDoubleBorder(
+            center1.y - halfSize1,
+            center1.y + halfSize1,
+            height
+        )
+        val (u2, d2) = changeCoorIfDoubleBorder(
+            center2.y - halfSize2,
+            center2.y + halfSize2,
+            height
+        )
         if ((r1 < l2) || (l1 > r2)) return false
         if ((d1 < u2) || (u1 > d2)) return false
         return true

@@ -9,10 +9,10 @@ data class PlayersDto(
 ) : java.io.Serializable {
 
     fun toPlayers(): List<Player> {
-        return players.map { playerDTO ->
+        return players.mapIndexed { index, playerDto ->
             val items = ItemsDatabase.getStartItems().map { typeItems ->
                 typeItems.copy(items = typeItems.items.map { item ->
-                    val findItem = playerDTO.items.find { it.id == item.id }
+                    val findItem = playerDto.items.find { it.id == item.id }
                     if (findItem != null)
                         item.copy(
                             state = findItem.state
@@ -23,10 +23,9 @@ data class PlayersDto(
             }
             Player(
                 mission = mission,
-                name = playerDTO.name,
-                controllerPlayer = playerDTO.controllerPlayer,
-                money = playerDTO.money,
-                score = playerDTO.score,
+                name = playerDto.name,
+                controllerPlayer = playerDto.controllerPlayer,
+                money = playerDto.money,
                 items = items,
             )
         }
