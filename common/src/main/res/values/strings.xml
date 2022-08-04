@@ -88,4 +88,5 @@
     <string name="forgotPassword">Восстановить пароль</string>
     <string name="resetPassword">Для восстановления вашего пароля укажите email</string>
     <string name="signOut">Выйти</string>
+    <string name="waitRespawn">Ожидаем воскрешения</string>
 </resources>

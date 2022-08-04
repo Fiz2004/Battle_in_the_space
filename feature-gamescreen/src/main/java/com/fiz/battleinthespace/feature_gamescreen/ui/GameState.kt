@@ -5,6 +5,8 @@ import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
 data class GameState(
     val round: Int,
     val status: com.fiz.feature.game.Game.Companion.GlobalStatusGame,
+    val isMainPlayerInGame: Boolean = true,
+    val isWaitRespawn: Boolean = false,
     val backgroundsUi: List<BackgroundUi>,
     val spaceshipsUi: List<SpriteUi>,
     val spaceshipsFlyUi: List<SpriteUi>,

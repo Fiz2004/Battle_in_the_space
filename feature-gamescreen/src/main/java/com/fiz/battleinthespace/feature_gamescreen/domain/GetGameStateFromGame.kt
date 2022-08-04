@@ -86,9 +86,13 @@ class GetGameStateFromGame @Inject constructor(
     operator fun invoke(game: Game): GameState {
         viewport.update(game)
 
+        val mainSpaceship = game.listActors.spaceShips.first()
+
         return GameState(
             round = game.round,
             status = game.status,
+            isMainPlayerInGame = mainSpaceship.inGame,
+            isWaitRespawn = mainSpaceship.life != 0 && !mainSpaceship.inGame,
             backgroundsUi = getBackgroundsUI(game),
             spaceshipsUi = getSpaceshipsUi(game),
             spaceshipsFlyUi = getSpaceshipsFlyUi(game),

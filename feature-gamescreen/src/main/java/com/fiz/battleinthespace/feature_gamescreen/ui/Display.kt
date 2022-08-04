@@ -1,13 +1,19 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
+import android.content.Context
 import android.graphics.*
+import com.fiz.battleinthespace.feature_gamescreen.R
 import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
 import com.fiz.battleinthespace.repositories.BitmapRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Display @Inject constructor(private val bitmapRepository: BitmapRepository) {
+class Display @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val bitmapRepository: BitmapRepository
+) {
 
     private val paintBitmap: Paint = Paint()
 
@@ -77,11 +83,24 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
             stateGame.gameState.spaceShipsAnimationsDestroyUi,
             canvas
         )
-        drawJoystick(stateGame.controllerState, canvas)
-        drawHelper(
-            stateGame.gameState.helpersPlayerUi,
-            stateGame.gameState.helpersMeteoriteUi,
-            canvas
+        if (stateGame.gameState.isWaitRespawn)
+            drawInfoTextWaitRespawn(canvas)
+        if (stateGame.gameState.isMainPlayerInGame) {
+            drawJoystick(stateGame.controllerState, canvas)
+            drawHelper(
+                stateGame.gameState.helpersPlayerUi,
+                stateGame.gameState.helpersMeteoriteUi,
+                canvas
+            )
+        }
+    }
+
+    private fun drawInfoTextWaitRespawn(canvas: Canvas) {
+        canvas.drawText(
+            context.getString(R.string.waitRespawn),
+            (canvas.width / 2).toFloat(),
+            (canvas.height / 2).toFloat(),
+            paintRound
         )
     }
 
