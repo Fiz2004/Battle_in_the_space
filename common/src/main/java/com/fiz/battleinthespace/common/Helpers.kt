@@ -5,19 +5,18 @@ import android.os.Build
 import android.os.Bundle
 import java.io.Serializable
 
+fun <T : Serializable> Bundle.serializable(key: String?, klass: Class<T>): T? {
+    return when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+            getSerializable(key, klass)
+        }
 
-@Suppress("DEPRECATION")
-fun <T : Serializable?> getSerializable(
-    savedInstanceState: Bundle?,
-    clazz: Class<T>
-): T {
-    @Suppress("UNCHECKED_CAST")
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        savedInstanceState?.getSerializable(clazz.simpleName, clazz)!!
-    else
-        savedInstanceState?.getSerializable(clazz.simpleName) as T
+        else -> {
+            @Suppress("DEPRECATION", "UNCHECKED_CAST")
+            getSerializable(key) as? T
+        }
+    }
 }
-
 
 fun getMaxTextWidth(texts: List<String>, textSize: Float): Int {
     val paint = Paint()
