@@ -37,6 +37,10 @@ dependencies {
     implementation(project(":feature-gamescreen"))
 
     implementation(libs.material)
+    implementation(libs.leakcanary.android)
+    implementation(libs.hawk)
+    implementation(libs.shimmer)
+    implementation(libs.cymchad.baserecyclerviewadapterhelper)
 
     // Hilt
     implementation(libs.hilt.android)

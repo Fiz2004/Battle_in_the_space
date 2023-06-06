@@ -11,6 +11,10 @@ kotlinx-coroutines-core = "1.7.1"
 lifecycle-runtime-ktx = "2.6.1"
 material = "1.9.0"
 play-services-auth = "20.5.0"
+leakcanary-android = "2.11"
+base-recycler-view-adapter-helper = "4.0.0-beta14"
+hawk = "2.0.1"
+shimmer = "0.5.0"
 
 # Test
 junit = "4.13.2"
@@ -42,6 +46,12 @@ lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", v
 material = { module = "com.google.android.material:material", version.ref = "material" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
+
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary-android" }
+cymchad-baserecyclerviewadapterhelper = { module = "io.github.cymchad:BaseRecyclerViewAdapterHelper", version.ref = "base-recycler-view-adapter-helper" }
+hawk = { module = "com.orhanobut:hawk", version.ref = "hawk" }
+shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
+
 
 # Test
 junit = { module = "junit:junit", version.ref = "junit" }
