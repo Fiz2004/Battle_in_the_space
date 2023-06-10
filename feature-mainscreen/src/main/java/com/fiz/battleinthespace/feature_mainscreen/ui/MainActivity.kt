@@ -9,9 +9,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
-import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ActivityMainBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter
+import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.SectionsPagerAdapter.Companion.Sections
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,43 +36,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val itemMenu = listOf(R.id.page_1, R.id.page_2, R.id.page_3, R.id.page_4)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        init()
-        setupListener()
-        setupObserve()
+        binding.init()
+        binding.setupListener()
+        binding.setupObserve()
     }
 
-    private fun init() {
+    private fun ActivityMainBinding.init() {
         val pagerAdapter = SectionsPagerAdapter(supportFragmentManager, lifecycle)
-        binding.viewpager.adapter = pagerAdapter
+        viewpager.adapter = pagerAdapter
     }
 
-    private fun setupListener() {
-        binding.viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+    private fun ActivityMainBinding.setupListener() {
+        viewpager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                binding.bottomNavigation.menu.findItem(itemMenu[position]).isChecked = true
+                bottomNavigation.menu.findItem(Sections[position].id).isChecked = true
             }
         })
 
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            binding.viewpager.currentItem = itemMenu.indexOf(item.itemId)
+        bottomNavigation.setOnItemSelectedListener { item ->
+            viewpager.currentItem = Sections.indexOfFirst { it.id == item.itemId }
             true
         }
 
-        binding.flyFab.setOnClickListener {
+        flyFab.setOnClickListener {
             val intent = Intent("com.fiz.battleinthespace.GameActivity")
             startActivity(intent)
         }
     }
 
-    private fun setupObserve() {
+    private fun ActivityMainBinding.setupObserve() {
         launchAndRepeatWithViewLifecycle {
             accountViewModel.textToToast.collect {
                 it?.let {

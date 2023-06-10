@@ -10,8 +10,13 @@ import com.fiz.battleinthespace.domain.models.TypeItems
 import com.fiz.battleinthespace.domain.repositories.PlayerRepository
 import com.fiz.battleinthespace.domain.repositories.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,24 +32,24 @@ sealed class ViewEffect {
     data class ShowErrorMessage(val message: String) : ViewEffect()
 }
 
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val playerRepository: PlayerRepository,
     private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
+
+    private val _viewEffect = MutableSharedFlow<ViewEffect>()
+    val viewEffect = _viewEffect.asSharedFlow()
+
     init {
         if (settingsRepository.getIsFirstLaunch())
             viewModelScope.launch {
                 settingsRepository.saveIsFirstLaunchComplete(uuid = playerRepository.initFirstLaunchPlayers())
             }
-    }
 
-    val viewState = MutableStateFlow(ViewState())
-    val viewEffect = MutableSharedFlow<ViewEffect>()
-
-    init {
         viewModelScope.launch {
             launch {
                 settingsRepository.getFlowUuid().flatMapMerge {
@@ -54,16 +59,16 @@ class MainViewModel @Inject constructor(
                         flow {}
                 }.collect { resource ->
                     when (resource) {
-                        is Resource.Error -> viewEffect.emit(ViewEffect.ShowErrorMessage("Load Error"))
+                        is Resource.Error -> _viewEffect.emit(ViewEffect.ShowErrorMessage("Load Error"))
                         is Resource.Loading -> {}
                         is Resource.Success -> {
                             resource.data?.let {
-                                viewState.value = viewState.value.copy(
+                                _viewState.value = _viewState.value.copy(
                                     isLoadingPlayers = false,
                                     players = it,
                                 )
                             }
-                                ?: viewEffect.emit(ViewEffect.ShowErrorMessage("Load players equals null"))
+                                ?: _viewEffect.emit(ViewEffect.ShowErrorMessage("Load players equals null"))
                         }
                     }
 
@@ -72,7 +77,7 @@ class MainViewModel @Inject constructor(
 
             launch {
                 settingsRepository.getFlowCountPlayers().collect { countPlayer ->
-                    viewState.value = viewState.value.copy(
+                    _viewState.value = _viewState.value.copy(
                         isLoadingCount = false,
                         countPlayer = countPlayer
                     )
@@ -82,20 +87,20 @@ class MainViewModel @Inject constructor(
     }
 
     fun getItems(): List<TypeItems> {
-        val player = viewState.value.players[0]
+        val player = _viewState.value.players[0]
 
         return player.items
     }
 
     private fun changeItems(key: Int, type: Int, value: StateProduct) {
-        var player = viewState.value.players[0]
+        var player = _viewState.value.players[0]
 
         val items = player.items.toMutableList()
         items[type].items[key].state = value
 
         player = player.copy(items = items.toList())
 
-        val players = viewState.value.players.toMutableList()
+        val players = _viewState.value.players.toMutableList()
         players[0] = player
 
         viewModelScope.launch {
@@ -108,8 +113,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun clickOnMission(value: Int) {
-        val player = viewState.value.players.getOrNull(0) ?: return
-        val players = viewState.value.players.toMutableList()
+        val player = _viewState.value.players.getOrNull(0) ?: return
+        val players = _viewState.value.players.toMutableList()
         players[0] = player.copy(mission = value)
 
         viewModelScope.launch {
@@ -125,18 +130,18 @@ class MainViewModel @Inject constructor(
     }
 
     fun clickTypeItem(value: Int) {
-        viewState.value = viewState.value.copy(type = value + 1)
+        _viewState.value = _viewState.value.copy(type = value + 1)
     }
 
     private fun buyItem(
         index: Int,
         indexType: Int
     ) {
-        val player = viewState.value.players[0]
+        val player = _viewState.value.players[0]
 
         val balance = player.money - getItems()[indexType].items[index].cost
 
-        val players = viewState.value.players.toMutableList()
+        val players = _viewState.value.players.toMutableList()
 
         val items = player.items.toMutableList()
         items[indexType].items[index].state = StateProduct.BUY
@@ -152,9 +157,9 @@ class MainViewModel @Inject constructor(
 
     fun clickItems(position: Int) {
         if (position == 0) {
-            viewState.value = viewState.value.copy(type = 0)
+            _viewState.value = _viewState.value.copy(type = 0)
         } else {
-            val type = viewState.value.type
+            val type = _viewState.value.type
             val indexType = type - 1
             val listProduct =
                 Item.addZeroFirstItem(getItems()[indexType].items)
@@ -171,14 +176,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun getItemsWithZero(): List<Item> {
-        val type = viewState.value.type
+        val type = _viewState.value.type
         val indexType = type - 1
-        val items = viewState.value.players[0].items
+        val items = _viewState.value.players[0].items
         return Item.addZeroFirstItem(items[indexType].items)
     }
 
     fun nameChanged(index: Int, newName: String) {
-        val players = viewState.value.players.toMutableList()
+        val players = _viewState.value.players.toMutableList()
 
         if (players.isEmpty()) return
         if (players[index].name == newName) return
@@ -191,7 +196,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun changeControllerPlayer(index: Int, isChecked: Boolean) {
-        val players = viewState.value.players.toMutableList()
+        val players = _viewState.value.players.toMutableList()
         players[index] = players[index].copy(controllerPlayer = isChecked)
 
         viewModelScope.launch {
