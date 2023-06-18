@@ -1,6 +1,7 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -23,16 +24,16 @@ class SectionsPagerAdapter(fm: FragmentManager, lc: Lifecycle) :
 
     companion object {
 
-        data class Section(
+        data class Page(
             @IdRes val id: Int,
             val getFragment: () -> Fragment
         )
 
-        val Sections: List<Section> = listOf(
-            Section(R.id.page_1, { MissionSelectedFragment() }),
-            Section(R.id.page_2, { SpaceStationFragment() }),
-            Section(R.id.page_3, { StatisticsFragment() }),
-            Section(R.id.page_4, { OptionsFragment() })
+        val Sections: List<Page> = listOf(
+            Page(id = R.id.page_1, getFragment = { MissionSelectedFragment() }),
+            Page(id = R.id.page_2, getFragment = { SpaceStationFragment() }),
+            Page(id = R.id.page_3, getFragment = { StatisticsFragment() }),
+            Page(id = R.id.page_4, getFragment = { OptionsFragment() })
         )
     }
 

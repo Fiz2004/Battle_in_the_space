@@ -7,12 +7,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-/**
- * Launches a new coroutine and repeats `block` every time the Fragment's viewLifecycleOwner
- * is in and out of `minActiveState` lifecycle state.
- */
 inline fun Fragment.launchAndRepeatWithViewLifecycle(
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline block: suspend CoroutineScope.() -> Unit
@@ -20,6 +18,20 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
     viewLifecycleOwner.lifecycleScope.launch {
         viewLifecycleOwner.lifecycle.repeatOnLifecycle(minActiveState) {
             block()
+        }
+    }
+}
+
+inline fun <ViewState> Fragment.collectUiState(
+    viewState: StateFlow<ViewState>,
+    crossinline block: (ViewState) -> Unit,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(minActiveState) {
+            viewState.collect {
+                block(it)
+            }
         }
     }
 }

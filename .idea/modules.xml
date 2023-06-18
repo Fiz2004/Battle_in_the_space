@@ -2,7 +2,38 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battle_in_the_space.iml" filepath="$PROJECT_DIR$/.idea/modules/Battle_in_the_space.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Battle_in_the_space.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Battle_in_the_space.buildSrc.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.iml" filepath="$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/common/Battle_in_the_space.common.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.iml" filepath="$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.main.iml" filepath="$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/data/Battle_in_the_space.data.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.main.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/domain/Battle_in_the_space.domain.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-game/Battle_in_the_space.feature-game.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-gamescreen/Battle_in_the_space.feature-gamescreen.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.main.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/feature-mainscreen/Battle_in_the_space.feature-mainscreen.unitTest.iml" />
     </modules>
   </component>
 </project>

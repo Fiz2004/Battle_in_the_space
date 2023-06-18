@@ -28,9 +28,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun activityCallback(result: ActivityResult) {
         if (result.resultCode == RESULT_OK || result.data == null) {
-            result.data?.let { data ->
-                accountViewModel.signInFirebaseWithGoogle(data)
+            val data = result.data
+            if (data == null) {
+                return
             }
+            accountViewModel.signInFirebaseWithGoogle(data)
         } else {
             Toast.makeText(this@MainActivity, "Отмена входа", Toast.LENGTH_LONG).show()
         }

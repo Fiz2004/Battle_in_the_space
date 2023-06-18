@@ -1,5 +1,7 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
+import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.fiz.battleinthespace.feature_mainscreen.R
@@ -8,23 +10,27 @@ import com.fiz.battleinthespace.feature_mainscreen.ui.mission_selected.MissionDe
 
 class NestedSectionsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
-        return 2
+        return Missions.size
     }
 
     override fun createFragment(position: Int): Fragment {
-        val fragment = when (position) {
-            0 -> MissionDestroyMeteoriteFragment()
-            else -> MissionDestroySpaceShipsFragment()
-        }
-        return fragment
+        return Missions[position].getFragment()
     }
 
     companion object {
-        fun getTitle(position: Int): Int {
-            return when (position) {
-                0 -> R.string.mission_destroy_meteorites
-                else -> R.string.mission_destroy_spaceships
-            }
-        }
+
+        data class Mission(
+            @StringRes val title: Int = 0,
+            val getFragment: () -> Fragment
+        )
+
+        val Missions: List<Mission> = listOf(
+            Mission(
+                title = R.string.mission_destroy_meteorites,
+                getFragment = { MissionDestroyMeteoriteFragment() }),
+            Mission(
+                title = R.string.mission_destroy_spaceships,
+                getFragment = { MissionDestroySpaceShipsFragment() })
+        )
     }
 }
