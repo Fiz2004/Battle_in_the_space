@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import javax.inject.Inject
 
 private const val KEY_COUNT_PLAYER = "countPlayer"
-private const val IS_FIRST_LAUNCH = "isFirstLaunch"
 private const val UUID = "uuid"
 private const val GUUID = "guuid"
 
@@ -28,11 +27,10 @@ class SharedPrefPlayerStorage @Inject constructor(private val sharedPreferences:
     }
 
     fun loadIsFirstLaunch(): Boolean {
-        return sharedPreferences.getBoolean(IS_FIRST_LAUNCH, true)
+        return sharedPreferences.getString(UUID, "")?.isEmpty() == true
     }
 
     fun saveIsFirstLaunchComplete(uuid: String) {
-        sharedPreferences.edit().putBoolean(IS_FIRST_LAUNCH, false).apply()
         sharedPreferences.edit().putString(UUID, uuid).apply()
     }
 

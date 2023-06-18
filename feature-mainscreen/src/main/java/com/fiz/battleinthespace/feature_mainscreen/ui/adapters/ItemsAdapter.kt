@@ -1,11 +1,13 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.adapters
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.fiz.battleinthespace.domain.models.Item
 import com.fiz.battleinthespace.domain.models.StateProduct
 import com.fiz.battleinthespace.feature_mainscreen.R
@@ -14,29 +16,30 @@ import com.google.android.material.color.MaterialColors
 
 
 class ItemsAdapter(
-    private val Items: List<Item>,
     val callback: (Int) -> Unit
-) : RecyclerView.Adapter<ItemsAdapter.ViewHolder>() {
+) : BaseQuickAdapter<Item, ItemsAdapter.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        context: Context,
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemItemBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ItemsAdapter.ViewHolder, position: Int, item: Item?) {
         // position==0 Возникает когда возвращаемся назад из меню покупки.
-        if (position == 0)
+        if (position == 0) {
             holder.bind()
-        else
-            holder.bind(Items[position])
+        } else {
+            val item = item ?: return
+            holder.bind(item)
+        }
     }
 
-    override fun getItemCount(): Int {
-        return Items.size
-    }
-
-    inner class ViewHolder(val binding: ListItemItemBinding) :
+    inner class ViewHolder(private val binding: ListItemItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         private val colorDefault = binding.cardView.cardBackgroundColor.defaultColor
         private val colorFontDefault = binding.costText.textColors.defaultColor
@@ -53,9 +56,11 @@ class ItemsAdapter(
                 StateProduct.INSTALL -> {
                     MaterialColors.getColor(binding.root, R.attr.colorTertiary)
                 }
+
                 StateProduct.BUY -> {
                     MaterialColors.getColor(binding.root, R.attr.colorSecondary)
                 }
+
                 else -> {
                     colorDefault
                 }
@@ -64,9 +69,11 @@ class ItemsAdapter(
                 StateProduct.INSTALL -> {
                     MaterialColors.getColor(binding.root, R.attr.colorOnTertiary)
                 }
+
                 StateProduct.BUY -> {
                     MaterialColors.getColor(binding.root, R.attr.colorOnSecondary)
                 }
+
                 else -> {
                     colorFontDefault
                 }
@@ -79,8 +86,10 @@ class ItemsAdapter(
             val info = when (item.state) {
                 StateProduct.INSTALL ->
                     binding.root.context.resources.getString(R.string.install, names)
+
                 StateProduct.BUY ->
                     binding.root.context.resources.getString(R.string.buying, names)
+
                 else -> names
             }
             binding.infoText.text = info

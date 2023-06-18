@@ -25,6 +25,8 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.activity.ktx)
     implementation(libs.fragment.ktx)
+    implementation(libs.cymchad.baserecyclerviewadapterhelper)
+    implementation(libs.glide)
 
     implementation(platform("com.google.firebase:firebase-bom:32.1.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
