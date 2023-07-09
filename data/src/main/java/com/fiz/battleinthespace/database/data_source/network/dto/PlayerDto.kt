@@ -1,7 +1,8 @@
 package com.fiz.battleinthespace.database.data_source.network.dto
 
+import androidx.annotation.Keep
 import com.fiz.battleinthespace.domain.models.Player
-
+@Keep
 data class PlayerDto(
     var name: String = "Player",
     var controllerPlayer: Boolean = true,
