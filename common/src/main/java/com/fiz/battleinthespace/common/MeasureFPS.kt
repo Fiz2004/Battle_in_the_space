@@ -9,7 +9,7 @@ class MeasureFPS {
     operator fun invoke(body: () -> Unit) {
         val now = System.currentTimeMillis()
         val deltaTime = now - lastTime
-        fps = ((fps + (1000 / deltaTime)) / 2).toInt()
+        fps = (1000.0/deltaTime).toInt()
 
         Log.d("FPS", fps.toString())
 
