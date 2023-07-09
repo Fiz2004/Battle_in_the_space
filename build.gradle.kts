@@ -30,11 +30,6 @@ subprojects {
             plugins.matching { it is KotlinAndroidProjectExtension }.whenPluginAdded {
                 configure<KotlinAndroidProjectExtension> {
                     jvmToolchain(17)
-                    sourceSets.all {
-                        languageSettings {
-                            languageVersion = "2.0"
-                        }
-                    }
                 }
             }
         }
