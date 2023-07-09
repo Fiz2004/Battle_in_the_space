@@ -18,6 +18,19 @@ fun <T : Serializable> Bundle.serializable(key: String?, klass: Class<T>): T? {
     }
 }
 
+fun <T : Serializable> Bundle.parcelable(key: String?, klass: Class<T>): T? {
+    return when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+            getParcelable(key, klass)
+        }
+
+        else -> {
+            @Suppress("DEPRECATION", "UNCHECKED_CAST")
+            getParcelable(key) as? T
+        }
+    }
+}
+
 fun getMaxTextWidth(texts: List<String>, textSize: Float): Int {
     val paint = Paint()
     paint.textSize = textSize

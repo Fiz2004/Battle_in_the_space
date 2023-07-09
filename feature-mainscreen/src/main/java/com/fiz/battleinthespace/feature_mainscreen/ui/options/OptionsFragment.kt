@@ -114,16 +114,16 @@ class OptionsFragment : Fragment() {
     private fun setupListener() {
         binding.onePlayer.signIn.setOnClickListener {
             val args = Bundle()
-            args.putInt(DialogHelper.KEY, DialogHelper.SIGN_IN_STATE)
+            args.putParcelable(DialogHelper.KEY, DialogHelper.Companion.DialogState.SignIn)
             dialogHelper.arguments = args
-            dialogHelper.show(childFragmentManager, DialogHelper.SIGN_IN_STATE.toString())
+            dialogHelper.show(childFragmentManager, DialogHelper.Companion.DialogState.SignIn.toString())
         }
 
         binding.onePlayer.signUp.setOnClickListener {
             val args = Bundle()
-            args.putInt(DialogHelper.KEY, DialogHelper.SIGN_UP_STATE)
+            args.putParcelable(DialogHelper.KEY, DialogHelper.Companion.DialogState.SignUp)
             dialogHelper.arguments = args
-            dialogHelper.show(childFragmentManager, DialogHelper.SIGN_UP_STATE.toString())
+            dialogHelper.show(childFragmentManager, DialogHelper.Companion.DialogState.SignUp.toString())
         }
 
         binding.onePlayer.signOut.setOnClickListener {

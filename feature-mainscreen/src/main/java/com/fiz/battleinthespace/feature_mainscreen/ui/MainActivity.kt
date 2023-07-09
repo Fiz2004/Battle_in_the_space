@@ -28,10 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun activityCallback(result: ActivityResult) {
         if (result.resultCode == RESULT_OK || result.data == null) {
-            val data = result.data
-            if (data == null) {
-                return
-            }
+            val data = result.data ?: return
             accountViewModel.signInFirebaseWithGoogle(data)
         } else {
             Toast.makeText(this@MainActivity, "Отмена входа", Toast.LENGTH_LONG).show()
