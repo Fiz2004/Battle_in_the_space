@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
+import com.fiz.battleinthespace.common.collectUiState
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentSpaceStationBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
+import com.fiz.battleinthespace.feature_mainscreen.ui.ViewState
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.ItemsAdapter
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.TypeItemsAdapter
 
@@ -17,7 +18,8 @@ class SpaceStationFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
 
     private var _binding: FragmentSpaceStationBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = checkNotNull(_binding)
 
     private lateinit var typeItemsAdapter: TypeItemsAdapter
     private lateinit var itemsAdapter: ItemsAdapter
@@ -32,47 +34,37 @@ class SpaceStationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setupObservers()
+        collectUiState(viewModel.viewState, { binding.collectUiState(it) })
     }
 
-    private fun setupObservers() {
+    private fun FragmentSpaceStationBinding.collectUiState(viewState: ViewState) {
+        if (viewState.players.isEmpty()) return
 
-        launchAndRepeatWithViewLifecycle {
-            viewModel.viewState.collect { viewState ->
-                if (viewState.players.isEmpty()) return@collect
+        money.text = getString(R.string.balance, viewState.players[0].money)
 
-                binding.money.text = getString(R.string.balance, viewState.players[0].money)
-
-                binding.stationRecycler.adapter =
-                    if (viewState.type == 0)
-                        getTypeItemsAdapter()
-                    else
-                        getItemsAdapter()
-
-                binding.stationRecycler.adapter =
-                    if (viewState.type == 0)
-                        getTypeItemsAdapter()
-                    else
-                        getItemsAdapter()
-            }
-        }
+        stationRecycler.adapter = if (viewState.type == 0)
+            getTypeItemsAdapter()
+        else
+            getItemsAdapter()
     }
 
     private fun getItemsAdapter(): ItemsAdapter {
         val items = viewModel.getItemsWithZero()
-        itemsAdapter = ItemsAdapter(items, viewModel::clickItems)
+        itemsAdapter = ItemsAdapter(viewModel::clickItems)
+        itemsAdapter.submitList(items)
         return itemsAdapter
     }
 
     private fun getTypeItemsAdapter(): TypeItemsAdapter {
         val items = viewModel.getItems()
-        typeItemsAdapter = TypeItemsAdapter(items, viewModel::clickTypeItem)
+        typeItemsAdapter = TypeItemsAdapter(viewModel::clickTypeItem)
+        typeItemsAdapter.submitList(items)
         return typeItemsAdapter
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.stationRecycler.adapter = null
         _binding = null
     }
 }

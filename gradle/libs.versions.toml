@@ -15,6 +15,7 @@ leakcanary-android = "2.12"
 base-recycler-view-adapter-helper = "4.0.0-beta14"
 hawk = "2.0.1"
 shimmer = "0.5.0"
+glide = "4.15.1"
 
 # Test
 junit = "4.13.2"
@@ -51,7 +52,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 cymchad-baserecyclerviewadapterhelper = { module = "io.github.cymchad:BaseRecyclerViewAdapterHelper", version.ref = "base-recycler-view-adapter-helper" }
 hawk = { module = "com.orhanobut:hawk", version.ref = "hawk" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
-
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 
 # Test
 junit = { module = "junit:junit", version.ref = "junit" }

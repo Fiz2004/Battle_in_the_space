@@ -3,6 +3,7 @@ package com.fiz.battleinthespace.repositories
 import com.fiz.battleinthespace.database.data_source.local.SharedPrefPlayerStorage
 import com.fiz.battleinthespace.domain.repositories.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +17,7 @@ class SettingsRepositoryImpl @Inject constructor(
     private val countPlayersFlow: MutableStateFlow<Int> =
         MutableStateFlow(sharedPrefPlayerStorage.getCountPlayers())
 
-    override fun getFlowUuid(): MutableStateFlow<String> {
+    override fun getFlowUuid(): StateFlow<String> {
         return uuid
     }
 
@@ -31,7 +32,6 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun getCountPlayers(): Int {
         return sharedPrefPlayerStorage.getCountPlayers()
     }
-
 
     override fun getIsFirstLaunch(): Boolean {
         return sharedPrefPlayerStorage.loadIsFirstLaunch()
