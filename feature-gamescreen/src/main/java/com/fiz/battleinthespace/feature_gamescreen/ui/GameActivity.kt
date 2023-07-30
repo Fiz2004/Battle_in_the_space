@@ -5,11 +5,11 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.fiz.battleinthespace.common.MeasureFPS
 import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
 import com.fiz.battleinthespace.common.serializable
-import com.fiz.battleinthespace.common.setVisible
 import com.fiz.battleinthespace.domain.models.WIDTH_JOYSTICK_DEFAULT
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.feature.game.Game
@@ -75,7 +75,7 @@ class GameActivity : AppCompatActivity() {
     private fun updateScreenState(viewState: ViewState) {
         if (viewState.isFinish) finish()
 
-        binding.progressBar.setVisible(viewState.isLoading)
+        binding.progressBar.isVisible = viewState.isLoading
 
         binding.gameGameSurfaceview.holder.lockCanvas()?.let {
             display.render(viewState, it)

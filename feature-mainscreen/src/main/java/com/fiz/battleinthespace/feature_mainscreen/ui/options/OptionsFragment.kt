@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
-import com.fiz.battleinthespace.common.setVisible
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentOptionsBinding
 import com.fiz.battleinthespace.feature_mainscreen.ui.AccountViewModel
@@ -154,9 +154,9 @@ class OptionsFragment : Fragment() {
                     radioButton.isChecked = viewState.countPlayer == index + 1
                 }
 
-                binding.twoPlayer.root.setVisible(viewState.countPlayer >= 2)
-                binding.threePlayer.root.setVisible(viewState.countPlayer >= 3)
-                binding.fourPlayer.root.setVisible(viewState.countPlayer >= 4)
+                binding.twoPlayer.root.isVisible = viewState.countPlayer >= 2
+                binding.threePlayer.root.isVisible = viewState.countPlayer >= 3
+                binding.fourPlayer.root.isVisible = viewState.countPlayer >= 4
 
                 playersEditText.forEachIndexed { index, textInputEditText ->
                     if (textInputEditText.text.toString() != viewState.players[index].name)
@@ -180,9 +180,9 @@ class OptionsFragment : Fragment() {
 
         launchAndRepeatWithViewLifecycle {
             accountViewModel.email.collect { email ->
-                binding.onePlayer.signUp.setVisible(email == null)
-                binding.onePlayer.signIn.setVisible(email == null)
-                binding.onePlayer.signOut.setVisible(email != null)
+                binding.onePlayer.signUp.isVisible = email == null
+                binding.onePlayer.signIn.isVisible = email == null
+                binding.onePlayer.signOut.isVisible = email != null
 
                 binding.onePlayer.email.text = email ?: resources.getString(R.string.no_email)
             }
