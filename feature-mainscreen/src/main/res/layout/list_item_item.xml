@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     style="?attr/materialCardViewOutlinedStyle"
     android:layout_width="match_parent"
@@ -15,37 +16,41 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/info_image"
+            android:id="@+id/imgInfo"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_weight="1.0"
-            android:scaleType="centerInside" />
+            android:scaleType="centerInside"
+            tools:src="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/info_text"
+            android:id="@+id/txtInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginBottom="4dp"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="@tools:sample/lorem" />
 
         <TextView
-            android:id="@+id/cost_text"
+            android:id="@+id/txtCost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginBottom="4dp"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            tools:text="@tools:sample/lorem" />
 
         <LinearLayout
-            android:id="@+id/buttons_Layout"
+            android:id="@+id/containerConfirmButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/undo_Button"
+                android:id="@+id/btnUndo"
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,7 +60,7 @@
                 android:text="@string/undo" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/ok_Button"
+                android:id="@+id/btnOk"
                 style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

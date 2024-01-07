@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.fiz.battleinthespace">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -17,24 +16,6 @@
         android:theme="@style/Theme.BattleInTheSpace"
         tools:ignore="DataExtractionRules"
         tools:targetApi="s">
-        <activity
-            android:name=".feature_gamescreen.ui.GameActivity"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.fiz.battleinthespace.GameActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".feature_mainscreen.ui.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

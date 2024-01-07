@@ -1,17 +1,15 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import com.fiz.battleinthespace.domain.models.Controller
 import com.fiz.battleinthespace.feature_gamescreen.R
 import java.io.Serializable
 
 const val SecTimeForRestartForEndGame = 1.0
 
-data class ViewState(
+internal data class ViewState(
+    val isFinish: Boolean = false,
     val isLoading: Boolean = true,
-    val controllers: List<Controller>,
     val controllerState: ControllerState?,
     val gameState: GameState?,
-    val playSound: (Int) -> Unit,
 ) : Serializable {
 
     fun getResourceTextForPauseResumeButton(): Int {

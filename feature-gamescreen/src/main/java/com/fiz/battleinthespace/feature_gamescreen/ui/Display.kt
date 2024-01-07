@@ -1,13 +1,29 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.graphics.*
-import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Rect
+import android.graphics.RectF
+import com.fiz.battleinthespace.feature_gamescreen.R
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.BackgroundUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.HelperMeteoritesUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.HelperPlayerUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.MeteoriteSpriteUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.SpriteUi
 import com.fiz.battleinthespace.repositories.BitmapRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Display @Inject constructor(private val bitmapRepository: BitmapRepository) {
+internal class Display @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val bitmapRepository: BitmapRepository
+) {
 
     private val paintBitmap: Paint = Paint()
 
@@ -26,16 +42,29 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
     }
 
     private val paintHelperPlayer = Paint().apply {
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
         alpha = 80
-        strokeWidth = 30F
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 10F
+    }
+
+    private val paintTextHelperPlayer = Paint().apply {
+        textAlign = Paint.Align.CENTER
+        textSize = 30F
     }
 
     private val paintHelperMeteorites = Paint().apply {
         color = Color.RED
-        style = Paint.Style.FILL
+        style = Paint.Style.STROKE
         alpha = 160
-        strokeWidth = 20F
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 10F
+    }
+
+    private val paintTextHelperMeteorites = Paint().apply {
+        color = Color.RED
+        textAlign = Paint.Align.CENTER
+        textSize = 30F
     }
 
     private val paintRound = Paint().apply {
@@ -64,11 +93,24 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
             stateGame.gameState.spaceShipsAnimationsDestroyUi,
             canvas
         )
-        drawJoystick(stateGame.controllerState, canvas)
-        drawHelper(
-            stateGame.gameState.helpersPlayerUi,
-            stateGame.gameState.helpersMeteoriteUi,
-            canvas
+        if (stateGame.gameState.isWaitRespawn)
+            drawInfoTextWaitRespawn(canvas)
+        if (stateGame.gameState.isMainPlayerInGame) {
+            drawJoystick(stateGame.controllerState, canvas)
+            drawHelper(
+                stateGame.gameState.helpersPlayerUi,
+                stateGame.gameState.helpersMeteoriteUi,
+                canvas
+            )
+        }
+    }
+
+    private fun drawInfoTextWaitRespawn(canvas: Canvas) {
+        canvas.drawText(
+            context.getString(R.string.waitRespawn),
+            (canvas.width / 2).toFloat(),
+            (canvas.height / 2).toFloat(),
+            paintRound
         )
     }
 
@@ -214,31 +256,53 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
         canvas: Canvas
     ) {
         helpersPlayerUi.forEach {
-            paintHelperPlayer.color = it.value
+            paintHelperPlayer.color = it.color
+            paintTextHelperPlayer.color = it.color
 
-            canvas.drawCircle(
+            canvas.save()
+            canvas.translate(it.centerX, it.centerY)
+            canvas.rotate(it.angle - 90)
+            val path = Path()
+            path.moveTo(-15f, 23f)
+            path.lineTo(0f, 30f)
+            path.lineTo(15f, 23f)
+            canvas.drawPath(path, paintHelperPlayer)
+            canvas.restore()
+
+            canvas.drawText(
+                "S",
                 it.centerX,
                 it.centerY,
-                it.radius,
-                paintHelperPlayer
+                paintTextHelperPlayer
             )
         }
 
         helpersMeteoriteUi.forEach {
-            canvas.drawCircle(
+
+            canvas.save()
+            canvas.translate(it.centerX, it.centerY)
+            canvas.rotate(it.angle - 90)
+            val path = Path()
+            path.moveTo(-15f, 23f)
+            path.lineTo(0f, 30f)
+            path.lineTo(15f, 23f)
+            canvas.drawPath(path, paintHelperMeteorites)
+            canvas.restore()
+
+            canvas.drawText(
+                "M",
                 it.centerX,
                 it.centerY,
-                it.radius,
-                paintHelperMeteorites
+                paintTextHelperMeteorites
             )
         }
     }
 
-    fun renderInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
-        drawInfo(stateGame, canvasInfo, FPS)
+    fun renderInfo(stateGame: ViewState, canvasInfo: Canvas) {
+        drawInfo(stateGame, canvasInfo)
     }
 
-    private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas, FPS: Int) {
+    private fun drawInfo(stateGame: ViewState, canvasInfo: Canvas) {
         if (stateGame.gameState == null) return
 
         canvasInfo.drawColor(Color.BLACK)
@@ -273,12 +337,6 @@ class Display @Inject constructor(private val bitmapRepository: BitmapRepository
             )
         }
 
-        canvasInfo.drawText(
-            FPS.toString(),
-            0F,
-            66F,
-            paintPlayer
-        )
     }
 }
 

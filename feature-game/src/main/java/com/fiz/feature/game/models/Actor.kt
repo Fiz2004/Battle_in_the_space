@@ -1,11 +1,10 @@
 package com.fiz.feature.game.models
 
 import android.graphics.Bitmap
-import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.repositories.BitmapRepository
 
-interface Drawable : java.io.Serializable {
-    var center: Vec
+internal interface Drawable : java.io.Serializable {
+    var center: com.fiz.battleinthespace.common.Vec
     var angle: Double
     var size: Double
 
@@ -13,7 +12,7 @@ interface Drawable : java.io.Serializable {
 }
 
 abstract class Actor(
-    center: Vec,
+    center: com.fiz.battleinthespace.common.Vec,
     angle: Double,
     var size: Double
 ) : java.io.Serializable {
@@ -21,7 +20,7 @@ abstract class Actor(
     val halfSize
         get() = size / 2
 
-    var center: Vec = center.copy()
+    var center: com.fiz.battleinthespace.common.Vec = center.copy()
 
     var angle: Double = angle
         set(value) {

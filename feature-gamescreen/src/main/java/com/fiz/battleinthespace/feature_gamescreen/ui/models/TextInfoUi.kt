@@ -1,6 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui.models
 
-data class TextInfoUi(
+internal data class TextInfoUi(
     val value: String,
     val x: Float,
     val y: Float,

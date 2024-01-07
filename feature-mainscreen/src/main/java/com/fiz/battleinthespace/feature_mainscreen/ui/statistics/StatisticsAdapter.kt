@@ -1,80 +1,69 @@
 package com.fiz.battleinthespace.feature_mainscreen.ui.statistics
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fiz.battleinthespace.database.ItemsDatabase
-import com.fiz.battleinthespace.domain.models.Player
+import com.chad.library.adapter4.BaseMultiItemAdapter
 import com.fiz.battleinthespace.feature_mainscreen.databinding.ListItemStatisticBinding
 
-const val ITEM_HEADER = 0
-const val ITEM_PLAYER = 1
+internal class StatisticsAdapter : BaseMultiItemAdapter<StatisticItemUi>() {
 
-class StatisticsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var data: List<Player> = listOf()
+    class HeaderVH(val viewBinding: ListItemStatisticBinding) : RecyclerView.ViewHolder(viewBinding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ListItemStatisticBinding.inflate(inflater, parent, false)
-        when (viewType) {
-            ITEM_HEADER -> return HeaderViewHolder(binding)
-        }
-        return StatisticViewHolder(binding)
-    }
+    class StatisticVH(val viewBinding: ListItemStatisticBinding) : RecyclerView.ViewHolder(viewBinding.root)
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (position) {
-            0 -> (holder as HeaderViewHolder).bind("Полная статистика по игрокам")
-            1 -> (holder as HeaderViewHolder).bind("Игроки")
-            2 -> (holder as StatisticViewHolder).bind(data[position])
-            3 -> (holder as HeaderViewHolder).bind("Компьютер")
-            else -> (holder as StatisticViewHolder).bind(data[position])
-        }
-    }
+    init {
+        addItemType(HEADER_TYPE, object : OnMultiItemAdapterListener<StatisticItemUi, HeaderVH> {
+            override fun onCreate(context: Context, parent: ViewGroup, viewType: Int): HeaderVH {
+                val inflater = LayoutInflater.from(parent.context)
+                val binding = ListItemStatisticBinding.inflate(inflater, parent, false)
+                return HeaderVH(binding)
+            }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            0 -> ITEM_HEADER
-            1 -> ITEM_HEADER
-            2 -> ITEM_PLAYER
-            3 -> ITEM_HEADER
-            else -> ITEM_PLAYER
-        }
+            override fun onBind(holder: HeaderVH, position: Int, item: StatisticItemUi?) {
+                require(item is StatisticItemUi.HeaderItem)
 
-    }
+                with(holder) {
+                    viewBinding.apply {
+                        txtStatistic.textAlignment = TEXT_ALIGNMENT_CENTER
+                        txtStatistic.text = item.text
+                    }
+                }
+            }
+        }).addItemType(
+            STATISTIC_TYPE,
+            object : OnMultiItemAdapterListener<StatisticItemUi, StatisticVH> {
+                override fun onCreate(
+                    context: Context,
+                    parent: ViewGroup,
+                    viewType: Int
+                ): StatisticVH {
+                    val inflater = LayoutInflater.from(context)
+                    val binding = ListItemStatisticBinding.inflate(inflater, parent, false)
+                    return StatisticVH(binding)
+                }
 
-    override fun getItemCount(): Int {
-        return data.size
-    }
+                override fun onBind(holder: StatisticVH, position: Int, item: StatisticItemUi?) {
+                    require(item is StatisticItemUi.StatisticItem)
 
-    fun setData(players: List<Player>) {
-        data = listOf(Player(items = ItemsDatabase.getStartItems())) + listOf(
-            Player(items = ItemsDatabase.getStartItems())
-        ) + listOf(players[0]) + listOf(
-            Player(items = ItemsDatabase.getStartItems())
-        ) + listOf(
-            players[1],
-            players[2],
-            players[3]
-        )
-        notifyDataSetChanged()
-    }
-
-    class StatisticViewHolder(val binding: ListItemStatisticBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(player: Player) {
-            binding.statisticTextView.text = "${player.name}: ${player.money}"
+                    with(holder) {
+                        viewBinding.apply {
+                            txtStatistic.text = "${item.name}: ${item.money}"
+                        }
+                    }
+                }
+            }).onItemViewType { position, list ->
+            when (list[position]) {
+                is StatisticItemUi.HeaderItem -> HEADER_TYPE
+                is StatisticItemUi.StatisticItem -> STATISTIC_TYPE
+            }
         }
     }
 
-    class HeaderViewHolder(val binding: ListItemStatisticBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(text: String) {
-            binding.statisticTextView.textAlignment = TEXT_ALIGNMENT_CENTER
-            binding.statisticTextView.text = text
-        }
+    companion object {
+        private const val HEADER_TYPE = 0
+        private const val STATISTIC_TYPE = 1
     }
 }

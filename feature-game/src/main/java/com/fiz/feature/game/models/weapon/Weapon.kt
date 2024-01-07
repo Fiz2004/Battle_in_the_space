@@ -1,14 +1,13 @@
 package com.fiz.feature.game.models.weapon
 
-import com.fiz.battleinthespace.common.Vec
 import com.fiz.feature.game.models.MoveableActor
 import com.fiz.feature.game.models.SpaceShip
 import kotlin.math.sqrt
 
 abstract class Weapon(
-    center: Vec,
+    center: com.fiz.battleinthespace.common.Vec,
 
-    speed: Vec,
+    speed: com.fiz.battleinthespace.common.Vec,
 
     angle: Double,
 
@@ -35,7 +34,7 @@ abstract class Weapon(
     }
 
     companion object {
-        fun create(spaceShips: MutableList<SpaceShip>, player: Int, type: Int): Weapon {
+        fun create(spaceShips: List<SpaceShip>, player: Int, type: Int): Weapon {
             return when (type) {
                 0 -> OneBullet.create(spaceShips, player)
                 1 -> TwoBullet.create(spaceShips, player)

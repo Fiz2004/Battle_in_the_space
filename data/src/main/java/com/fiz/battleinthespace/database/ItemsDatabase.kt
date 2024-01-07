@@ -1,38 +1,38 @@
 package com.fiz.battleinthespace.database
 
-import com.fiz.battleinthespace.domain.models.Item
+import com.fiz.battleinthespace.domain.models.CategoryItem
 import com.fiz.battleinthespace.domain.models.StateProduct
-import com.fiz.battleinthespace.domain.models.TypeItems
+import com.fiz.battleinthespace.domain.models.SubItem
 
 class ItemsDatabase {
     companion object {
-        fun getStartItems(): List<TypeItems> {
+        fun getStartItems(): List<CategoryItem> {
             return listOf(
-                TypeItems(
+                CategoryItem(
                     "0", R.string.weapon, R.drawable.station_weapon,
                     mutableListOf(
-                        Item(
+                        SubItem.Item(
                             "Пуля",
                             R.string.bullet,
                             R.drawable.weapon_2,
                             100,
                             StateProduct.INSTALL
                         ),
-                        Item(
+                        SubItem.Item(
                             "Двойная пуля",
                             R.string.double_bullet,
                             R.drawable.weapon_3,
                             300,
                             StateProduct.NONE
                         ),
-                        Item(
+                        SubItem.Item(
                             "Ракета",
                             R.string.missile,
                             R.drawable.weapon_4,
                             500,
                             StateProduct.NONE
                         ),
-                        Item(
+                        SubItem.Item(
                             "Шар",
                             R.string.ball,
                             R.drawable.weapon_5,
@@ -41,10 +41,10 @@ class ItemsDatabase {
                         ),
                     )
                 ),
-                TypeItems(
+                CategoryItem(
                     "Скорость полета", R.string.flight_speed, R.drawable.station_speed_fly,
                     mutableListOf(
-                        Item(
+                        SubItem.Item(
                             "0",
                             R.string.basic_engine,
                             R.drawable.back,
@@ -53,10 +53,10 @@ class ItemsDatabase {
                         )
                     )
                 ),
-                TypeItems(
+                CategoryItem(
                     "Скорость поворота", R.string.turning_speed, R.drawable.station_speed_rotate,
                     mutableListOf(
-                        Item(
+                        SubItem.Item(
                             "0",
                             R.string.basic_steering_wheel,
                             R.drawable.back,
@@ -65,10 +65,10 @@ class ItemsDatabase {
                         )
                     )
                 ),
-                TypeItems(
+                CategoryItem(
                     "Скорость стрельбы", R.string.rate_of_fire, R.drawable.station_speed_shoot,
                     mutableListOf(
-                        Item(
+                        SubItem.Item(
                             "0",
                             R.string.basic_charger,
                             R.drawable.back,
@@ -77,10 +77,10 @@ class ItemsDatabase {
                         )
                     )
                 ),
-                TypeItems(
+                CategoryItem(
                     "Корпус", R.string.body, R.drawable.station_speed_shoot,
                     mutableListOf(
-                        Item(
+                        SubItem.Item(
                             "0",
                             R.string.base_case,
                             R.drawable.back,

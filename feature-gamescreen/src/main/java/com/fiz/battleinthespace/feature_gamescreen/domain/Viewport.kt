@@ -1,9 +1,10 @@
 package com.fiz.battleinthespace.feature_gamescreen.domain
 
-import com.fiz.battleinthespace.common.Vec
+import com.fiz.feature.game.Game
+import com.fiz.feature.game.models.Actor
 import kotlin.math.ceil
 
-class Viewport(
+internal class Viewport(
     surfaceWidth: Int, surfaceHeight: Int,
     stateGameWidth: Int, stateGameHeight: Int, sizeUnit: Float
 ) {
@@ -29,17 +30,22 @@ class Viewport(
         levelHeight * countViewportYOnScreen
     }
 
-    fun update(game: com.fiz.feature.game.Game) {
-        val spaceship =
-            game.listActors.spaceShips[game.players.indexOf(game.players.find { it.main })]
+    fun update(game: Game) {
+
+        val spaceship = if (game.listActors.spaceShips.first().life == 0)
+            game.listActors.spaceShips.find { it.inGame && it.life != 0 }
+                ?: game.listActors.spaceShips.first()
+        else
+            game.listActors.spaceShips.first()
+
         val center = spaceship.center
         left = center.x - marginX
 
         top = center.y - marginY
     }
 
-    fun getAllPoints(actor: com.fiz.feature.game.models.Actor): MutableList<Vec> {
-        val result = mutableListOf<Vec>()
+    fun getAllPoints(actor: Actor): List<com.fiz.battleinthespace.common.Vec> {
+        val result = mutableListOf<com.fiz.battleinthespace.common.Vec>()
         var relativeX =
             actor.center.x - widthAllViewportsOnScreen
 
@@ -62,7 +68,7 @@ class Viewport(
                     break
                 }
 
-                result.add(Vec(relativeX - left, relativeY - top))
+                result.add(com.fiz.battleinthespace.common.Vec(relativeX - left, relativeY - top))
 
                 relativeY += levelHeight
             }

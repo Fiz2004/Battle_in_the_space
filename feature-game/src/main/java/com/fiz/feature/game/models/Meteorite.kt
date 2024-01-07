@@ -1,7 +1,6 @@
 package com.fiz.feature.game.models
 
 import android.graphics.Bitmap
-import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.repositories.BitmapRepository
 import kotlin.math.cos
 import kotlin.math.sign
@@ -11,9 +10,9 @@ private const val SPEED_MAX: Double = 1.0
 const val NUMBER_BITMAP_METEORITE_OPTION = 4
 
 class Meteorite(
-    center: Vec,
+    center: com.fiz.battleinthespace.common.Vec,
 
-    speed: Vec = Vec(0.0, 0.0),
+    speed: com.fiz.battleinthespace.common.Vec = com.fiz.battleinthespace.common.Vec(0.0, 0.0),
 
     angle: Double,
 
@@ -29,10 +28,13 @@ class Meteorite(
     fun createMeteorite(angleDestroy: Double, angleCreate: Double): Meteorite {
         val currentSpeed = speed.length()
         val currentAngleToRadians = (angleDestroy - angleCreate) / 180.0 * Math.PI
-        val vec = Vec(cos(currentAngleToRadians), sin(currentAngleToRadians))
+        val vec = com.fiz.battleinthespace.common.Vec(
+            cos(currentAngleToRadians),
+            sin(currentAngleToRadians)
+        )
 
         return Meteorite(
-            center + Vec(sign(vec.x), sign(vec.y)) * halfSize,
+            center + com.fiz.battleinthespace.common.Vec(sign(vec.x), sign(vec.y)) * halfSize,
             angle = angleDestroy - angleCreate,
             speed = vec * currentSpeed * 1.2,
             size = size - 0.2,
@@ -45,9 +47,9 @@ class Meteorite(
         fun createNew(x: Double, y: Double): Meteorite {
             val angle = (0..360).shuffled().first()
             val angleToRadians = angle / 180.0 * Math.PI
-            val vec = Vec(cos(angleToRadians), sin(angleToRadians))
+            val vec = com.fiz.battleinthespace.common.Vec(cos(angleToRadians), sin(angleToRadians))
             return Meteorite(
-                center = Vec(x, y),
+                center = com.fiz.battleinthespace.common.Vec(x, y),
                 speed = vec * SPEED_MAX * 0.4,
                 angle = angle.toDouble(),
                 size = 1.0,

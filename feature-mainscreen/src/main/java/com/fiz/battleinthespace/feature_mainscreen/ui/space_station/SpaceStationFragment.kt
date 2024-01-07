@@ -4,23 +4,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
+import androidx.fragment.app.viewModels
+import com.fiz.battleinthespace.common.collectUiState
+import com.fiz.battleinthespace.common.unsafeLazy
 import com.fiz.battleinthespace.feature_mainscreen.R
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentSpaceStationBinding
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
-import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.ItemsAdapter
-import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.TypeItemsAdapter
+import dagger.hilt.android.AndroidEntryPoint
 
-class SpaceStationFragment : Fragment() {
-    private val viewModel: MainViewModel by activityViewModels()
+@AndroidEntryPoint
+internal class SpaceStationFragment : Fragment() {
+
+    private val viewModel: SpaceStationViewModel by viewModels()
 
     private var _binding: FragmentSpaceStationBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = checkNotNull(_binding)
 
-    private lateinit var typeItemsAdapter: TypeItemsAdapter
-    private lateinit var itemsAdapter: ItemsAdapter
+    private val adapter: ItemUiAdapter by unsafeLazy {
+        ItemUiAdapter(viewModel::clickItem, viewModel::undoClickItem)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,46 +37,26 @@ class SpaceStationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupObservers()
+        binding.init()
+
+        collectUiState(viewModel.viewState, { binding.collectUiState(it) })
     }
 
-    private fun setupObservers() {
-
-        launchAndRepeatWithViewLifecycle {
-            viewModel.viewState.collect { viewState ->
-                if (viewState.players.isEmpty()) return@collect
-
-                binding.money.text = getString(R.string.balance, viewState.players[0].money)
-
-                binding.stationRecycler.adapter =
-                    if (viewState.type == 0)
-                        getTypeItemsAdapter()
-                    else
-                        getItemsAdapter()
-
-                binding.stationRecycler.adapter =
-                    if (viewState.type == 0)
-                        getTypeItemsAdapter()
-                    else
-                        getItemsAdapter()
-            }
-        }
+    private fun FragmentSpaceStationBinding.init() {
+        stationRecycler.adapter = adapter
     }
 
-    private fun getItemsAdapter(): ItemsAdapter {
-        val items = viewModel.getItemsWithZero()
-        itemsAdapter = ItemsAdapter(items, viewModel::clickItems)
-        return itemsAdapter
-    }
+    private fun FragmentSpaceStationBinding.collectUiState(viewState: SpaceStationViewState) {
+        progress.isVisible = viewState.isLoading
+        mainContent.isVisible = !viewState.isLoading
 
-    private fun getTypeItemsAdapter(): TypeItemsAdapter {
-        val items = viewModel.getItems()
-        typeItemsAdapter = TypeItemsAdapter(items, viewModel::clickTypeItem)
-        return typeItemsAdapter
-    }
+        txtMoney.text = getString(R.string.balance, viewState.money)
 
+        adapter.submitList(viewState.items)
+    }
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.stationRecycler.adapter = null
         _binding = null
     }
 }

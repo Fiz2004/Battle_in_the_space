@@ -4,65 +4,88 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
+import com.fiz.battleinthespace.common.collectUiState
+import com.fiz.battleinthespace.common.unsafeLazy
 import com.fiz.battleinthespace.feature_mainscreen.databinding.FragmentMissionSelectedBinding
-import com.fiz.battleinthespace.feature_mainscreen.ui.MainViewModel
 import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.NestedSectionsPagerAdapter
+import com.fiz.battleinthespace.feature_mainscreen.ui.adapters.NestedSectionsPagerAdapter.Companion.Missions
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
-class MissionSelectedFragment : Fragment() {
+@AndroidEntryPoint
+internal class MissionSelectedFragment : Fragment() {
+
     private var _binding: FragmentMissionSelectedBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = checkNotNull(_binding)
 
-    private val viewModel: MainViewModel by activityViewModels()
+    private val viewModel: MissionSelectedViewModel by viewModels()
+
+    private val pagerAdapter by unsafeLazy { NestedSectionsPagerAdapter(this) }
+
+    private val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+
+        private var isInit: Boolean = false
+
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            if (!isInit) {
+                isInit = true
+                return
+            }
+            viewModel.clickOnMission(position)
+        }
+    }
+
+    private var tabLayoutMediator: TabLayoutMediator? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMissionSelectedBinding.inflate(inflater, container, false)
-
-        val pagerAdapter = NestedSectionsPagerAdapter(this)
-        binding.viewpagerMission.adapter = pagerAdapter
-
-        TabLayoutMediator(binding.tabsMission, binding.viewpagerMission) { tab, position ->
-            tab.text = resources.getText(NestedSectionsPagerAdapter.getTitle(position))
-        }.attach()
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.viewpagerMission.currentItem =
-            viewModel.viewState.value.players.getOrNull(0)?.mission ?: 0
-        binding.viewpagerMission.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
 
-                viewModel.clickOnMission(position)
-                binding.viewpagerMission.currentItem = position
-            }
-        })
+        binding.init()
+        binding.setupListeners()
 
-        launchAndRepeatWithViewLifecycle {
-            viewModel.viewState.collect { viewState ->
-                if (viewState.players.isEmpty()) return@collect
+        collectUiState(viewModel.viewState, { binding.collectUiState(it) })
+    }
 
-                binding.viewpagerMission.currentItem = viewState.players[0].mission
-            }
+    private fun FragmentMissionSelectedBinding.init() {
+        viewpagerMission.adapter = pagerAdapter
+        tabLayoutMediator = TabLayoutMediator(tabsMission, viewpagerMission) { tab, position ->
+            tab.text = getString(Missions[position].title)
         }
+        tabLayoutMediator?.attach()
+    }
+
+    private fun FragmentMissionSelectedBinding.setupListeners() {
+        viewpagerMission.registerOnPageChangeCallback(onPageChangeCallback)
+    }
+
+    private fun FragmentMissionSelectedBinding.collectUiState(viewState: MissionSelectedViewState) {
+        mainContainer.isVisible = !viewState.isLoading
+        progress.isVisible = viewState.isLoading
+        viewpagerMission.currentItem = viewState.mission
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.viewpagerMission.adapter = null
+        binding.viewpagerMission.unregisterOnPageChangeCallback(onPageChangeCallback)
+        tabLayoutMediator?.detach()
         _binding = null
     }
 
-
 }
+
 

@@ -2,14 +2,13 @@ package com.fiz.feature.game.engine
 
 import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.common.cross
-import com.fiz.battleinthespace.common.dot
 import com.fiz.battleinthespace.common.sqr
 import com.fiz.feature.game.models.MoveableActor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-class Collision(private var actor1: MoveableActor, private var actor2: MoveableActor) {
+internal class Collision(private var actor1: MoveableActor, private var actor2: MoveableActor) {
     // Вычислить вектор поступательного движения, который является нормальным
     private val normalVec: Vec = actor2.center - actor1.center
     private val distSqr: Double = normalVec.sumPow2()
@@ -36,11 +35,14 @@ class Collision(private var actor1: MoveableActor, private var actor2: MoveableA
         val rb: Vec = contact - actor2.center
 
         // Относительная скорость
-        val rv: Vec = actor2.speed + cross(actor2.angleSpeed, rb) - actor1.speed
+        val rv: Vec = actor2.speed + cross(
+            actor2.angleSpeed,
+            rb
+        ) - actor1.speed
         -cross(actor1.angleSpeed, ra)
 
         //Относительная скорость по нормали
-        val contactVel: Double = dot(rv, normal)
+        val contactVel: Double = com.fiz.battleinthespace.common.dot(rv, normal)
 
         // Не разрешайте, если скорости разделяются
         if (contactVel > 0)
@@ -49,7 +51,9 @@ class Collision(private var actor1: MoveableActor, private var actor2: MoveableA
         val raCrossN: Double = cross(ra, normal)
         val rbCrossN: Double = cross(rb, normal)
         val invMassSum: Double =
-            actor1.inverseWeight + actor2.inverseWeight + sqr(raCrossN) * actor1.inverseMomentInertia + sqr(
+            actor1.inverseWeight + actor2.inverseWeight + sqr(
+                raCrossN
+            ) * actor1.inverseMomentInertia + sqr(
                 rbCrossN
             ) * actor2.inverseMomentInertia
 
@@ -71,7 +75,7 @@ class Collision(private var actor1: MoveableActor, private var actor2: MoveableA
         val percent = 0.4
         val correction: Vec = normal *
                 (max(penetration - kSlop, 0.0) / (actor1.size + actor2.size)) * percent
-        actor1.center = actor1.center - correction * actor1.size
-        actor2.center = actor2.center + correction * actor2.size
+        actor1.center -= correction * actor1.size
+        actor2.center += correction * actor2.size
     }
 }

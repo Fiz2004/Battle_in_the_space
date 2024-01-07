@@ -28,7 +28,8 @@
             android:layout_height="wrap_content"
             app:elevation="16dp"
             app:labelVisibilityMode="labeled"
-            app:menu="@menu/bottom_navigation_menu" />
+            app:menu="@menu/bottom_navigation_menu"
+            tools:layout_height="50dp" />
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton

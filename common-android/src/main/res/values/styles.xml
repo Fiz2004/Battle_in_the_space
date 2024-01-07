@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="RadioButtonStyle">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="ButtonStyle">
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>

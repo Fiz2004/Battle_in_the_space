@@ -1,41 +1,23 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.fiz.battleinthespace.common.Vec
+import androidx.core.view.isVisible
+import com.fiz.battleinthespace.common.MeasureFPS
+import com.fiz.battleinthespace.common.launchAndRepeatWithViewLifecycle
+import com.fiz.battleinthespace.common.serializable
 import com.fiz.battleinthespace.domain.models.WIDTH_JOYSTICK_DEFAULT
 import com.fiz.battleinthespace.feature_gamescreen.databinding.ActivityGameBinding
 import com.fiz.feature.game.Game
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.Serializable
 import javax.inject.Inject
 
-@Suppress("DEPRECATION")
-fun <T : Serializable?> getSerializable(
-    savedInstanceState: Bundle?,
-    name: String,
-    clazz: Class<T>
-): T {
-    @Suppress("UNCHECKED_CAST")
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        savedInstanceState?.getSerializable(name, clazz)!!
-    else
-        savedInstanceState?.getSerializable(name) as T
-}
-
 @AndroidEntryPoint
-class GameActivity : AppCompatActivity() {
+internal class GameActivity : AppCompatActivity() {
 
     private val viewModel: GameViewModel by viewModels()
 
@@ -57,7 +39,7 @@ class GameActivity : AppCompatActivity() {
 
     private fun init(savedInstanceState: Bundle?) {
         val loadGame =
-            getSerializable(savedInstanceState, Game::class.java.simpleName, Game::class.java)
+            savedInstanceState?.serializable(Game::class.java.simpleName, Game::class.java)
         viewModel.loadState(loadGame)
     }
 
@@ -79,42 +61,33 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun collectFlows() {
-        var lastTime = System.currentTimeMillis()
-        var fps = 60
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                withContext(Dispatchers.Main) {
-                    viewModel.viewState.collectLatest { viewState ->
-
-                        val now = System.currentTimeMillis()
-                        val deltaTime = now - lastTime
-                        fps = ((fps + (1000 / deltaTime)) / 2).toInt()
-
-                        binding.gameGameSurfaceview.holder.lockCanvas()?.let {
-                            display.render(
-                                viewState,
-                                it
-                            )
-                            binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
-                        }
-
-                        binding.informationGameSurfaceview.holder.lockCanvas()?.let {
-                            display.renderInfo(viewState, it, fps)
-                            binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
-                        }
-
-                        binding.pauseGameButton.text =
-                            getString(viewState.getResourceTextForPauseResumeButton())
-
-                        lastTime = now
-
-                    }
+        val measureFPS = MeasureFPS()
+        launchAndRepeatWithViewLifecycle {
+            viewModel.viewState.collectLatest { viewState ->
+                measureFPS {
+                    updateScreenState(viewState)
                 }
-
             }
         }
+    }
+
+    private fun updateScreenState(viewState: ViewState) {
+        if (viewState.isFinish) finish()
+
+        binding.progressBar.isVisible = viewState.isLoading
+
+        binding.gameGameSurfaceview.holder.lockCanvas()?.let {
+            display.render(viewState, it)
+            binding.gameGameSurfaceview.holder.unlockCanvasAndPost(it)
+        }
+
+        binding.informationGameSurfaceview.holder.lockCanvas()?.let {
+            display.renderInfo(viewState, it)
+            binding.informationGameSurfaceview.holder.unlockCanvasAndPost(it)
+        }
+
+        binding.pauseGameButton.text =
+            getString(viewState.getResourceTextForPauseResumeButton())
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -124,14 +97,14 @@ class GameActivity : AppCompatActivity() {
         val pointerId = event.getPointerId(pointerIndex)
 
         val point =
-            Vec(
+            com.fiz.battleinthespace.common.Vec(
                 event.getX(pointerIndex).toDouble(),
                 event.getY(pointerIndex).toDouble()
             )
 
         val pointIndex = (event.findPointerIndex(pointerId))
 
-        val pointUp = Vec(
+        val pointUp = com.fiz.battleinthespace.common.Vec(
             event.getX(event.findPointerIndex(pointerId)).toDouble(),
             event.getY(event.findPointerIndex(pointerId)).toDouble()
         )

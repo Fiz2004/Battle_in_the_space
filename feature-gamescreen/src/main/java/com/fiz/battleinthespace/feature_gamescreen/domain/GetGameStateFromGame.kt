@@ -3,11 +3,19 @@ package com.fiz.battleinthespace.feature_gamescreen.domain
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.RectF
-import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.feature_gamescreen.ui.GameState
 import com.fiz.battleinthespace.feature_gamescreen.ui.WIDTH_WORLD
-import com.fiz.battleinthespace.feature_gamescreen.ui.models.*
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.BackgroundUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.HelperMeteoritesUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.HelperPlayerUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.InfoUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.MeteoriteSpriteUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.SpriteUi
+import com.fiz.battleinthespace.feature_gamescreen.ui.models.TextInfoUi
 import com.fiz.battleinthespace.repositories.BitmapRepository
+import com.fiz.feature.game.Game
+import com.fiz.feature.game.engine.Physics
+import com.fiz.feature.game.models.Actor
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.ceil
@@ -19,7 +27,7 @@ private const val NUMBER_BITMAP_BULLET_DESTROY = 3
 private const val NUMBER_BITMAP_SPACESHIP_DESTROY = 7
 
 @Singleton
-class GetGameStateFromGame @Inject constructor(
+internal class GetGameStateFromGame @Inject constructor(
     private val bitmapRepository: BitmapRepository
 ) {
     private var surfaceWidth: Int = 0
@@ -80,12 +88,16 @@ class GetGameStateFromGame @Inject constructor(
         )
     }
 
-    operator fun invoke(game: com.fiz.feature.game.Game): GameState {
+    operator fun invoke(game: Game): GameState {
         viewport.update(game)
+
+        val mainSpaceship = game.listActors.spaceShips.first()
 
         return GameState(
             round = game.round,
             status = game.status,
+            isMainPlayerInGame = mainSpaceship.inGame,
+            isWaitRespawn = mainSpaceship.life != 0 && !mainSpaceship.inGame,
             backgroundsUi = getBackgroundsUI(game),
             spaceshipsUi = getSpaceshipsUi(game),
             spaceshipsFlyUi = getSpaceshipsFlyUi(game),
@@ -101,7 +113,7 @@ class GetGameStateFromGame @Inject constructor(
         )
     }
 
-    private fun getBackgroundsUI(game: com.fiz.feature.game.Game): List<BackgroundUi> {
+    private fun getBackgroundsUI(game: Game): List<BackgroundUi> {
         val result = mutableListOf<BackgroundUi>()
 
         val xStart = floor(viewport.left).toInt()
@@ -117,13 +129,13 @@ class GetGameStateFromGame @Inject constructor(
         )
         for (n in xStart until xEnd)
             for (k in yStart until yEnd) {
-                val x = com.fiz.feature.game.engine.Physics.changeCoordinateIfBorderTop(
+                val x = Physics.changeCoordinateIfBorderTop(
                     n.toDouble(),
-                    com.fiz.feature.game.engine.Physics.width
+                    Physics.width
                 )
-                val y = com.fiz.feature.game.engine.Physics.changeCoordinateIfBorderTop(
+                val y = Physics.changeCoordinateIfBorderTop(
                     k.toDouble(),
-                    com.fiz.feature.game.engine.Physics.height
+                    Physics.height
                 )
                 val background = game.backgrounds[x.toInt()][y.toInt()]
 
@@ -146,13 +158,13 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getBulletsAnimationDestroyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
+    private fun getBulletsAnimationDestroyUi(game: Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.bulletsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_BULLET_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_BULLET_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as com.fiz.feature.game.models.Actor
+            val actor = animationDestroy as Actor
             for (point in viewport.getAllPoints(actor)) {
 
                 val rectSrc = Rect(
@@ -182,13 +194,13 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsAnimationDestroyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
+    private fun getSpaceshipsAnimationDestroyUi(game: Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
         for (animationDestroy in game.listActors.spaceShipsAnimationDestroy) {
             val step = animationDestroy.timeShowMax / NUMBER_BITMAP_SPACESHIP_DESTROY
             animationDestroy.frame =
                 NUMBER_BITMAP_SPACESHIP_DESTROY - ceil(animationDestroy.timeShow / step).toInt()
-            val actor = animationDestroy as com.fiz.feature.game.models.Actor
+            val actor = animationDestroy as Actor
             for (point in viewport.getAllPoints(actor)) {
 
                 val rectSrc = Rect(
@@ -218,7 +230,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
+    private fun getSpaceshipsUi(game: Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
 
         for (actor in game.listActors.spaceShips) {
@@ -239,7 +251,7 @@ class GetGameStateFromGame @Inject constructor(
 
                 result.add(
                     SpriteUi(
-                        value = actor.player.number,
+                        value = actor.number,
                         centerX = (point.x * sizeUnit).toFloat(),
                         centerY = (point.y * sizeUnit).toFloat(),
                         src = rectSrc,
@@ -253,7 +265,7 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getSpaceshipsFlyUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
+    private fun getSpaceshipsFlyUi(game: Game): List<SpriteUi> {
         val result = mutableListOf<SpriteUi>()
 
         for (actor in game.listActors.spaceShips) {
@@ -274,7 +286,7 @@ class GetGameStateFromGame @Inject constructor(
 
                 result.add(
                     SpriteUi(
-                        value = actor.player.number,
+                        value = actor.number,
                         centerX = (point.x * sizeUnit).toFloat(),
                         centerY = (point.y * sizeUnit).toFloat(),
                         src = rectSrc,
@@ -288,40 +300,34 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getBulletsUi(game: com.fiz.feature.game.Game): List<SpriteUi> {
-        val result = mutableListOf<SpriteUi>()
-
-        for (actor in game.listActors.bullets) {
-            for (point in viewport.getAllPoints(actor)) {
+    private fun getBulletsUi(game: Game): List<SpriteUi> {
+        return game.listActors.weapons.map { weapon ->
+            viewport.getAllPoints(weapon).map { point ->
                 val rectSrc = Rect(
                     0,
                     0,
-                    bitmapRepository.bmpWeapon[actor.getType()].width,
-                    bitmapRepository.bmpWeapon[actor.getType()].height
+                    bitmapRepository.bmpWeapon[weapon.getType()].width,
+                    bitmapRepository.bmpWeapon[weapon.getType()].height
                 )
-                val halfSize = (actor.size * sizeUnit / 2).toFloat()
+                val halfSize = (weapon.size * sizeUnit / 2).toFloat()
                 val rectDst = RectF(
                     -halfSize, -halfSize,
                     halfSize, halfSize
                 )
 
-                result.add(
                     SpriteUi(
-                        value = actor.getType(),
+                        value = weapon.getType(),
                         centerX = (point.x * sizeUnit).toFloat(),
                         centerY = (point.y * sizeUnit).toFloat(),
                         src = rectSrc,
                         dst = rectDst,
-                        angle = actor.angle.toFloat(),
+                        angle = weapon.angle.toFloat(),
                     )
-                )
             }
-        }
-
-        return result
+        }.flatten()
     }
 
-    private fun getMeteoritesUi(game: com.fiz.feature.game.Game): List<MeteoriteSpriteUi> {
+    private fun getMeteoritesUi(game: Game): List<MeteoriteSpriteUi> {
         val result = mutableListOf<MeteoriteSpriteUi>()
 
         for (actor in game.listActors.meteorites) {
@@ -355,83 +361,84 @@ class GetGameStateFromGame @Inject constructor(
         return result
     }
 
-    private fun getHelperPlayerUi(game: com.fiz.feature.game.Game): List<HelperPlayerUi> {
+    private fun getHelperPlayerUi(game: Game): List<HelperPlayerUi> {
 
         val result = mutableListOf<HelperPlayerUi>()
 
-        val mainSpaceship = game.listActors.spaceShips.filter { it.player.main }
-        if (mainSpaceship.isNotEmpty()) {
-            game.listActors.spaceShips.filter { it.inGame && !it.player.main }
-                .forEach {
-                    if (viewport.getAllPoints(it).size == 0) {
+        val mainSpaceship = game.listActors.spaceShips.first()
 
-                        val angle = com.fiz.feature.game.engine.Physics.findAngle(
-                            mainSpaceship[0].center,
-                            it.center
-                        )
-                        val angleToRadians = angle / 180.0 * Math.PI
-                        val vec = Vec(
-                            cos(angleToRadians),
-                            sin(angleToRadians)
-                        )
-                        val cx =
-                            (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 60F
-                        val cy =
-                            (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 60F
+        if (!mainSpaceship.inGame) return emptyList()
 
-                        result.add(
-                            HelperPlayerUi(
-                                value = it.player.number,
-                                centerX = cx,
-                                centerY = cy,
-                                radius = 30F,
-                                color = getColor(it.player.number)
-                            )
+        game.listActors.spaceShips
+            .filterIndexed { index, spaceShip -> spaceShip.inGame && index != 0 }
+            .forEach {
+                if (viewport.getAllPoints(it).isEmpty()) {
+
+                    val angle = Physics.findAngle(
+                        mainSpaceship.center,
+                        it.center
+                    )
+                    val angleToRadians = Physics.getAngleToRadians(angle)
+                    val vec = com.fiz.battleinthespace.common.Vec(
+                        cos(angleToRadians),
+                        sin(angleToRadians)
+                    )
+                    val cx =
+                        (mainSpaceship.center.x - viewport.left + vec.x * (viewport.width - 1) / 2).toFloat() * sizeUnit
+                    val cy =
+                        (mainSpaceship.center.y - viewport.top + vec.y * (viewport.height - 1) / 2).toFloat() * sizeUnit
+
+                    result.add(
+                        HelperPlayerUi(
+                            value = it.number,
+                            centerX = cx,
+                            centerY = cy,
+                            angle = angle.toFloat(),
+                            color = getColor(it.number)
                         )
-                    }
+                    )
                 }
-
-        }
+            }
 
         return result
     }
 
-    private fun getHelperMeteoritesUi(game: com.fiz.feature.game.Game): List<HelperMeteoritesUi> {
+    private fun getHelperMeteoritesUi(game: Game): List<HelperMeteoritesUi> {
 
         val result = mutableListOf<HelperMeteoritesUi>()
 
-        val mainSpaceship = game.listActors.spaceShips.filter { it.player.main }
-        if (mainSpaceship.isNotEmpty()) {
+        val mainSpaceship = game.listActors.spaceShips.first()
 
-            if (game.listActors.meteorites.all { (viewport.getAllPoints(it).size == 0) })
-                game.listActors.meteorites.forEach {
+        if (!mainSpaceship.inGame) return emptyList()
 
-                    val angle = com.fiz.feature.game.engine.Physics.findAngle(
-                        mainSpaceship[0].center,
-                        it.center
+        if (game.listActors.meteorites.all { (viewport.getAllPoints(it).isEmpty()) })
+            game.listActors.meteorites.forEach {
+
+                val angle = Physics.findAngle(
+                    mainSpaceship.center,
+                    it.center
+                )
+                val angleToRadians = Physics.getAngleToRadians(angle)
+                val vec =
+                    com.fiz.battleinthespace.common.Vec(cos(angleToRadians), sin(angleToRadians))
+                val cx =
+                    (mainSpaceship.center.x - viewport.left + vec.x * (viewport.width - 1) / 2).toFloat() * sizeUnit
+                val cy =
+                    (mainSpaceship.center.y - viewport.top + vec.y * (viewport.height - 1) / 2).toFloat() * sizeUnit
+
+                result.add(
+                    HelperMeteoritesUi(
+                        centerX = cx,
+                        centerY = cy,
+                        angle = angle.toFloat(),
                     )
-                    val angleToRadians = angle / 180.0 * Math.PI
-                    val vec =
-                        Vec(cos(angleToRadians), sin(angleToRadians))
-                    val cx =
-                        (mainSpaceship[0].center.x - viewport.left + vec.x * viewport.width / 2).toFloat() * sizeUnit - 40F
-                    val cy =
-                        (mainSpaceship[0].center.y - viewport.top + vec.y * viewport.height / 2).toFloat() * sizeUnit - 40F
-
-                    result.add(
-                        HelperMeteoritesUi(
-                            centerX = cx,
-                            centerY = cy,
-                            radius = 30F
-                        )
-                    )
-                }
-        }
+                )
+            }
 
         return result
     }
 
-    private fun getTextRoundInfoUi(game: com.fiz.feature.game.Game): TextInfoUi {
+    private fun getTextRoundInfoUi(game: Game): TextInfoUi {
 
         val paintRoundTextSize = baseTextSize
 
@@ -445,17 +452,30 @@ class GetGameStateFromGame @Inject constructor(
 
     }
 
-    private fun getInfoTextUi(game: com.fiz.feature.game.Game): List<TextInfoUi> {
+    private fun getInfoTextUi(game: Game): List<TextInfoUi> {
         val result = mutableListOf<TextInfoUi>()
 
         val textSize = baseTextSize * 0.75F
 
+        val isGorisontal = 2 * infoHeight > infoWidth
+
         for (n in 0 until game.players.size) {
+            val left = if (isGorisontal)
+                0f
+            else
+                (n / 2) * (infoWidth / 2).toFloat()
+
+            val top = if (isGorisontal)
+                baseTextSize + (textSize * (n + 1))
+            else
+                baseTextSize + (textSize * (n % 2 + 1))
+
+
             result.add(
                 TextInfoUi(
                     value = game.players[n].name,
-                    x = 0F,
-                    y = baseTextSize + (textSize * (n + 1)),
+                    x = left,
+                    y = top,
                     textSize = textSize,
                     color = getColor(n)
                 )
@@ -463,9 +483,9 @@ class GetGameStateFromGame @Inject constructor(
 
             result.add(
                 TextInfoUi(
-                    value = game.players[n].score.toString(),
-                    x = (maxTextNameWidth + bmplife * 3).toFloat(),
-                    y = baseTextSize + textSize * (n + 1),
+                    value = game.listActors.spaceShips[n].score.toString(),
+                    x = left + (maxTextNameWidth + bmplife * 3).toFloat(),
+                    y = top,
                     textSize = textSize,
                     color = getColor(n)
                 )
@@ -477,35 +497,40 @@ class GetGameStateFromGame @Inject constructor(
     }
 
 
-    private fun getInfoUi(game: com.fiz.feature.game.Game): List<InfoUi> {
-        val result = mutableListOf<InfoUi>()
-
+    private fun getInfoUi(game: Game): List<InfoUi> {
         val textSize = baseTextSize * 0.75F
+
+        val isGorisontal = 2 * infoHeight > infoWidth
 
         val rectSrc = Rect(
             0, 0,
-            bitmapRepository.bmpSpaceshipLife[0].width, bitmapRepository.bmpSpaceshipLife[0].height
+            bitmapRepository.bmpSpaceshipLife.first().width,
+            bitmapRepository.bmpSpaceshipLife.first().height
         )
 
-        for (n in 0 until game.players.size) {
-
-            for (k in 0 until game.players[n].life)
-                result.add(
-                    InfoUi(
-                        value = n,
-                        src = rectSrc,
-                        dst = RectF(
-                            maxTextNameWidth + bmplife * k.toFloat(),
-                            baseTextSize + textSize * n,
-                            (maxTextNameWidth + bmplife * k + bmplife).toFloat(),
-                            baseTextSize + textSize * n + textSize
-                        )
+        return game.players.indices.map { indexPlayer ->
+            val leftStart = if (isGorisontal)
+                0F
+            else
+                (indexPlayer / 2) * (this.surfaceWidth / 2).toFloat()
+            (0 until game.listActors.spaceShips[indexPlayer].life).map { numberLife ->
+                val left = leftStart + maxTextNameWidth + bmplife * numberLife.toFloat()
+                val top = if (isGorisontal)
+                    baseTextSize + textSize * indexPlayer + 5
+                else
+                    baseTextSize + textSize * (indexPlayer % 2) + 5
+                InfoUi(
+                    value = indexPlayer,
+                    src = rectSrc,
+                    dst = RectF(
+                        left,
+                        top,
+                        left + bmplife,
+                        top + textSize
                     )
                 )
-        }
-
-        return result
-
+            }
+        }.flatten()
     }
 
     private fun getColor(n: Int) = when (n) {

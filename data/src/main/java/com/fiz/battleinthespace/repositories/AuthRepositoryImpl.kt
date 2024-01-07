@@ -1,14 +1,20 @@
 package com.fiz.battleinthespace.repositories
 
-import android.content.Intent
-import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.fiz.battleinthespace.domain.repositories.AuthRepository
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -18,19 +24,20 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 @Singleton
-class AuthRepositoryImpl @Inject constructor() {
+internal class AuthRepositoryImpl @Inject constructor(
+    private val mAuth: FirebaseAuth
+) : AuthRepository {
 
-    val mAuth: FirebaseAuth = Firebase.auth
-    val user: MutableStateFlow<FirebaseUser?> = MutableStateFlow(mAuth.currentUser)
-    val email: MutableStateFlow<String?> = MutableStateFlow(mAuth.currentUser?.email)
+    private val user: MutableStateFlow<FirebaseUser?> = MutableStateFlow(mAuth.currentUser)
+    private val email: MutableStateFlow<String?> = MutableStateFlow(mAuth.currentUser?.email)
 
     init {
-        user.onEach {
-            email.value = it?.email
+        user.onEach { user ->
+            email.value = user?.email
         }.launchIn(CoroutineScope(Dispatchers.Default))
     }
 
-    suspend fun createAccount(email: String, password: String): String {
+    override suspend fun createAccount(email: String, password: String): String {
         try {
             val firebaseUser = suspendCoroutine { continuation ->
                 if (email.isEmpty() || password.isEmpty())
@@ -50,7 +57,7 @@ class AuthRepositoryImpl @Inject constructor() {
             return sendEmailVerification(firebaseUser)
         } catch (e: Exception) {
             if (e is FirebaseAuthUserCollisionException) {
-                if (e.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
+                if (e.errorCode == ERROR_EMAIL_ALREADY_IN_USE) {
                     return try {
                         linkEmailToG(email, password)
                     } catch (e: Exception) {
@@ -90,7 +97,7 @@ class AuthRepositoryImpl @Inject constructor() {
         }
 
 
-    suspend fun signInWithEmail(email: String, password: String): String {
+    override suspend fun signInWithEmail(email: String, password: String): String {
         try {
             val firebaseUser = suspendCoroutine { continuation ->
                 if (email.isEmpty() || password.isEmpty())
@@ -114,32 +121,26 @@ class AuthRepositoryImpl @Inject constructor() {
         }
     }
 
-    suspend fun signInFirebaseWithGoogle(result: Intent): String {
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result)
+    override suspend fun signInFirebaseWithGoogle(result: String): String {
         try {
-            val account = task.getResult(ApiException::class.java)
-            if (account != null) {
-                val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-                return suspendCoroutine { continuation ->
-                    mAuth.signInWithCredential(credential)
-                        .addOnCompleteListener {
-                            if (it.isSuccessful) {
-                                user.value = it.result?.user
-                                continuation.resumeWith(Result.success("Вход выполнен"))
-                            } else {
-                                continuation.resumeWithException(Exception("Ошибка входа"))
-                            }
+            val credential = GoogleAuthProvider.getCredential(result, null)
+            return suspendCoroutine { continuation ->
+                mAuth.signInWithCredential(credential)
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            user.value = it.result?.user
+                            continuation.resumeWith(Result.success("Вход выполнен"))
+                        } else {
+                            continuation.resumeWithException(Exception("Ошибка входа"))
                         }
-                }
-            } else {
-                return "Account equals null"
+                    }
             }
         } catch (e: ApiException) {
             return e.message.toString()
         }
     }
 
-    suspend fun resetPassword(email: String): String = suspendCoroutine { continuation ->
+    override suspend fun resetPassword(email: String): String = suspendCoroutine { continuation ->
         mAuth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -153,55 +154,53 @@ class AuthRepositoryImpl @Inject constructor() {
     private fun printInfoExceptionAndResolveProcess(task: Task<AuthResult>): String {
         if (task.exception is FirebaseAuthUserCollisionException) {
             val exception = task.exception as FirebaseAuthUserCollisionException
-            if (exception.errorCode == FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE) {
-                return (FirebaseAuthConstants.ERROR_EMAIL_ALREADY_IN_USE)
+            if (exception.errorCode == ERROR_EMAIL_ALREADY_IN_USE) {
+                return (ERROR_EMAIL_ALREADY_IN_USE)
             }
         }
         if (task.exception is FirebaseAuthInvalidCredentialsException) {
             val exception = task.exception as FirebaseAuthInvalidCredentialsException
-            if (exception.errorCode == FirebaseAuthConstants.ERROR_INVALID_EMAIL) {
-                return (FirebaseAuthConstants.ERROR_INVALID_EMAIL)
+            if (exception.errorCode == ERROR_INVALID_EMAIL) {
+                return (ERROR_INVALID_EMAIL)
             }
-            if (exception.errorCode == FirebaseAuthConstants.ERROR_WRONG_PASSWORD) {
-                return (FirebaseAuthConstants.ERROR_WRONG_PASSWORD)
+            if (exception.errorCode == ERROR_WRONG_PASSWORD) {
+                return (ERROR_WRONG_PASSWORD)
             }
         }
         if (task.exception is FirebaseAuthWeakPasswordException) {
             val exception = task.exception as FirebaseAuthWeakPasswordException
-            if (exception.errorCode == FirebaseAuthConstants.ERROR_WEAK_PASSWORD) {
-                return (FirebaseAuthConstants.ERROR_WEAK_PASSWORD)
+            if (exception.errorCode == ERROR_WEAK_PASSWORD) {
+                return (ERROR_WEAK_PASSWORD)
             }
         }
         if (task.exception is FirebaseAuthInvalidUserException) {
             val exception = task.exception as FirebaseAuthInvalidCredentialsException
             // Если пользователя нет с таким email
-            if (exception.errorCode == FirebaseAuthConstants.ERROR_USER_NOT_FOUND) {
-                return (FirebaseAuthConstants.ERROR_USER_NOT_FOUND)
+            if (exception.errorCode == ERROR_USER_NOT_FOUND) {
+                return (ERROR_USER_NOT_FOUND)
             }
         }
         return ""
     }
 
-    fun signOut() {
+    override fun signOut() {
         user.value = null
         mAuth.signOut()
     }
 
-    fun getFlowEmail(): MutableStateFlow<String?> {
+    override fun getFlowEmail(): Flow<String?> {
         return email
     }
 
-    fun getAuthUuid(): String? {
+    override fun getAuthUuid(): String? {
         return user.value?.uid
     }
 
-    companion object {
-        object FirebaseAuthConstants {
-            const val ERROR_EMAIL_ALREADY_IN_USE = "ERROR_EMAIL_ALREADY_IN_USE"
-            const val ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL"
-            const val ERROR_WRONG_PASSWORD = "ERROR_WRONG_PASSWORD"
-            const val ERROR_WEAK_PASSWORD = "ERROR_WEAK_PASSWORD"
-            const val ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND"
-        }
+    private companion object {
+        const val ERROR_EMAIL_ALREADY_IN_USE = "ERROR_EMAIL_ALREADY_IN_USE"
+        const val ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL"
+        const val ERROR_WRONG_PASSWORD = "ERROR_WRONG_PASSWORD"
+        const val ERROR_WEAK_PASSWORD = "ERROR_WEAK_PASSWORD"
+        const val ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND"
     }
 }

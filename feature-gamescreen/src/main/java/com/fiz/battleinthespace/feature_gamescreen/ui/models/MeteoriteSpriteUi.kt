@@ -3,7 +3,7 @@ package com.fiz.battleinthespace.feature_gamescreen.ui.models
 import android.graphics.Rect
 import android.graphics.RectF
 
-data class MeteoriteSpriteUi(
+internal data class MeteoriteSpriteUi(
     val view: Int,
     val viewSize: Int,
     val centerX: Float,

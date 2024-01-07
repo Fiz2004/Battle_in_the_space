@@ -1,7 +1,6 @@
 package com.fiz.feature.game.models
 
 import com.fiz.battleinthespace.common.Vec
-import com.fiz.battleinthespace.common.cross
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sign
@@ -35,7 +34,10 @@ abstract class MoveableActor(
 
     fun applyImpulse(impulse: Vec, contactVector: Vec) {
         speed += impulse * inverseWeight
-        angleSpeed += inverseMomentInertia * cross(contactVector, impulse)
+        angleSpeed += inverseMomentInertia * com.fiz.battleinthespace.common.cross(
+            contactVector,
+            impulse
+        )
     }
 
     var speed: Vec = _speed.copy()

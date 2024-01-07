@@ -1,7 +1,6 @@
 package com.fiz.feature.game.models.weapon
 
 import android.graphics.Bitmap
-import com.fiz.battleinthespace.common.Vec
 import com.fiz.battleinthespace.repositories.BitmapRepository
 import com.fiz.feature.game.models.SpaceShip
 import kotlin.math.cos
@@ -10,10 +9,10 @@ import kotlin.math.sqrt
 
 private const val SPEED_MAX: Double = 4.0
 
-class TwoBullet(
-    center: Vec,
+internal class TwoBullet(
+    center: com.fiz.battleinthespace.common.Vec,
 
-    speed: Vec,
+    speed: com.fiz.battleinthespace.common.Vec,
 
     angle: Double,
 
@@ -30,13 +29,13 @@ class TwoBullet(
 
     companion object {
 
-        fun create(spaceShips: MutableList<SpaceShip>, player: Int): Weapon {
+        fun create(spaceShips: List<SpaceShip>, player: Int): Weapon {
             val spaceship = spaceShips[player]
-            val center = Vec(
+            val center = com.fiz.battleinthespace.common.Vec(
                 spaceship.center.x + (spaceship.halfSize) * cos(spaceship.angleToRadians),
                 spaceship.center.y + (spaceship.halfSize) * sin(spaceship.angleToRadians)
             )
-            val speed = Vec(
+            val speed = com.fiz.battleinthespace.common.Vec(
                 SPEED_MAX * cos(spaceship.angleToRadians),
                 SPEED_MAX * sin(spaceship.angleToRadians)
             )

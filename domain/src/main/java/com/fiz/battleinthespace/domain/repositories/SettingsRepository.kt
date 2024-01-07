@@ -1,20 +1,20 @@
 package com.fiz.battleinthespace.domain.repositories
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
 
-    fun getFlowCountPlayers(): MutableStateFlow<Int>
+    fun getFlowCountPlayers(): Flow<Result<Int>>
 
-    fun getFlowUuid(): MutableStateFlow<String>
+    suspend fun getCountPlayers(): Int
 
-    fun getIsFirstLaunch(): Boolean
+    fun getFlowUuid(): Flow<String?>
 
-    fun saveCountPlayers(count: Int): Boolean
+    suspend fun getUuid(): String?
 
-    fun saveIsFirstLaunchComplete(uuid: String)
+    suspend fun saveCountPlayers(count: Int)
 
-    fun saveAuthUuid(uuid: String)
+    suspend fun saveAuthUuid(uuid: String)
 
-    fun deleteAuthUuid()
+    suspend fun deleteAuthUuid()
 }

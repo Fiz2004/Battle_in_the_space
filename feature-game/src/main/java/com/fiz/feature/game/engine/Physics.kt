@@ -1,7 +1,10 @@
 package com.fiz.feature.game.engine
 
-import com.fiz.battleinthespace.common.Vec
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 object Physics {
 
@@ -13,10 +16,12 @@ object Physics {
         Physics.height = height.toDouble()
     }
 
+    fun getAngleToRadians(angle: Double): Double = angle / 180.0 * Math.PI
+
     fun overlap(
-        center1: Vec,
+        center1: com.fiz.battleinthespace.common.Vec,
         size1: Double,
-        center2: Vec,
+        center2: com.fiz.battleinthespace.common.Vec,
         size2: Double
     ): Boolean {
         val halfSize1 = (size1 / 2)
@@ -43,38 +48,48 @@ object Physics {
     }
 
     fun overlapCircle(
-        center1: Vec,
+        center1: com.fiz.battleinthespace.common.Vec,
         size1: Double,
-        center2: Vec,
+        center2: com.fiz.battleinthespace.common.Vec,
         size2: Double
     ): Boolean {
         val radius1 = (size1 / 2)
         val radius2 = (size2 / 2)
         var radius = radius1 + radius2
         radius = radius.pow(2)
-        val globalCenter1 = Vec(
+        val globalCenter1 = com.fiz.battleinthespace.common.Vec(
             if (center1.x - radius1 < 0) center1.x + width else center1.x,
             if (center1.y - radius1 < 0) center1.y + height else center1.y
         )
-        val globalCenter2 = Vec(
+        val globalCenter2 = com.fiz.battleinthespace.common.Vec(
             if (center2.x - radius2 < 0) center2.x + width else center2.x,
             if (center2.y - radius2 < 0) center2.y + height else center2.y
         )
-        return radius > (globalCenter1.x - globalCenter2.x).pow(2) + (globalCenter1.y - globalCenter2.y).pow(2)
+        return radius > (globalCenter1.x - globalCenter2.x).pow(2) + (globalCenter1.y - globalCenter2.y).pow(
+            2
+        )
     }
 
     fun overlapRectangle(
-        center1: Vec,
+        center1: com.fiz.battleinthespace.common.Vec,
         size1: Double,
-        center2: Vec,
+        center2: com.fiz.battleinthespace.common.Vec,
         size2: Double
     ): Boolean {
         val halfSize1 = (size1 / 2)
         val halfSize2 = (size2 / 2)
         val (l1, r1) = changeCoorIfDoubleBorder(center1.x - halfSize1, center1.x + halfSize1, width)
         val (l2, r2) = changeCoorIfDoubleBorder(center2.x - halfSize2, center2.x + halfSize2, width)
-        val (u1, d1) = changeCoorIfDoubleBorder(center1.y - halfSize1, center1.y + halfSize1, height)
-        val (u2, d2) = changeCoorIfDoubleBorder(center2.y - halfSize2, center2.y + halfSize2, height)
+        val (u1, d1) = changeCoorIfDoubleBorder(
+            center1.y - halfSize1,
+            center1.y + halfSize1,
+            height
+        )
+        val (u2, d2) = changeCoorIfDoubleBorder(
+            center2.y - halfSize2,
+            center2.y + halfSize2,
+            height
+        )
         if ((r1 < l2) || (l1 > r2)) return false
         if ((d1 < u2) || (u1 > d2)) return false
         return true
@@ -108,7 +123,10 @@ object Physics {
         }
     }
 
-    fun findDistance(center1: Vec, center2: Vec): Double {
+    fun findDistance(
+        center1: com.fiz.battleinthespace.common.Vec,
+        center2: com.fiz.battleinthespace.common.Vec
+    ): Double {
         val distanceX = getMinDistance(center1.x, center2.x, width)
         val distanceY = getMinDistance(center1.y, center2.y, height)
         return sqrt(distanceX * distanceX + distanceY * distanceY)
@@ -121,7 +139,7 @@ object Physics {
         return min(base, min(reverse1, reverse2))
     }
 
-    fun findAngle(center1: Vec, center2: Vec): Double {
+    fun findAngle(center1: com.fiz.battleinthespace.common.Vec, center2: com.fiz.battleinthespace.common.Vec): Double {
         val baseX = abs(center2.x - center1.x)
         val reverseX1 = abs((width - center2.x) - (0 - center1.x))
         val reverseX2 = abs((width - center1.x) - (0 - center2.x))
@@ -152,7 +170,7 @@ object Physics {
             }
         }
 
-        val direction = Vec(cx2, cy2) - center1
+        val direction = com.fiz.battleinthespace.common.Vec(cx2, cy2) - center1
         return atan2(direction.y, direction.x) * 180 / Math.PI
     }
 }

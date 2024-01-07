@@ -10,7 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-class NestedScrollableHost : FrameLayout {
+internal class NestedScrollableHost : FrameLayout {
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
@@ -30,15 +31,6 @@ class NestedScrollableHost : FrameLayout {
 
     init {
         touchSlop = ViewConfiguration.get(context).scaledTouchSlop
-    }
-
-    private fun canChildScroll(orientation: Int, delta: Float): Boolean {
-        val direction = -delta.sign.toInt()
-        return when (orientation) {
-            0 -> child?.canScrollHorizontally(direction) ?: false
-            1 -> child?.canScrollVertically(direction) ?: false
-            else -> throw IllegalArgumentException()
-        }
     }
 
     override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
@@ -82,6 +74,15 @@ class NestedScrollableHost : FrameLayout {
                     }
                 }
             }
+        }
+    }
+
+    private fun canChildScroll(orientation: Int, delta: Float): Boolean {
+        val direction = -delta.sign.toInt()
+        return when (orientation) {
+            0 -> child?.canScrollHorizontally(direction) ?: false
+            1 -> child?.canScrollVertically(direction) ?: false
+            else -> throw IllegalArgumentException()
         }
     }
 }

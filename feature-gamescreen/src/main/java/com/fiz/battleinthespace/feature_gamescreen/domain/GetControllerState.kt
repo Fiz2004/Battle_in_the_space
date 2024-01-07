@@ -3,7 +3,7 @@ package com.fiz.battleinthespace.feature_gamescreen.domain
 import com.fiz.battleinthespace.domain.models.Controller
 import com.fiz.battleinthespace.feature_gamescreen.ui.ControllerState
 
-class GetControllerState(
+internal class GetControllerState(
     private val leftLocationOnScreen: Int,
     private val topLocationOnScreen: Int,
     private val widthJoystick: Double

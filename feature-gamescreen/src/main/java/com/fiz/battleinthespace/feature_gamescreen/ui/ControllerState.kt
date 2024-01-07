@@ -1,6 +1,6 @@
 package com.fiz.battleinthespace.feature_gamescreen.ui
 
-data class ControllerState(
+internal data class ControllerState(
     val centerXOutsideCircle: Double,
     val centerYOutsideCircle: Double,
     val centerXInnerCircle: Double,

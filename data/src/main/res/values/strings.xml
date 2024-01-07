@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="errorLoadPlayersNoSavedPlayers">No players in remote data base</string>
+    <string name="errorLoadPlayersNoDocument">No Document in remote data base</string>
+</resources>

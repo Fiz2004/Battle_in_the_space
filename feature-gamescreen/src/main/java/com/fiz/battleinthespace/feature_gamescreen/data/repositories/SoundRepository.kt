@@ -9,7 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SoundRepository @Inject constructor(@ApplicationContext context: Context) {
+internal class SoundRepository @Inject constructor(@ApplicationContext context: Context) {
     var soundPool: SoundPool = SoundPool.Builder().build()
     var soundMap: SparseIntArray = SparseIntArray(2)
 
